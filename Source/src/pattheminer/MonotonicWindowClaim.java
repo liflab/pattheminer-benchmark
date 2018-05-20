@@ -58,7 +58,7 @@ public class MonotonicWindowClaim extends Claim
       {
         float f1 = te.get(m_keys[i]).numberValue().floatValue();
         float f2 = te.get(m_keys[i+1]).numberValue().floatValue();
-        if (Math.abs(f2 - f1) / f1 > s_tolerance)
+        if ((f1 - f2) / f1 > s_tolerance)
         {
           Explanation exp = new Explanation("The running time of " + m_trend 
               + " with a window width of " + m_keys[i+1] 

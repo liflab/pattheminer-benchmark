@@ -50,38 +50,45 @@ public class MainLab extends Laboratory
 {
   protected static int s_eventStep = 10000;
 
-  public static int MAX_TRACE_LENGTH = 100000;
+  public static int MAX_TRACE_LENGTH = 100001;
 
 
   @Override
   public void setup()
   {	  
+    // Basic metadata
+    setTitle("Benchmark for Pat The Miner");
+    setAuthor("Laboratoire d'informatique formelle");
+
     // Average experiments
-    generateWindowExperiments(generateAverageExperiment(50), generateAverageExperiment(200), "running average", "Average");
+    generateWindowExperiments(generateAverageExperiment(50), generateAverageExperiment(100), generateAverageExperiment(200), "running average", "Average");
     // Running moments experiments
-    generateWindowExperiments(generateRunningMomentsExperiment(50), generateRunningMomentsExperiment(200), "running moments", "Moments");
+    generateWindowExperiments(generateRunningMomentsExperiment(50), generateRunningMomentsExperiment(100), generateRunningMomentsExperiment(200), "running moments", "Moments");
     // Distribution experiments
-    generateWindowExperiments(generateDistributionExperiment(50), generateDistributionExperiment(200), "symbol distribution", "Distribution");
+    generateWindowExperiments(generateDistributionExperiment(50), generateRunningMomentsExperiment(100), generateDistributionExperiment(200), "symbol distribution", "Distribution");
     // K-means experiments
-    generateWindowExperiments(generateKMeansDistributionExperiment(50), generateKMeansDistributionExperiment(200), "k-means clustering", "Clustering");
+    generateWindowExperiments(generateKMeansDistributionExperiment(50), generateRunningMomentsExperiment(100), generateKMeansDistributionExperiment(200), "k-means clustering", "Clustering");
   }
 
-  protected void generateWindowExperiments(ExperimentTable table_50, ExperimentTable table_200, String beta_name, String nickname_prefix)
+  protected void generateWindowExperiments(ExperimentTable table_50, ExperimentTable table_100, ExperimentTable table_200, String beta_name, String nickname_prefix)
   {
-    Table tt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
-        new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "50"), table_50),
-        new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "200"), table_200)
-        );
-    tt.setTitle("Running time for the " + beta_name);
-    add(tt);
-    Scatterplot plot = new Scatterplot(tt);
-    plot.setCaption(Axis.X, "Number of events").setCaption(Axis.Y, "Time (ms)");
-    plot.setTitle("Running time for the " + beta_name);
-    plot.setNickname("p" + nickname_prefix);
-    add(plot);
-    add(new AverageThroughputMacro(this, table_50, "tp" + nickname_prefix + "Fifty", beta_name + " with a window of 50"));
-    add(new AverageThroughputMacro(this, table_200, "tp" + nickname_prefix + "TwoHundred", beta_name + " with a window of 200"));
-    add(new MonotonicWindowClaim(tt, beta_name, "50", "200"));
+    {
+      Table tt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "50"), table_50),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "100"), table_100),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "200"), table_200)
+          );
+      tt.setTitle("Running time for the " + beta_name);
+      add(tt);
+      Scatterplot plot = new Scatterplot(tt);
+      plot.setCaption(Axis.X, "Number of events").setCaption(Axis.Y, "Time (ms)");
+      plot.setTitle("Running time for the " + beta_name);
+      plot.setNickname("p" + nickname_prefix);
+      add(plot);
+      add(new AverageThroughputMacro(this, table_50, "tp" + nickname_prefix + "Fifty", beta_name + " with a window of 50"));
+      add(new AverageThroughputMacro(this, table_200, "tp" + nickname_prefix + "TwoHundred", beta_name + " with a window of 200"));
+      add(new MonotonicWindowClaim(tt, beta_name, "50", "100", "200"));
+    }
   }
 
   protected ExperimentTable generateAverageExperiment(int width)
@@ -118,7 +125,7 @@ public class MainLab extends Laboratory
     ExperimentTable et = addNewExperiment("Running moments", "Vector distance", src, alarm, width);
     return et;
   }
-  
+
   protected ExperimentTable generateKMeansDistributionExperiment(int width)
   {
     int num_symbols = 2;
