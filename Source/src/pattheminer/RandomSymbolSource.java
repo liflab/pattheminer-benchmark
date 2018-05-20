@@ -26,7 +26,7 @@ import ca.uqac.lif.labpal.Random;
 public class RandomSymbolSource extends RandomSource
 {
   /**
-   * The number of distinct symbols to produce
+   * The number of distinct symbols to choose from
    */
   protected int m_numDistinct = 3;
   
@@ -36,11 +36,23 @@ public class RandomSymbolSource extends RandomSource
    * Creates a new random number source.
    * @param r The random number generator used to generate the numbers
    * @param num_events The number of events to produce
+   * @param num_symbols The number of distinct symbols to choose from 
+   */
+  public RandomSymbolSource(Random r, int num_events, int num_symbols)
+  {
+    super(r, num_events);
+    m_numDistinct = num_symbols;
+    m_symbols = fillSymbols(m_numDistinct);
+  }
+  
+  /**
+   * Creates a new random number source.
+   * @param r The random number generator used to generate the numbers
+   * @param num_events The number of events to produce
    */
   public RandomSymbolSource(Random r, int num_events)
   {
-    super(r, num_events);
-    m_symbols = fillSymbols(m_numDistinct);
+    this(r, num_events, 3);
   }
   
   @Override

@@ -18,6 +18,8 @@
 package pattheminer;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
@@ -27,6 +29,7 @@ import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.peg.MapDistance;
 import ca.uqac.lif.cep.peg.PointDistance;
 import ca.uqac.lif.cep.peg.TrendDistance;
+import ca.uqac.lif.cep.peg.ml.DistanceToClosest;
 import ca.uqac.lif.cep.peg.ml.RunningMoments;
 import ca.uqac.lif.cep.tmf.Source;
 import ca.uqac.lif.cep.util.Numbers;
@@ -41,6 +44,7 @@ import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TransformedTable;
 import pattheminer.patterns.CumulativeAverage;
 import pattheminer.patterns.SymbolDistribution;
+import pattheminer.patterns.SymbolDistributionClusters;
 
 public class MainLab extends Laboratory
 {
@@ -58,6 +62,8 @@ public class MainLab extends Laboratory
     generateWindowExperiments(generateRunningMomentsExperiment(50), generateRunningMomentsExperiment(200), "running moments", "Moments");
     // Distribution experiments
     generateWindowExperiments(generateDistributionExperiment(50), generateDistributionExperiment(200), "symbol distribution", "Distribution");
+    // K-means experiments
+    generateWindowExperiments(generateKMeansDistributionExperiment(50), generateKMeansDistributionExperiment(200), "k-means clustering", "Clustering");
   }
 
   protected void generateWindowExperiments(ExperimentTable table_50, ExperimentTable table_200, String beta_name, String nickname_prefix)
@@ -112,6 +118,21 @@ public class MainLab extends Laboratory
     ExperimentTable et = addNewExperiment("Running moments", "Vector distance", src, alarm, width);
     return et;
   }
+  
+  protected ExperimentTable generateKMeansDistributionExperiment(int width)
+  {
+    int num_symbols = 2;
+    Random random = getRandom();
+    SymbolDistributionClusters beta = new SymbolDistributionClusters();
+    Set<DoublePoint> pattern = new HashSet<DoublePoint>();
+    pattern.add(new DoublePoint(new double[]{0.7, 0.3}));
+    pattern.add(new DoublePoint(new double[]{0.3, 0.7}));
+    TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
+        new FunctionTree(new DistanceToClosest(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
+    Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH, num_symbols);
+    ExperimentTable et = addNewExperiment("k-means clustering", "Euclidean distance to closest cluster", src, alarm, width);
+    return et;
+  }
 
   protected ExperimentTable addNewExperiment(String trend, String metric, Source src, TrendDistance<?,?,?> alarm, int width)
   {
@@ -128,9 +149,6 @@ public class MainLab extends Laboratory
     et.setTitle(title);
     et.add(tde);
     add(et);
-    /*Scatterplot plot = new Scatterplot(et);
-    plot.setTitle(title);
-    add(plot);*/
     return et;
   }
 
