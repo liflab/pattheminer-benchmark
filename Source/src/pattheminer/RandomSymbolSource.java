@@ -21,25 +21,43 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;
 
 /**
- * A source of randomly generated numbers.
+ * A source of randomly generated symbols.
  */
-public class RandomNumberSource extends RandomSource
+public class RandomSymbolSource extends RandomSource
 {
+  /**
+   * The number of distinct symbols to produce
+   */
+  protected int m_numDistinct = 3;
+  
+  protected String[] m_symbols;
   
   /**
    * Creates a new random number source.
    * @param r The random number generator used to generate the numbers
    * @param num_events The number of events to produce
    */
-  public RandomNumberSource(Random r, int num_events)
+  public RandomSymbolSource(Random r, int num_events)
   {
     super(r, num_events);
+    m_symbols = fillSymbols(m_numDistinct);
   }
   
   @Override
-  protected Float getEvent()
+  protected String getEvent()
   {
-    return m_random.nextFloat();
+    int pos = m_random.nextInt(m_numDistinct);
+    return m_symbols[pos];
+  }
+  
+  protected static String[] fillSymbols(int n)
+  {
+    String[] symbs = new String[n];
+    for (int i = 0; i < n; i++)
+    {
+      symbs[i] = Integer.toString(i);
+    }
+    return symbs;
   }
 
   @Override
@@ -47,5 +65,5 @@ public class RandomNumberSource extends RandomSource
   {
     // Not supported
     return null;
-  }
+  }  
 }
