@@ -19,10 +19,15 @@ package pattheminer;
 
 import java.util.HashMap;
 
+import org.apache.commons.math3.ml.clustering.DoublePoint;
+import org.apache.commons.math3.ml.distance.EuclideanDistance;
+
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.peg.MapDistance;
+import ca.uqac.lif.cep.peg.PointDistance;
 import ca.uqac.lif.cep.peg.TrendDistance;
+import ca.uqac.lif.cep.peg.ml.RunningMoments;
 import ca.uqac.lif.cep.tmf.Source;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.labpal.Laboratory;
@@ -49,10 +54,12 @@ public class MainLab extends Laboratory
   {	  
     // Average experiments
     generateWindowExperiments(generateAverageExperiment(50), generateAverageExperiment(200), "running average", "Average");
+    // Running moments experiments
+    generateWindowExperiments(generateRunningMomentsExperiment(50), generateRunningMomentsExperiment(200), "running moments", "Moments");
     // Distribution experiments
     generateWindowExperiments(generateDistributionExperiment(50), generateDistributionExperiment(200), "symbol distribution", "Distribution");
   }
-  
+
   protected void generateWindowExperiments(ExperimentTable table_50, ExperimentTable table_200, String beta_name, String nickname_prefix)
   {
     Table tt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
@@ -81,7 +88,7 @@ public class MainLab extends Laboratory
     ExperimentTable et = addNewExperiment("Average", "Subtraction", src, alarm, width);
     return et;
   }
-  
+
   protected ExperimentTable generateDistributionExperiment(int width)
   {
     Random random = getRandom();
@@ -91,6 +98,18 @@ public class MainLab extends Laboratory
         new FunctionTree(MapDistance.instance, StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH);
     ExperimentTable et = addNewExperiment("Symbol distribution", "Map distance", src, alarm, width);
+    return et;
+  }
+
+  protected ExperimentTable generateRunningMomentsExperiment(int width)
+  {
+    Random random = getRandom();
+    RunningMoments beta = new RunningMoments(3);
+    DoublePoint pattern = new DoublePoint(new double[]{1d, 1d, 1d});
+    TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
+        new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
+    Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
+    ExperimentTable et = addNewExperiment("Running moments", "Vector distance", src, alarm, width);
     return et;
   }
 
