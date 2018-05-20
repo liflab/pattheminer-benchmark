@@ -61,17 +61,38 @@ public class MainLab extends Laboratory
     setAuthor("Laboratoire d'informatique formelle");
 
     // Average experiments
-    generateWindowExperiments(generateAverageExperiment(50), generateAverageExperiment(100), generateAverageExperiment(200), "running average", "Average");
+    ExperimentTable et_avg = generateWindowExperiments(generateAverageExperiment(50), generateAverageExperiment(100), generateAverageExperiment(200), "running average", "Average");
     // Running moments experiments
-    generateWindowExperiments(generateRunningMomentsExperiment(50), generateRunningMomentsExperiment(100), generateRunningMomentsExperiment(200), "running moments", "Moments");
+    ExperimentTable et_moments = generateWindowExperiments(generateRunningMomentsExperiment(50), generateRunningMomentsExperiment(100), generateRunningMomentsExperiment(200), "running moments", "Moments");
     // Distribution experiments
-    generateWindowExperiments(generateDistributionExperiment(50), generateRunningMomentsExperiment(100), generateDistributionExperiment(200), "symbol distribution", "Distribution");
+    ExperimentTable et_distribution = generateWindowExperiments(generateDistributionExperiment(50), generateRunningMomentsExperiment(100), generateDistributionExperiment(200), "symbol distribution", "Distribution");
     // K-means experiments
-    generateWindowExperiments(generateKMeansDistributionExperiment(50), generateRunningMomentsExperiment(100), generateKMeansDistributionExperiment(200), "k-means clustering", "Clustering");
+    ExperimentTable et_clustering = generateWindowExperiments(generateClusterDistributionExperiment(50), generateRunningMomentsExperiment(100), generateClusterDistributionExperiment(200), "closest cluster", "Clustering");
+
+    {
+      // Table and plot for impact of window width
+      TransformedTable t_impact_window = new TransformedTable(new Join(TrendDistanceExperiment.WIDTH),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running average"), et_avg),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running moments"), et_moments),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Symbol distribution"), et_distribution),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Closest cluster"), et_clustering)
+          );
+      t_impact_window.setTitle("Impact of window width");
+      t_impact_window.setNickname("tImpactWidth");
+      add(t_impact_window);
+      Scatterplot plot = new Scatterplot(t_impact_window);
+      plot.setTitle("Impact of window width");
+      plot.setCaption(Axis.X, "Window width").setCaption(Axis.Y, "Throughput (Hz)");
+      plot.setNickname("pImpactWidth");
+      add(plot);
+    }
   }
 
-  protected void generateWindowExperiments(ExperimentTable table_50, ExperimentTable table_100, ExperimentTable table_200, String beta_name, String nickname_prefix)
+  protected ExperimentTable generateWindowExperiments(TrendDistanceExperiment exp_50, TrendDistanceExperiment exp_100, TrendDistanceExperiment exp_200, String beta_name, String nickname_prefix)
   {
+    ExperimentTable table_50 = createTable(exp_50, beta_name, 50);
+    ExperimentTable table_100 = createTable(exp_100, beta_name, 100);
+    ExperimentTable table_200 = createTable(exp_200, beta_name, 200);
     {
       Table tt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
           new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "50"), table_50),
@@ -89,20 +110,24 @@ public class MainLab extends Laboratory
       add(new AverageThroughputMacro(this, table_200, "tp" + nickname_prefix + "TwoHundred", beta_name + " with a window of 200"));
       add(new MonotonicWindowClaim(tt, beta_name, "50", "100", "200"));
     }
+    ExperimentTable et = new ExperimentTable(TrendDistanceExperiment.WIDTH, TrendDistanceExperiment.THROUGHPUT);
+    et.add(exp_50).add(exp_100).add(exp_200);
+    et.setTitle("Impact of window width for the " + beta_name);
+    add(et);
+    return et;
   }
 
-  protected ExperimentTable generateAverageExperiment(int width)
+  protected TrendDistanceExperiment generateAverageExperiment(int width)
   {
     Random random = getRandom();
     CumulativeAverage average = new CumulativeAverage();
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(6, width, average, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(Numbers.subtraction, StreamVariable.X, StreamVariable.Y)), 0.5, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
-    ExperimentTable et = addNewExperiment("Average", "Subtraction", src, alarm, width);
-    return et;
+    return addNewExperiment("Average", "Subtraction", src, alarm, width);
   }
 
-  protected ExperimentTable generateDistributionExperiment(int width)
+  protected TrendDistanceExperiment generateDistributionExperiment(int width)
   {
     Random random = getRandom();
     SymbolDistribution beta = new SymbolDistribution();
@@ -110,11 +135,10 @@ public class MainLab extends Laboratory
     TrendDistance<HashMap<?,?>,Number,Number> alarm = new TrendDistance<HashMap<?,?>,Number,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(MapDistance.instance, StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH);
-    ExperimentTable et = addNewExperiment("Symbol distribution", "Map distance", src, alarm, width);
-    return et;
+    return addNewExperiment("Symbol distribution", "Map distance", src, alarm, width);
   }
 
-  protected ExperimentTable generateRunningMomentsExperiment(int width)
+  protected TrendDistanceExperiment generateRunningMomentsExperiment(int width)
   {
     Random random = getRandom();
     RunningMoments beta = new RunningMoments(3);
@@ -122,11 +146,10 @@ public class MainLab extends Laboratory
     TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
-    ExperimentTable et = addNewExperiment("Running moments", "Vector distance", src, alarm, width);
-    return et;
+    return addNewExperiment("Running moments", "Vector distance", src, alarm, width);
   }
 
-  protected ExperimentTable generateKMeansDistributionExperiment(int width)
+  protected TrendDistanceExperiment generateClusterDistributionExperiment(int width)
   {
     int num_symbols = 2;
     Random random = getRandom();
@@ -137,11 +160,10 @@ public class MainLab extends Laboratory
     TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new DistanceToClosest(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH, num_symbols);
-    ExperimentTable et = addNewExperiment("k-means clustering", "Euclidean distance to closest cluster", src, alarm, width);
-    return et;
+    return addNewExperiment("Closest cluster", "Euclidean distance to closest cluster", src, alarm, width);
   }
 
-  protected ExperimentTable addNewExperiment(String trend, String metric, Source src, TrendDistance<?,?,?> alarm, int width)
+  protected TrendDistanceExperiment addNewExperiment(String trend, String metric, Source src, TrendDistance<?,?,?> alarm, int width)
   {
     TrendDistanceExperiment tde = new TrendDistanceExperiment();
     tde.setSource(src);
@@ -151,12 +173,18 @@ public class MainLab extends Laboratory
     tde.setInput(TrendDistanceExperiment.TREND, trend);
     tde.setInput(TrendDistanceExperiment.METRIC, metric);
     add(tde);
+    return tde;
+  }
+
+  protected ExperimentTable createTable(TrendDistanceExperiment tde, String trend, int width)
+  {
     String title = "Running time for " + trend + ", window width = " + width;
     ExperimentTable et = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME);
     et.setTitle(title);
     et.add(tde);
     add(et);
     return et;
+
   }
 
   public static void main(String[] args)
