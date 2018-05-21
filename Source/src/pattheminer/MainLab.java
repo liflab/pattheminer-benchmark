@@ -34,6 +34,7 @@ import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.peg.MapDistance;
 import ca.uqac.lif.cep.peg.PointDistance;
+import ca.uqac.lif.cep.peg.SelfCorrelatedTrendDistance;
 import ca.uqac.lif.cep.peg.TrendDistance;
 import ca.uqac.lif.cep.peg.ml.DistanceToClosest;
 import ca.uqac.lif.cep.peg.ml.RunningMoments;
@@ -85,6 +86,12 @@ public class MainLab extends Laboratory
   protected transient Group m_groupTrendDistance;
 
   /**
+   * A group for experiments measuring the throughput of self-correlated
+   * trend distance processors
+   */
+  protected transient Group m_groupSelfCorrelated;
+
+  /**
    * Whether to display experiments about multi-threading
    */
   protected static boolean s_includeThreadExperiments = false;
@@ -110,7 +117,7 @@ public class MainLab extends Laboratory
     // Basic metadata
     setTitle("Benchmark for Pat The Miner");
     setAuthor("Laboratoire d'informatique formelle");
-    
+
     // Command line arguments
     ArgumentMap args = getCliArguments();
     if (args.hasOption("with-mt"))
@@ -120,40 +127,42 @@ public class MainLab extends Laboratory
     }
 
     // Trend distance experiments
-    m_groupTrendDistance = new Group("Trend distance throughput");
-    m_groupTrendDistance.setDescription("Measures the throughput of the trend distance processor for various trend computations.");
-    add(m_groupTrendDistance);
-    // Average experiments
-    ExperimentTable et_avg = generateWindowExperiments(generateAverageExperiment(s_width1, false), generateAverageExperiment(s_width2, false), generateAverageExperiment(s_width3, false), "running average", "Average");
-    // Running moments experiments
-    ExperimentTable et_moments = generateWindowExperiments(generateRunningMomentsExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateRunningMomentsExperiment(s_width3, false), "running moments", "Moments");
-    // Distribution experiments
-    ExperimentTable et_distribution = generateWindowExperiments(generateDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateDistributionExperiment(s_width3, false), "symbol distribution", "Distribution");
-    // K-means experiments
-    ExperimentTable et_clustering = generateWindowExperiments(generateClusterDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateClusterDistributionExperiment(s_width3, false), "closest cluster", "Clustering");
-
     {
-      // Table and plot for impact of window width
-      TransformedTable t_impact_window = new TransformedTable(new Join(TrendDistanceExperiment.WIDTH),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running average"), et_avg),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running moments"), et_moments),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Symbol distribution"), et_distribution),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Closest cluster"), et_clustering)
-          );
-      t_impact_window.setTitle("Impact of window width");
-      t_impact_window.setNickname("tImpactWidth");
-      add(t_impact_window);
-      Scatterplot plot = new Scatterplot(t_impact_window);
-      plot.setTitle("Impact of window width");
-      plot.setCaption(Axis.X, "Window width").setCaption(Axis.Y, "Throughput (Hz)");
-      plot.setNickname("pImpactWidth");
-      add(plot);
+      m_groupTrendDistance = new Group("Trend distance throughput");
+      m_groupTrendDistance.setDescription("Measures the throughput of the trend distance processor for various trend computations.");
+      add(m_groupTrendDistance);
+      // Average experiments
+      ExperimentTable et_avg = generateWindowExperiments(generateAverageExperiment(s_width1, false), generateAverageExperiment(s_width2, false), generateAverageExperiment(s_width3, false), "running average (trend distance)", "Average", m_groupTrendDistance);
+      // Running moments experiments
+      ExperimentTable et_moments = generateWindowExperiments(generateRunningMomentsExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateRunningMomentsExperiment(s_width3, false), "running moments (trend distance)", "Moments", m_groupTrendDistance);
+      // Distribution experiments
+      ExperimentTable et_distribution = generateWindowExperiments(generateDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateDistributionExperiment(s_width3, false), "symbol distribution (trend distance)", "Distribution", m_groupTrendDistance);
+      // K-means experiments
+      ExperimentTable et_clustering = generateWindowExperiments(generateClusterDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateClusterDistributionExperiment(s_width3, false), "closest cluster (trend distance)", "Clustering", m_groupTrendDistance);
+
+      {
+        // Table and plot for impact of window width
+        TransformedTable t_impact_window = new TransformedTable(new Join(TrendDistanceExperiment.WIDTH),
+            new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running average"), et_avg),
+            new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running moments"), et_moments),
+            new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Symbol distribution"), et_distribution),
+            new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Closest cluster"), et_clustering)
+            );
+        t_impact_window.setTitle("Impact of window width (trend distance)");
+        t_impact_window.setNickname("tImpactWidth");
+        add(t_impact_window);
+        Scatterplot plot = new Scatterplot(t_impact_window);
+        plot.setTitle("Impact of window width");
+        plot.setCaption(Axis.X, "Window width").setCaption(Axis.Y, "Throughput (Hz)");
+        plot.setNickname("pImpactWidth");
+        add(plot);
+      }
     }
 
     // Impact of threading
     if (s_includeThreadExperiments)
     {
-      Group g_threading = new Group("Impact of multi-threading");
+      Group g_threading = new Group("Impact of multi-threading (trend distance)");
       add(g_threading);
       {
         int for_width = s_width3;
@@ -181,19 +190,51 @@ public class MainLab extends Laboratory
         add(claim);
       }
     }
+
+    // Self-correlated trend distance experiments
+    {
+      m_groupSelfCorrelated = new Group("Self-correlated trend distance throughput");
+      m_groupSelfCorrelated.setDescription("Measures the throughput of the self-correlated trend distance processor for various trend computations.");
+      add(m_groupSelfCorrelated);
+      // Average experiments
+      ExperimentTable et_avg = generateWindowExperiments(generateSelfAverageExperiment(s_width1, false), generateSelfAverageExperiment(s_width2, false), generateSelfAverageExperiment(s_width3, false), "running average (self-correlated)", "Average", m_groupSelfCorrelated);
+      // Running moments experiments
+      //ExperimentTable et_moments = generateWindowExperiments(generateRunningMomentsExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateRunningMomentsExperiment(s_width3, false), "running moments (self-correlated)", "Moments", m_groupSelfCorrelated);
+      // Distribution experiments
+      //ExperimentTable et_distribution = generateWindowExperiments(generateDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateDistributionExperiment(s_width3, false), "symbol distribution (self-correlated)", "Distribution", m_groupSelfCorrelated);
+      // K-means experiments
+      //ExperimentTable et_clustering = generateWindowExperiments(generateClusterDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateClusterDistributionExperiment(s_width3, false), "closest cluster (self-correlated)", "Clustering", m_groupSelfCorrelated);
+      {
+        // Table and plot for impact of window width
+        TransformedTable t_impact_window = new TransformedTable(new Join(TrendDistanceExperiment.WIDTH),
+            new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running average"), et_avg)
+            //new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Running moments"), et_moments),
+            //new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Symbol distribution"), et_distribution),
+            //new TransformedTable(new RenameColumns(TrendDistanceExperiment.WIDTH, "Closest cluster"), et_clustering)
+            );
+        t_impact_window.setTitle("Impact of window width (self-correlated trend distance)");
+        t_impact_window.setNickname("tImpactWidthSc");
+        add(t_impact_window);
+        Scatterplot plot = new Scatterplot(t_impact_window);
+        plot.setTitle("Impact of window width");
+        plot.setCaption(Axis.X, "Window width").setCaption(Axis.Y, "Throughput (Hz)");
+        plot.setNickname("pImpactWidthSc");
+        add(plot);
+      }
+    }
   }
 
-  protected ExperimentTable generateWindowExperiments(TrendDistanceExperiment exp_50, TrendDistanceExperiment exp_100, TrendDistanceExperiment exp_200, String beta_name, String nickname_prefix)
+  protected ExperimentTable generateWindowExperiments(StreamExperiment exp_50, StreamExperiment exp_100, StreamExperiment exp_200, String beta_name, String nickname_prefix, Group g)
   {
     ExperimentTable table_50 = createTable(exp_50, beta_name, s_width1);
     ExperimentTable table_100 = createTable(exp_100, beta_name, s_width2);
     ExperimentTable table_200 = createTable(exp_200, beta_name, s_width3);
-    m_groupTrendDistance.add(exp_50, exp_100, exp_200);
+    g.add(exp_50, exp_100, exp_200);
     {
-      Table tt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, Integer.toString(s_width1)), table_50),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, Integer.toString(s_width2)), table_100),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, Integer.toString(s_width3)), table_200)
+      Table tt = new TransformedTable(new Join(StreamExperiment.LENGTH),
+          new TransformedTable(new RenameColumns(StreamExperiment.LENGTH, Integer.toString(s_width1)), table_50),
+          new TransformedTable(new RenameColumns(StreamExperiment.LENGTH, Integer.toString(s_width2)), table_100),
+          new TransformedTable(new RenameColumns(StreamExperiment.LENGTH, Integer.toString(s_width3)), table_200)
           );
       tt.setTitle("Running time for the " + beta_name);
       add(tt);
@@ -231,7 +272,17 @@ public class MainLab extends Laboratory
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(6, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(Numbers.subtraction, StreamVariable.X, StreamVariable.Y)), 0.5, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
-    return addNewExperiment("Average", "Subtraction", src, alarm, width, multi_thread);
+    return addNewTrendDistanceExperiment("Average", "Subtraction", src, alarm, width, multi_thread);
+  }
+  
+  protected SelfCorrelatedExperiment generateSelfAverageExperiment(int width, boolean multi_thread)
+  {
+    Random random = getRandom();
+    CumulativeAverage beta = new CumulativeAverage();
+    SelfCorrelatedTrendDistance<Number,Number,Number> alarm = new SelfCorrelatedTrendDistance<Number,Number,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
+        new FunctionTree(Numbers.subtraction, StreamVariable.X, StreamVariable.Y)), 0.5, Numbers.isLessThan);
+    Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
+    return addNewSelfCorrelatedExperiment("Average", "Subtraction", src, alarm, width, multi_thread);
   }
 
   protected TrendDistanceExperiment generateDistributionExperiment(int width, boolean multi_thread)
@@ -253,7 +304,7 @@ public class MainLab extends Laboratory
     TrendDistance<HashMap<?,?>,Number,Number> alarm = new TrendDistance<HashMap<?,?>,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(MapDistance.instance, StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH);
-    return addNewExperiment("Symbol distribution", "Map distance", src, alarm, width, multi_thread);
+    return addNewTrendDistanceExperiment("Symbol distribution", "Map distance", src, alarm, width, multi_thread);
   }
 
   protected TrendDistanceExperiment generateRunningMomentsExperiment(int width, boolean multi_thread)
@@ -275,7 +326,7 @@ public class MainLab extends Laboratory
     TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
-    return addNewExperiment("Running moments", "Vector distance", src, alarm, width, multi_thread);
+    return addNewTrendDistanceExperiment("Running moments", "Vector distance", src, alarm, width, multi_thread);
   }
 
   protected TrendDistanceExperiment generateClusterDistributionExperiment(int width, boolean multi_thread)
@@ -300,14 +351,14 @@ public class MainLab extends Laboratory
     TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new DistanceToClosest(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH, num_symbols);
-    return addNewExperiment("Closest cluster", "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
+    return addNewTrendDistanceExperiment("Closest cluster", "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
 
-  protected TrendDistanceExperiment addNewExperiment(String trend, String metric, Source src, TrendDistance<?,?,?> alarm, int width, boolean multi_thread)
+  protected TrendDistanceExperiment addNewTrendDistanceExperiment(String trend, String metric, Source src, Processor alarm, int width, boolean multi_thread)
   {
     TrendDistanceExperiment tde = new TrendDistanceExperiment();
     tde.setSource(src);
-    tde.setTrendDistance(alarm);
+    tde.setProcessor(alarm);
     tde.setEventStep(s_eventStep);
     tde.setInput(TrendDistanceExperiment.WIDTH, width);
     tde.setInput(TrendDistanceExperiment.TREND, trend);
@@ -322,10 +373,29 @@ public class MainLab extends Laboratory
     return tde;
   }
 
-  protected ExperimentTable createTable(TrendDistanceExperiment tde, String trend, int width)
+  protected SelfCorrelatedExperiment addNewSelfCorrelatedExperiment(String trend, String metric, Source src, Processor alarm, int width, boolean multi_thread)
+  {
+    SelfCorrelatedExperiment tde = new SelfCorrelatedExperiment();
+    tde.setSource(src);
+    tde.setProcessor(alarm);
+    tde.setEventStep(s_eventStep);
+    tde.setInput(TrendDistanceExperiment.WIDTH, width);
+    tde.setInput(TrendDistanceExperiment.TREND, trend);
+    tde.setInput(TrendDistanceExperiment.METRIC, metric);
+    JsonString jb = new JsonString("yes");
+    if (!multi_thread)
+    {
+      jb = new JsonString("no");
+    }
+    tde.setInput(TrendDistanceExperiment.MULTITHREAD, jb);
+    add(tde);
+    return tde;
+  }
+
+  protected ExperimentTable createTable(StreamExperiment tde, String trend, int width)
   {
     String title = "Running time for " + trend + ", window width = " + width;
-    ExperimentTable et = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME);
+    ExperimentTable et = new ExperimentTable(StreamExperiment.LENGTH, StreamExperiment.TIME);
     et.setTitle(title);
     et.add(tde);
     add(et);
@@ -342,7 +412,7 @@ public class MainLab extends Laboratory
     }
     return null;
   }
-  
+
   @Override
   public void setupCli(CliParser parser)
   {

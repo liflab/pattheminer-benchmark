@@ -17,11 +17,11 @@
  */
 package pattheminer;
 
-public class TrendDistanceExperiment extends TrendExperiment
-{  
-  public TrendDistanceExperiment()
+public class SelfCorrelatedExperiment extends TrendExperiment
+{
+  public SelfCorrelatedExperiment()
   {
     super();
-    setDescription("Measures the throughput of the trend distance processor");
+    setDescription("Measures the throughput of the self-correlated trend distance processor");
   }
 }
