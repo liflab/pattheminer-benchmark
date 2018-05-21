@@ -40,6 +40,9 @@ import ca.uqac.lif.cep.peg.ml.RunningMoments;
 import ca.uqac.lif.cep.tmf.Source;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.json.JsonString;
+import ca.uqac.lif.labpal.CliParser;
+import ca.uqac.lif.labpal.CliParser.Argument;
+import ca.uqac.lif.labpal.CliParser.ArgumentMap;
 import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.Group;
 import ca.uqac.lif.labpal.Laboratory;
@@ -56,19 +59,50 @@ import pattheminer.patterns.CumulativeAverage;
 import pattheminer.patterns.SymbolDistribution;
 import pattheminer.patterns.SymbolDistributionClusters;
 
+/**
+ * Main laboratory for Pat The Miner
+ */
 public class MainLab extends Laboratory
 {
+  /**
+   * The step (in number of events) at which measurements are made in each experiment
+   */
   protected static int s_eventStep = 10000;
 
+  /**
+   * The maximum trace length to generate
+   */
   public static int MAX_TRACE_LENGTH = 100001;
 
+  /**
+   * A thread pool. Used only for multi-thread experiments.
+   */
   protected static transient ExecutorService s_service = Executors.newCachedThreadPool();
-  
+
+  /**
+   * A group for experiments measuring the throughput of trend distance processors
+   */
   protected transient Group m_groupTrendDistance;
-  
+
+  /**
+   * Whether to display experiments about multi-threading
+   */
+  protected static boolean s_includeThreadExperiments = false;
+
+  /**
+   * The first window width to be used in each experiment
+   */
   protected static transient int s_width1 = 50;
+
+  /**
+   * The second window width to be used in each experiment
+   */
   protected static transient int s_width2 = 100;
-  protected static transient int s_width3 = 800;
+
+  /**
+   * The third window width to be used in each experiment
+   */
+  protected static transient int s_width3 = 200;
 
   @Override
   public void setup()
@@ -77,6 +111,14 @@ public class MainLab extends Laboratory
     setTitle("Benchmark for Pat The Miner");
     setAuthor("Laboratoire d'informatique formelle");
     
+    // Command line arguments
+    ArgumentMap args = getCliArguments();
+    if (args.hasOption("with-mt"))
+    {
+      // Include multi-thread experiments
+      s_includeThreadExperiments = true;
+    }
+
     // Trend distance experiments
     m_groupTrendDistance = new Group("Trend distance throughput");
     m_groupTrendDistance.setDescription("Measures the throughput of the trend distance processor for various trend computations.");
@@ -89,7 +131,7 @@ public class MainLab extends Laboratory
     ExperimentTable et_distribution = generateWindowExperiments(generateDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateDistributionExperiment(s_width3, false), "symbol distribution", "Distribution");
     // K-means experiments
     ExperimentTable et_clustering = generateWindowExperiments(generateClusterDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateClusterDistributionExperiment(s_width3, false), "closest cluster", "Clustering");
-    
+
     {
       // Table and plot for impact of window width
       TransformedTable t_impact_window = new TransformedTable(new Join(TrendDistanceExperiment.WIDTH),
@@ -107,34 +149,37 @@ public class MainLab extends Laboratory
       plot.setNickname("pImpactWidth");
       add(plot);
     }
-    
+
     // Impact of threading
-    Group g_threading = new Group("Impact of multi-threading");
-    add(g_threading);
+    if (s_includeThreadExperiments)
     {
-      int for_width = s_width3;
-      String for_trend = "Running moments";
-      TrendDistanceExperiment exp_nt = (TrendDistanceExperiment) getAnyExperiment(
-          new Region().add(TrendDistanceExperiment.TREND, for_trend).add(TrendDistanceExperiment.WIDTH, for_width));
-      TrendDistanceExperiment exp_mt = generateRunningMomentsExperiment(for_width, true);
-      ExperimentTable et_nt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_nt);
-      ExperimentTable et_mt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_mt);
-      TransformedTable t_impact_mt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "No threads"), et_nt),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "With threads"), et_mt));
-      t_impact_mt.setTitle("Impact of multi-threading");
-      t_impact_mt.setNickname("tImpactMt");
-      add(t_impact_mt);
-      Scatterplot plot = new Scatterplot(t_impact_mt);
-      plot.setTitle("Impact of multi-threading");
-      plot.setCaption(Axis.X, "Number of events").setCaption(Axis.Y, "Processing time (ms)");
-      plot.setNickname("pImpactMt");
-      add(plot);
-      g_threading.add(exp_nt, exp_mt);
-      ThreadSpeedupMacro macro = new ThreadSpeedupMacro(this, exp_nt, exp_mt);
-      add(macro);
-      ThreadSpeedupClaim claim = new ThreadSpeedupClaim(this, macro);
-      add(claim);
+      Group g_threading = new Group("Impact of multi-threading");
+      add(g_threading);
+      {
+        int for_width = s_width3;
+        String for_trend = "Running moments";
+        TrendDistanceExperiment exp_nt = (TrendDistanceExperiment) getAnyExperiment(
+            new Region().add(TrendDistanceExperiment.TREND, for_trend).add(TrendDistanceExperiment.WIDTH, for_width));
+        TrendDistanceExperiment exp_mt = generateRunningMomentsExperiment(for_width, true);
+        ExperimentTable et_nt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_nt);
+        ExperimentTable et_mt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_mt);
+        TransformedTable t_impact_mt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
+            new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "No threads"), et_nt),
+            new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "With threads"), et_mt));
+        t_impact_mt.setTitle("Impact of multi-threading");
+        t_impact_mt.setNickname("tImpactMt");
+        add(t_impact_mt);
+        Scatterplot plot = new Scatterplot(t_impact_mt);
+        plot.setTitle("Impact of multi-threading");
+        plot.setCaption(Axis.X, "Number of events").setCaption(Axis.Y, "Processing time (ms)");
+        plot.setNickname("pImpactMt");
+        add(plot);
+        g_threading.add(exp_nt, exp_mt);
+        ThreadSpeedupMacro macro = new ThreadSpeedupMacro(this, exp_nt, exp_mt);
+        add(macro);
+        ThreadSpeedupClaim claim = new ThreadSpeedupClaim(this, macro);
+        add(claim);
+      }
     }
   }
 
@@ -287,7 +332,7 @@ public class MainLab extends Laboratory
     return et;
 
   }
-  
+
   protected Experiment getAnyExperiment(Region r)
   {
     Collection<Experiment> ce = filterExperiments(r);
@@ -296,6 +341,12 @@ public class MainLab extends Laboratory
       return e;
     }
     return null;
+  }
+  
+  @Override
+  public void setupCli(CliParser parser)
+  {
+    parser.addArgument(new Argument().withLongName("with-mt").withDescription("Include experiments about multi-threading"));
   }
 
   public static void main(String[] args)
