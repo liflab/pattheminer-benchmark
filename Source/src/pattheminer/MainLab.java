@@ -64,7 +64,11 @@ public class MainLab extends Laboratory
 
   protected static transient ExecutorService s_service = Executors.newCachedThreadPool();
   
-  protected transient Group m_groupTrendDistance; 
+  protected transient Group m_groupTrendDistance;
+  
+  protected static transient int s_width1 = 50;
+  protected static transient int s_width2 = 100;
+  protected static transient int s_width3 = 800;
 
   @Override
   public void setup()
@@ -78,13 +82,13 @@ public class MainLab extends Laboratory
     m_groupTrendDistance.setDescription("Measures the throughput of the trend distance processor for various trend computations.");
     add(m_groupTrendDistance);
     // Average experiments
-    ExperimentTable et_avg = generateWindowExperiments(generateAverageExperiment(50, false), generateAverageExperiment(100, false), generateAverageExperiment(200, false), "running average", "Average");
+    ExperimentTable et_avg = generateWindowExperiments(generateAverageExperiment(s_width1, false), generateAverageExperiment(s_width2, false), generateAverageExperiment(s_width3, false), "running average", "Average");
     // Running moments experiments
-    ExperimentTable et_moments = generateWindowExperiments(generateRunningMomentsExperiment(50, false), generateRunningMomentsExperiment(100, false), generateRunningMomentsExperiment(200, false), "running moments", "Moments");
+    ExperimentTable et_moments = generateWindowExperiments(generateRunningMomentsExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateRunningMomentsExperiment(s_width3, false), "running moments", "Moments");
     // Distribution experiments
-    ExperimentTable et_distribution = generateWindowExperiments(generateDistributionExperiment(50, false), generateRunningMomentsExperiment(100, false), generateDistributionExperiment(200, false), "symbol distribution", "Distribution");
+    ExperimentTable et_distribution = generateWindowExperiments(generateDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateDistributionExperiment(s_width3, false), "symbol distribution", "Distribution");
     // K-means experiments
-    ExperimentTable et_clustering = generateWindowExperiments(generateClusterDistributionExperiment(50, false), generateRunningMomentsExperiment(100, false), generateClusterDistributionExperiment(200, false), "closest cluster", "Clustering");
+    ExperimentTable et_clustering = generateWindowExperiments(generateClusterDistributionExperiment(s_width1, false), generateRunningMomentsExperiment(s_width2, false), generateClusterDistributionExperiment(s_width3, false), "closest cluster", "Clustering");
     
     {
       // Table and plot for impact of window width
@@ -108,10 +112,11 @@ public class MainLab extends Laboratory
     Group g_threading = new Group("Impact of multi-threading");
     add(g_threading);
     {
-      int for_width = 50;
+      int for_width = s_width3;
+      String for_trend = "Running moments";
       TrendDistanceExperiment exp_nt = (TrendDistanceExperiment) getAnyExperiment(
-          new Region().add(TrendDistanceExperiment.TREND, "Average").add(TrendDistanceExperiment.WIDTH, for_width));
-      TrendDistanceExperiment exp_mt = generateAverageExperiment(for_width, true);
+          new Region().add(TrendDistanceExperiment.TREND, for_trend).add(TrendDistanceExperiment.WIDTH, for_width));
+      TrendDistanceExperiment exp_mt = generateRunningMomentsExperiment(for_width, true);
       ExperimentTable et_nt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_nt);
       ExperimentTable et_mt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_mt);
       TransformedTable t_impact_mt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
@@ -135,15 +140,15 @@ public class MainLab extends Laboratory
 
   protected ExperimentTable generateWindowExperiments(TrendDistanceExperiment exp_50, TrendDistanceExperiment exp_100, TrendDistanceExperiment exp_200, String beta_name, String nickname_prefix)
   {
-    ExperimentTable table_50 = createTable(exp_50, beta_name, 50);
-    ExperimentTable table_100 = createTable(exp_100, beta_name, 100);
-    ExperimentTable table_200 = createTable(exp_200, beta_name, 200);
+    ExperimentTable table_50 = createTable(exp_50, beta_name, s_width1);
+    ExperimentTable table_100 = createTable(exp_100, beta_name, s_width2);
+    ExperimentTable table_200 = createTable(exp_200, beta_name, s_width3);
     m_groupTrendDistance.add(exp_50, exp_100, exp_200);
     {
       Table tt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "50"), table_50),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "100"), table_100),
-          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "200"), table_200)
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, Integer.toString(s_width1)), table_50),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, Integer.toString(s_width2)), table_100),
+          new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, Integer.toString(s_width3)), table_200)
           );
       tt.setTitle("Running time for the " + beta_name);
       add(tt);
@@ -152,9 +157,9 @@ public class MainLab extends Laboratory
       plot.setTitle("Running time for the " + beta_name);
       plot.setNickname("p" + nickname_prefix);
       add(plot);
-      add(new AverageThroughputMacro(this, table_50, "tp" + nickname_prefix + "Fifty", beta_name + " with a window of 50"));
-      add(new AverageThroughputMacro(this, table_200, "tp" + nickname_prefix + "TwoHundred", beta_name + " with a window of 200"));
-      add(new MonotonicWindowClaim(tt, beta_name, "50", "100", "200"));
+      add(new AverageThroughputMacro(this, table_50, "tp" + nickname_prefix + "Fifty", beta_name + " with a window of " + s_width1));
+      add(new AverageThroughputMacro(this, table_200, "tp" + nickname_prefix + "TwoHundred", beta_name + " with a window of " + s_width3));
+      add(new MonotonicWindowClaim(tt, beta_name, Integer.toString(s_width1), Integer.toString(s_width2), Integer.toString(s_width3)));
     }
     ExperimentTable et = new ExperimentTable(TrendDistanceExperiment.WIDTH, TrendDistanceExperiment.THROUGHPUT);
     et.add(exp_50).add(exp_100).add(exp_200);
@@ -189,7 +194,18 @@ public class MainLab extends Laboratory
     Random random = getRandom();
     SymbolDistribution beta = new SymbolDistribution();
     HashMap<Object,Object> pattern = MapDistance.createMap("0", width - 2, "1", 1, "2", 1);
-    TrendDistance<HashMap<?,?>,Number,Number> alarm = new TrendDistance<HashMap<?,?>,Number,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
+    Processor wp = null;
+    if (multi_thread)
+    {
+      NonBlockingPush nbp = new NonBlockingPush(beta, s_service);
+      wp = new ParallelWindow(nbp, width);
+    }
+    else
+    {
+      //wp = new Window(average, width);
+      wp = new ParallelWindow(beta, width);
+    }
+    TrendDistance<HashMap<?,?>,Number,Number> alarm = new TrendDistance<HashMap<?,?>,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(MapDistance.instance, StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH);
     return addNewExperiment("Symbol distribution", "Map distance", src, alarm, width, multi_thread);
@@ -200,7 +216,18 @@ public class MainLab extends Laboratory
     Random random = getRandom();
     RunningMoments beta = new RunningMoments(3);
     DoublePoint pattern = new DoublePoint(new double[]{1d, 1d, 1d});
-    TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
+    Processor wp = null;
+    if (multi_thread)
+    {
+      NonBlockingPush nbp = new NonBlockingPush(beta, s_service);
+      wp = new ParallelWindow(nbp, width);
+    }
+    else
+    {
+      //wp = new Window(average, width);
+      wp = new ParallelWindow(beta, width);
+    }
+    TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
     return addNewExperiment("Running moments", "Vector distance", src, alarm, width, multi_thread);
@@ -214,7 +241,18 @@ public class MainLab extends Laboratory
     Set<DoublePoint> pattern = new HashSet<DoublePoint>();
     pattern.add(new DoublePoint(new double[]{0.7, 0.3}));
     pattern.add(new DoublePoint(new double[]{0.3, 0.7}));
-    TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, width, beta, new FunctionTree(Numbers.absoluteValue, 
+    Processor wp = null;
+    if (multi_thread)
+    {
+      NonBlockingPush nbp = new NonBlockingPush(beta, s_service);
+      wp = new ParallelWindow(nbp, width);
+    }
+    else
+    {
+      //wp = new Window(average, width);
+      wp = new ParallelWindow(beta, width);
+    }
+    TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new DistanceToClosest(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH, num_symbols);
     return addNewExperiment("Closest cluster", "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
