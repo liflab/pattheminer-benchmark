@@ -19,6 +19,7 @@ package pattheminer;
 
 import ca.uqac.lif.labpal.Claim;
 import ca.uqac.lif.labpal.Laboratory;
+import ca.uqac.lif.mtnp.table.PrimitiveValue;
 import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
@@ -43,8 +44,8 @@ public class MonotonicWindowClaim extends Claim
     m_table = table;
     m_keys = keys;
     m_trend = trend;
-    this.setName("Monotonic window " + trend);
-    this.setDescription("The running time of a trend function should increase with the width of the window.");
+    setName("Monotonic window " + trend);
+    setDescription("The running time of a trend function should increase with the width of the window.");
   }
   
   @Override
@@ -56,8 +57,14 @@ public class MonotonicWindowClaim extends Claim
     {
       for (int i = 0; i < m_keys.length - 1; i++)
       {
-        float f1 = te.get(m_keys[i]).numberValue().floatValue();
-        float f2 = te.get(m_keys[i+1]).numberValue().floatValue();
+        PrimitiveValue pv1 = te.get(m_keys[i]);
+        PrimitiveValue pv2 = te.get(m_keys[i+1]);
+        if (pv1 == null || pv2 == null)
+        {
+          continue;
+        }
+        float f1 = pv1.numberValue().floatValue();
+        float f2 = pv2.numberValue().floatValue();
         if ((f1 - f2) / f1 > s_tolerance)
         {
           Explanation exp = new Explanation("The running time of " + m_trend 

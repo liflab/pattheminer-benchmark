@@ -49,4 +49,10 @@ public class CumulativeAverage extends GroupProcessor
     associateOutput(OUTPUT, div, OUTPUT);
     addProcessors(fork, sum, one, sum_one, div);
   }
+  
+  @Override
+  public CumulativeAverage duplicate(boolean with_state)
+  {
+    return new CumulativeAverage();
+  }
 }

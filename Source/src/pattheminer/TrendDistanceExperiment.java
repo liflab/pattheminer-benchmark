@@ -41,6 +41,8 @@ public class TrendDistanceExperiment extends Experiment
   
   public static final transient String THROUGHPUT = "Throughput";
   
+  public static final transient String MULTITHREAD = "Multi-threaded";
+  
   protected transient TrendDistance<?,?,?> m_trendDistance;
   
   protected transient Source m_source;
@@ -57,6 +59,7 @@ public class TrendDistanceExperiment extends Experiment
     describe(THROUGHPUT, "The average number of events processed per second");
     describe(TIME, "Cumulative running time (in ms)");
     describe(LENGTH, "Number of events processed");
+    //describe(MULTITHREAD, "Whether the expeiment uses multiple threads or a single one");
     JsonList x = new JsonList();
     x.add(0);
     write(LENGTH, x);
