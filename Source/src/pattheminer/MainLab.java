@@ -200,13 +200,13 @@ public class MainLab extends Laboratory
       m_groupSelfCorrelated.setDescription("Measures the throughput of the self-correlated trend distance processor for various trend computations.");
       add(m_groupSelfCorrelated);
       // Average experiments
-      ExperimentTable et_avg = generateWindowExperiments(generateSelfAverageExperiment(s_width1, false), generateSelfAverageExperiment(s_width2, false), generateSelfAverageExperiment(s_width3, false), "running average", "Average", m_groupSelfCorrelated);
+      ExperimentTable et_avg = generateWindowExperiments(generateSelfAverageExperiment(s_width1, false), generateSelfAverageExperiment(s_width2, false), generateSelfAverageExperiment(s_width3, false), "running average", "AverageSc", m_groupSelfCorrelated);
       // Running moments experiments
-      ExperimentTable et_moments = generateWindowExperiments(generateSelfRunningMomentsExperiment(s_width1, false), generateSelfRunningMomentsExperiment(s_width2, false), generateSelfRunningMomentsExperiment(s_width3, false), "running moments", "Moments", m_groupSelfCorrelated);
+      ExperimentTable et_moments = generateWindowExperiments(generateSelfRunningMomentsExperiment(s_width1, false), generateSelfRunningMomentsExperiment(s_width2, false), generateSelfRunningMomentsExperiment(s_width3, false), "running moments", "MomentsSc", m_groupSelfCorrelated);
       // Distribution experiments
-      ExperimentTable et_distribution = generateWindowExperiments(generateSelfDistributionExperiment(s_width1, false), generateSelfDistributionExperiment(s_width2, false), generateSelfDistributionExperiment(s_width3, false), "symbol distribution", "Distribution", m_groupSelfCorrelated);
+      ExperimentTable et_distribution = generateWindowExperiments(generateSelfDistributionExperiment(s_width1, false), generateSelfDistributionExperiment(s_width2, false), generateSelfDistributionExperiment(s_width3, false), "symbol distribution", "DistributionSc", m_groupSelfCorrelated);
       // K-means experiments
-      ExperimentTable et_clustering = generateWindowExperiments(generateSelfClusterDistributionExperiment(s_width1, false), generateSelfClusterDistributionExperiment(s_width2, false), generateSelfClusterDistributionExperiment(s_width3, false), "closest cluster", "Clustering", m_groupSelfCorrelated);
+      ExperimentTable et_clustering = generateWindowExperiments(generateSelfClusterDistributionExperiment(s_width1, false), generateSelfClusterDistributionExperiment(s_width2, false), generateSelfClusterDistributionExperiment(s_width3, false), "closest cluster", "ClusteringSc", m_groupSelfCorrelated);
       {
         // Table and plot for impact of window width
         TransformedTable t_impact_window = new TransformedTable(new Join(TrendDistanceExperiment.WIDTH),
