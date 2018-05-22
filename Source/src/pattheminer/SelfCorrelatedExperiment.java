@@ -19,9 +19,12 @@ package pattheminer;
 
 public class SelfCorrelatedExperiment extends TrendExperiment
 {
+  public static final transient String TYPE_NAME = "Self-correlated trend distance";
+  
   public SelfCorrelatedExperiment()
   {
     super();
     setDescription("Measures the throughput of the self-correlated trend distance processor");
+    setInput(TYPE, TYPE_NAME);
   }
 }

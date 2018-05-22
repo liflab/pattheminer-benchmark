@@ -19,9 +19,12 @@ package pattheminer;
 
 public class TrendDistanceExperiment extends TrendExperiment
 {  
+  public static final transient String TYPE_NAME = "Trend distance";
+  
   public TrendDistanceExperiment()
   {
     super();
     setDescription("Measures the throughput of the trend distance processor");
+    setInput(TYPE, TYPE_NAME);
   }
 }
