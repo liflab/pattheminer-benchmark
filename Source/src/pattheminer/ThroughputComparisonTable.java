@@ -1,3 +1,20 @@
+/*
+    A benchmark for Pat The Miner
+    Copyright (C) 2018 Laboratoire d'informatique formelle
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package pattheminer;
 
 import java.util.HashMap;
@@ -78,7 +95,7 @@ public class ThroughputComparisonTable extends Table
         te.put(TrendDistanceExperiment.TYPE_NAME, 0);
       }
       SelfCorrelatedExperiment sce = m_selfCorrelatedExperiments.get(trend);
-      if (tde != null)
+      if (sce != null)
       {
         te.put(SelfCorrelatedExperiment.TYPE_NAME, sce.readFloat(TrendExperiment.THROUGHPUT));
       }
@@ -101,6 +118,10 @@ public class ThroughputComparisonTable extends Table
     if (col < 2)
     {
       TrendDistanceExperiment tde = m_trendExperiments.get(trend_name);
+      if (tde == null)
+      {
+        return null;
+      }
       if (col == 0)
       {
         return new DirectValue(new ExperimentValue(tde, TrendExperiment.TREND));
@@ -111,6 +132,10 @@ public class ThroughputComparisonTable extends Table
       }
     }
     SelfCorrelatedExperiment sce = m_selfCorrelatedExperiments.get(trend_name);
+    if (sce == null)
+    {
+      return null;
+    }
     return new DirectValue(new ExperimentValue(sce, TrendExperiment.THROUGHPUT));
   }
 }

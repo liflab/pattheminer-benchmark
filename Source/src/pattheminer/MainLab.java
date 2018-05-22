@@ -125,6 +125,9 @@ public class MainLab extends Laboratory
       // Include multi-thread experiments
       s_includeThreadExperiments = true;
     }
+    
+    // Lab stats
+    add(new LabStats(this));
 
     // Trend distance experiments
     {
@@ -222,7 +225,7 @@ public class MainLab extends Laboratory
         add(plot);
       }
     }
-    
+
     // Fixed pattern vs. self correlated
     {
       Region r = new Region();
@@ -231,19 +234,21 @@ public class MainLab extends Laboratory
       r.add(TrendExperiment.TREND, trends);
       for (Region sub_r : r.all(TrendExperiment.WIDTH))
       {
+        int w = sub_r.getInt(TrendExperiment.WIDTH);
         ThroughputComparisonTable tab = new ThroughputComparisonTable(trends);
-        tab.setTitle("Throughput comparison (window width = " + sub_r.getInt(TrendExperiment.WIDTH) + ")");
-        tab.setNickname("tThroughputComparison" + sub_r.getInt(TrendExperiment.WIDTH));
+        tab.setTitle("Throughput comparison (window width = " + toLatex(w) + ")");
+        tab.setNickname("tThroughputComparison" + w);
         for (Region sub_r2 : sub_r.all(TrendExperiment.TREND))
         {
           Region r_t = new Region(sub_r2).add(TrendExperiment.TYPE, TrendDistanceExperiment.TYPE_NAME);
           TrendDistanceExperiment exp_t = (TrendDistanceExperiment) getAnyExperiment(r_t);
           Region r_s = new Region(sub_r2).add(TrendExperiment.TYPE, SelfCorrelatedExperiment.TYPE_NAME);
           SelfCorrelatedExperiment exp_s = (SelfCorrelatedExperiment) getAnyExperiment(r_s);
-          tab.add(sub_r.getString(TrendExperiment.TREND), exp_t);
-          tab.add(sub_r.getString(TrendExperiment.TREND), exp_s);
+          tab.add(sub_r2.getString(TrendExperiment.TREND), exp_t);
+          tab.add(sub_r2.getString(TrendExperiment.TREND), exp_s);
         }
         add(tab);
+        add(new MaxSlowdownMacro(this, "maxSlowdown" + toLatex(w), w, tab));
       }
     }
   }
@@ -367,7 +372,7 @@ public class MainLab extends Laboratory
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH, num_symbols);
     return addNewTrendDistanceExperiment("Closest cluster", "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
-  
+
   protected SelfCorrelatedExperiment generateSelfAverageExperiment(int width, boolean multi_thread)
   {
     Random random = getRandom();
@@ -377,7 +382,7 @@ public class MainLab extends Laboratory
     Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
     return addNewSelfCorrelatedExperiment("Average", "Subtraction", src, alarm, width, multi_thread);
   }
-  
+
   protected SelfCorrelatedExperiment generateSelfRunningMomentsExperiment(int width, boolean multi_thread)
   {
     Random random = getRandom();
@@ -385,9 +390,9 @@ public class MainLab extends Laboratory
     SelfCorrelatedTrendDistance<DoublePoint,Number,Number> alarm = new SelfCorrelatedTrendDistance<DoublePoint,Number,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MAX_TRACE_LENGTH);
-    return addNewSelfCorrelatedExperiment("Average", "Subtraction", src, alarm, width, multi_thread);
+    return addNewSelfCorrelatedExperiment("Running moments", "Subtraction", src, alarm, width, multi_thread);
   }
-  
+
   protected SelfCorrelatedExperiment generateSelfDistributionExperiment(int width, boolean multi_thread)
   {
     Random random = getRandom();
@@ -397,14 +402,14 @@ public class MainLab extends Laboratory
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH);
     return addNewSelfCorrelatedExperiment("Symbol distribution", "Map distance", src, alarm, width, multi_thread);
   }
-  
+
   protected SelfCorrelatedExperiment generateSelfClusterDistributionExperiment(int width, boolean multi_thread)
   {
     int num_symbols = 2;
     Random random = getRandom();
     SymbolDistributionClusters beta = new SymbolDistributionClusters();
-    SelfCorrelatedTrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new SelfCorrelatedTrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
-        new FunctionTree(new DistanceToClosest(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
+    SelfCorrelatedTrendDistance<DoublePoint,Number,Number> alarm = new SelfCorrelatedTrendDistance<DoublePoint,Number,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
+        new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MAX_TRACE_LENGTH, num_symbols);
     return addNewSelfCorrelatedExperiment("Closest cluster", "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
@@ -478,5 +483,22 @@ public class MainLab extends Laboratory
   {
     // Nothing else to do here
     MainLab.initialize(args, MainLab.class);
+  }
+  
+  /**
+   * Converts a number into a "LaTeX" name (as LaTeX forbids macro names
+   * that contain numbers)
+   * @param x The number
+   * @return The name
+   */
+  public static String toLatex(int x)
+  {
+    if (x == 50)
+      return "Fifty";
+    if (x == 100)
+      return "Hundred";
+    if (x == 200)
+      return "TwoHundred";
+    return "Unknown";
   }
 }
