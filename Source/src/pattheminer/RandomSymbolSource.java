@@ -30,7 +30,7 @@ public class RandomSymbolSource extends RandomSource
    */
   protected int m_numDistinct = 3;
   
-  protected String[] m_symbols;
+  protected /*@ non_null @*/ String[] m_symbols;
   
   /**
    * Creates a new random number source.
@@ -38,7 +38,7 @@ public class RandomSymbolSource extends RandomSource
    * @param num_events The number of events to produce
    * @param num_symbols The number of distinct symbols to choose from 
    */
-  public RandomSymbolSource(Random r, int num_events, int num_symbols)
+  public RandomSymbolSource(/*@ non_null @*/ Random r, int num_events, int num_symbols)
   {
     super(r, num_events);
     m_numDistinct = num_symbols;
@@ -70,6 +70,11 @@ public class RandomSymbolSource extends RandomSource
       symbs[i] = Integer.toString(i);
     }
     return symbs;
+  }
+  
+  public /*@ non_null @*/ String[] getSymbols()
+  {
+    return m_symbols;
   }
 
   @Override
