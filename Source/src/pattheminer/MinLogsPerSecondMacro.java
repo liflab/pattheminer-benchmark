@@ -44,7 +44,7 @@ public class MinLogsPerSecondMacro extends NumberMacro
   public Double getNumber()
   {
     TempTable tt = m_table.getDataTable();
-    double min_value = Double.MAX_VALUE;
+    double max_value = Double.MIN_VALUE;
     boolean found = false;
     for (TableEntry te : tt.getEntries())
     {
@@ -59,14 +59,14 @@ public class MinLogsPerSecondMacro extends NumberMacro
         PrimitiveValue pv = me.getValue();
         if (pv != null && !pv.isNull())
         {
-          min_value = Math.min(min_value, me.getValue().numberValue().doubleValue());
+          max_value = Math.max(max_value, me.getValue().numberValue().doubleValue());
           found = true;
         }
       }
     }
-    if (found)
+    if (found && max_value > 0)
     {
-      return DataFormatter.roundToSignificantFigures(min_value / (double) m_line, 2);
+      return DataFormatter.roundToSignificantFigures((double) m_line * 1000d / max_value, 2);
     }
     return 0d;
   }

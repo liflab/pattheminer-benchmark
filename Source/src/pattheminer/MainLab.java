@@ -255,7 +255,7 @@ public class MainLab extends Laboratory
       Group g_te = new Group("Trend extraction");
       add(g_te);
       {
-        Region reg = new Region().add(MiningExperiment.NUM_LOGS, 100, 500, 1000);
+        Region reg = new Region().add(MiningExperiment.NUM_LOGS, 100, 250, 1000);
         reg.addRange(MiningExperiment.LOG_LENGTH, 20000, 100000, 20000);
 
         ExperimentTable t_20000 = generateKMeansExperiment(reg, 20000, g_te);
@@ -271,7 +271,7 @@ public class MainLab extends Laboratory
         k_plot.setNickname("pKMeansLength");
         k_plot.setTitle("Trend extraction speed for symbol distribution and K-means");
         add(k_plot);
-        MinLogsPerSecondMacro mlpsm = new MinLogsPerSecondMacro(this, "minLogsKMeans", 100000, tt);
+        MinLogsPerSecondMacro mlpsm = new MinLogsPerSecondMacro(this, "minLogsKMeans", 1000, tt);
         add(mlpsm);
       }
     }
