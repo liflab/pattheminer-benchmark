@@ -1,12 +1,21 @@
-Title of your lab
-=================
+A benchmark for Pat The Miner
+=============================
 
-| Author:      | Fred Flintstone      |
-| Contact:     | fred@bedrock.com     |
-| Version:     | 1.0                  |
-| Date:        | 2000 B.C.            |
+| Author:      | Laboratoire d'informatique formelle |
+| Version:     | 1.0                                 |
+| Date:        | 2018-05-24                          |
 
-Write here a quick description of your set of experiments.
+Pat The Miner is an extension to the BeepBeep event stream engine.
+It provides various functions and processors to perform two things:
+
+- Compute in real time whether a stream of events deviates from a reference
+  "trend"
+- Compute referece trends from an event stream or a collection of reference
+  event streams
+
+This benchmark measures the performance of these two functionalities, using
+various types of input event streams, pattern computations, and distance
+metrics.
 
 Instructions on using this archive
 ----------------------------------

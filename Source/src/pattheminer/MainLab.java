@@ -117,6 +117,7 @@ public class MainLab extends Laboratory
     // Basic metadata
     setTitle("Benchmark for Pat The Miner");
     setAuthor("Laboratoire d'informatique formelle");
+    setDoi("10.5281/zenodo.1252497");
 
     // Command line arguments
     ArgumentMap args = getCliArguments();
@@ -255,23 +256,23 @@ public class MainLab extends Laboratory
       Group g_te = new Group("Trend extraction");
       add(g_te);
       {
-        Region reg = new Region().add(MiningExperiment.NUM_LOGS, 100, 250, 1000);
-        reg.addRange(MiningExperiment.LOG_LENGTH, 20000, 100000, 20000);
+        Region reg = new Region().add(MiningExperiment.NUM_LOGS, 100, 250, 500);
+        reg.add(MiningExperiment.LOG_LENGTH, 10000, 20000, 50000);
 
-        ExperimentTable t_20000 = generateKMeansExperiment(reg, 20000, g_te);
-        ExperimentTable t_50000 = generateKMeansExperiment(reg, 50000, g_te);
-        ExperimentTable t_100000 = generateKMeansExperiment(reg, 100000, g_te);
+        ExperimentTable t_20000 = generateKMeansExperiment(reg, 10000, g_te);
+        ExperimentTable t_50000 = generateKMeansExperiment(reg, 20000, g_te);
+        ExperimentTable t_100000 = generateKMeansExperiment(reg, 50000, g_te);
         TransformedTable tt = new TransformedTable(new Join(MiningExperiment.NUM_LOGS), 
-            new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "20000"), t_20000),
-            new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "50000"), t_50000),
-            new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "100000"), t_100000));
+            new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "10000"), t_20000),
+            new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "20000"), t_50000),
+            new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "50000"), t_100000));
         tt.setTitle("Trend extraction speed for symbol distribution and K-means");
         add(tt);
         Scatterplot k_plot = new Scatterplot(tt);
         k_plot.setNickname("pKMeansLength");
         k_plot.setTitle("Trend extraction speed for symbol distribution and K-means");
         add(k_plot);
-        MinLogsPerSecondMacro mlpsm = new MinLogsPerSecondMacro(this, "minLogsKMeans", 1000, tt);
+        MinLogsPerSecondMacro mlpsm = new MinLogsPerSecondMacro(this, "minLogsKMeans", 500, tt);
         add(mlpsm);
       }
     }
