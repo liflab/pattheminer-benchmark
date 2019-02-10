@@ -18,7 +18,7 @@
 package pattheminer;
 
 import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.peg.ProcessorMiningFunction;
+import ca.uqac.lif.cep.peg.ml.ProcessorMiningFunction;
 import pattheminer.patterns.CumulativeAverage;
 
 public class WeightedAverageExperiment extends MiningExperiment

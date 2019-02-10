@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018 Laboratoire d'informatique formelle
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -26,8 +26,8 @@ import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
 import ca.uqac.lif.cep.functions.Cumulate;
 import ca.uqac.lif.cep.functions.CumulativeFunction;
+import ca.uqac.lif.cep.functions.TurnInto;
 import ca.uqac.lif.cep.tmf.Fork;
-import ca.uqac.lif.cep.tmf.ReplaceWith;
 import ca.uqac.lif.cep.util.Numbers;
 
 public class CumulativeAverage extends GroupProcessor
@@ -39,7 +39,7 @@ public class CumulativeAverage extends GroupProcessor
     associateInput(INPUT, fork, INPUT);
     Cumulate sum = new Cumulate(new CumulativeFunction<Number>(Numbers.addition));
     Connector.connect(fork, TOP, sum, INPUT);
-    ReplaceWith one = new ReplaceWith(1);
+    TurnInto one = new TurnInto(1);
     Connector.connect(fork, BOTTOM, one, INPUT);
     Cumulate sum_one = new Cumulate(new CumulativeFunction<Number>(Numbers.addition));
     Connector.connect(one, sum_one);

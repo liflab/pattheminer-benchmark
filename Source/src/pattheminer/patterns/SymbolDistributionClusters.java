@@ -27,10 +27,10 @@ import ca.uqac.lif.cep.functions.CumulativeFunction;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.IdentityFunction;
 import ca.uqac.lif.cep.functions.StreamVariable;
+import ca.uqac.lif.cep.functions.TurnInto;
 import ca.uqac.lif.cep.peg.MapDistance.ToValueArray;
 import ca.uqac.lif.cep.peg.Normalize;
 import ca.uqac.lif.cep.peg.ml.DoublePointCast;
-import ca.uqac.lif.cep.tmf.ReplaceWith;
 import ca.uqac.lif.cep.tmf.Slice;
 import ca.uqac.lif.cep.util.Numbers;
 
@@ -41,7 +41,7 @@ public class SymbolDistributionClusters extends GroupProcessor
     super(1, 1);
     GroupProcessor counter = new GroupProcessor(1, 1);
     {
-      ReplaceWith one = new ReplaceWith(1);
+      TurnInto one = new TurnInto(1);
       counter.associateInput(INPUT, one, INPUT);
       Cumulate sum_one = new Cumulate(new CumulativeFunction<Number>(Numbers.addition));
       Connector.connect(one, sum_one);

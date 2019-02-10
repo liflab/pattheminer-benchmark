@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018 Laboratoire d'informatique formelle
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
-import ca.uqac.lif.cep.peg.ProcessorMiningFunction;
 import ca.uqac.lif.cep.peg.ml.KMeansFunction;
+import ca.uqac.lif.cep.peg.ml.ProcessorMiningFunction;
 import ca.uqac.lif.labpal.Random;
 import pattheminer.patterns.SymbolDistribution;
 
