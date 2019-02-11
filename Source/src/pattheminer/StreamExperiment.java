@@ -91,17 +91,17 @@ public abstract class StreamExperiment extends Experiment
     write(THROUGHPUT, (1000f * (float) MainLab.MAX_TRACE_LENGTH) / ((float) (end - start)));
   }
   
-  protected void setProcessor(Processor p)
+  public void setProcessor(Processor p)
   {
     m_processor = p;
   }
   
-  protected void setSource(Source s)
+  public void setSource(Source s)
   {
     m_source = s;
   }
   
-  protected void setEventStep(int step)
+  public void setEventStep(int step)
   {
     m_eventStep = step;
   }
