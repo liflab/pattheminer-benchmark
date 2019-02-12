@@ -45,6 +45,11 @@ public abstract class ClassifierExperiment extends StreamExperiment
    * Number of classes in which a window can be classified
    */
   public static final transient String NUM_CLASSES = "Number of classes";
+  
+  /**
+   * Width of the circular buffer holding the instances to learn
+   */
+  public static final transient String ROLL_WIDTH = "Roll width";
 
   /**
    * The classifier used in the prediction experiment
@@ -64,7 +69,7 @@ public abstract class ClassifierExperiment extends StreamExperiment
   /**
    * The processor used to update the classifier
    */
-  protected UpdateClassifier m_updateClassifier;
+  protected transient UpdateClassifier m_updateClassifier;
 
   ClassifierExperiment()
   {
@@ -74,9 +79,10 @@ public abstract class ClassifierExperiment extends StreamExperiment
     describe(NUM_FEATURES, "Number of features computed from the window (i.e. number of dimensions of the learning problem)");
     describe(UPDATE_INTERVAL, "Interval at which the learning algorithm is updated");
     describe(NUM_CLASSES, "Number of classes in which a window can be classified");
+    describe(ROLL_WIDTH, "Width of the circular buffer holding the instances to learn");
   }
   
-  public ClassifierExperiment(String learning_algorithm, Classifier c, int update_interval, Attribute ... attributes)
+  public ClassifierExperiment(String learning_algorithm, Classifier c, int update_interval, int roll_width, Attribute ... attributes)
   {
     this();
     m_classifier = c;
@@ -85,6 +91,7 @@ public abstract class ClassifierExperiment extends StreamExperiment
     setInput(NUM_FEATURES, attributes.length - 1);
     setInput(UPDATE_INTERVAL, update_interval);
     setInput(NUM_CLASSES, attributes[attributes.length - 1].numValues());
-    m_updateClassifier = new UpdateClassifier(c, update_interval, m_datasetName, attributes);
+    setInput(ROLL_WIDTH, roll_width);
+    m_updateClassifier = new UpdateClassifier(c, update_interval, roll_width, m_datasetName, attributes);
   }
 }

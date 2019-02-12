@@ -62,9 +62,9 @@ public class ClassifierTrainingExperiment extends ClassifierExperiment
   /**
    * Creates a new prediction experiment
    */
-  public ClassifierTrainingExperiment(String learning_algorithm, Classifier c, int update_interval, Processor beta, Processor kappa, int t, int m, int n, Attribute ... attributes)
+  public ClassifierTrainingExperiment(String learning_algorithm, Classifier c, int update_interval, int roll_width, Processor beta, Processor kappa, int t, int m, int n, Attribute ... attributes)
   {
-    super(learning_algorithm, c, update_interval, attributes);
+    super(learning_algorithm, c, update_interval, roll_width, attributes);
     setDescription("Experiment that trains a classifier by comparing two windows of the same stream.");
     describe(T, "Offset (in number of events) between the trend and the class windows");
     describe(M, "Width of the trend window");

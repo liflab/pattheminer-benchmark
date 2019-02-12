@@ -30,7 +30,7 @@ public abstract class RandomSource extends Source
   /**
    * The random number generator used to generate the numbers
    */
-  protected /*@ non_null @*/ Random m_random;
+  protected transient /*@ non_null @*/ Random m_random;
   
   /**
    * The number of events to produce

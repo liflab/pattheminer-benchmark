@@ -1,0 +1,49 @@
+package pattheminer.classifiers;
+
+import ca.uqac.lif.cep.Processor;
+import ca.uqac.lif.labpal.Random;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import pattheminer.RandomSource;
+import weka.core.Attribute;
+
+public class RandomArraySource extends RandomSource
+{
+  /**
+   * The number of attributes
+   */
+  protected int m_numAttributes;
+  
+  protected ArrayList<Object> m_classValues;
+  
+  public RandomArraySource(Random r, int num_events, int num_attributes, Attribute class_att)
+  {
+    super(r, num_events);
+    m_classValues = new ArrayList<Object>();
+    m_numAttributes = num_attributes;
+    Enumeration<?> en = class_att.enumerateValues();
+    while (en.hasMoreElements())
+    {
+      m_classValues.add(en.nextElement());
+    }
+  }
+  
+  @Override
+  protected Object getEvent()
+  {
+    Object[] out = new Object[m_numAttributes + 1];
+    for (int i = 0; i < m_numAttributes; i++)
+    {
+      out[i] = m_random.nextInt(100);
+    }
+    out[m_numAttributes] = m_classValues.get(m_random.nextInt(m_classValues.size()));
+    return out;
+  }
+
+  @Override
+  public Processor duplicate(boolean with_state)
+  {
+    throw new UnsupportedOperationException();
+  }
+
+}
