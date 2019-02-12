@@ -33,18 +33,30 @@ import ca.uqac.lif.labpal.ExperimentException;
  */
 public abstract class StreamExperiment extends Experiment
 {
+  /**
+   * The average number of events processed per second
+   */
   public static final transient String THROUGHPUT = "Throughput";
-  
+
+  /**
+   * Cumulative running time (in ms)
+   */
   public static final transient String TIME = "Running time";
-  
+
+  /**
+   * Number of events processed
+   */
   public static final transient String LENGTH = "Stream length";
-    
+
+  /**
+   * Whether the experiment uses multiple threads or a single one
+   */
   public static final transient String MULTITHREAD = "Multi-threaded";
 
   protected transient Processor m_processor;
-  
+
   protected transient Source m_source;
-  
+
   protected int m_eventStep = 1000;
 
   public StreamExperiment()
@@ -60,7 +72,7 @@ public abstract class StreamExperiment extends Experiment
     y.add(0);
     write(TIME, y);
   }
-  
+
   @Override
   public void execute() throws ExperimentException, InterruptedException 
   {
@@ -90,17 +102,17 @@ public abstract class StreamExperiment extends Experiment
     long end = System.currentTimeMillis();
     write(THROUGHPUT, (1000f * (float) MainLab.MAX_TRACE_LENGTH) / ((float) (end - start)));
   }
-  
+
   public void setProcessor(Processor p)
   {
     m_processor = p;
   }
-  
+
   public void setSource(Source s)
   {
     m_source = s;
   }
-  
+
   public void setEventStep(int step)
   {
     m_eventStep = step;
