@@ -21,7 +21,7 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
 import ca.uqac.lif.cep.peg.weka.WekaUtils;
 import ca.uqac.lif.cep.util.NthElement;
-import ca.uqac.lif.labpal.Experiment;
+import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Group;
 import ca.uqac.lif.labpal.Region;
 import ca.uqac.lif.labpal.table.ExperimentTable;
@@ -29,19 +29,17 @@ import ca.uqac.lif.mtnp.plot.TwoDimensionalPlot.Axis;
 import ca.uqac.lif.mtnp.plot.gnuplot.Scatterplot;
 import ca.uqac.lif.mtnp.table.ExpandAsColumns;
 import ca.uqac.lif.mtnp.table.TransformedTable;
-import java.util.Collection;
 import pattheminer.ClassifierExperiment;
 import pattheminer.ClassifierTrainingExperiment;
 import pattheminer.MainLab;
+import pattheminer.SetupAgent;
 import pattheminer.StreamExperiment;
 import pattheminer.patterns.ExtractAttributes;
 import weka.core.Attribute;
 import static pattheminer.ClassifierExperiment.*;
 
-public class SetupClassifierExperiments
+public class SetupClassifierExperiments extends SetupAgent<ClassifierTrainingExperiment>
 {
-  protected MainLab m_lab;
-
   protected static int s_maxTraceLength = 10000;
 
   public static void populate(MainLab lab)
@@ -52,8 +50,7 @@ public class SetupClassifierExperiments
 
   protected SetupClassifierExperiments(/*@ non_null @*/ MainLab lab)
   {
-    super();
-    m_lab = lab;
+    super(lab, new SetupFactory(lab));
   }
 
   /**
@@ -81,14 +78,15 @@ public class SetupClassifierExperiments
           original_table.setShowInList(false);
           for (Region r_ll : r_w.all(ClassifierExperiment.NUM_CLASSES, ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.NUM_FEATURES))
           {
-            ClassifierTrainingExperiment cte = getClassifierTrainingExperiment(r_ll);
+            ClassifierTrainingExperiment cte = m_factory.get(r_ll);
+            g.add(cte);
             original_table.add(cte);
           }
           TransformedTable t_table = new TransformedTable(new ExpandAsColumns(ClassifierExperiment.NUM_FEATURES, ClassifierExperiment.TIME), original_table);
           t_table.setTitle("Throughput for classifier training (" + r_w.getString(ClassifierExperiment.LEARNING_ALGORITHM) + "), roll width=" + r_w.getInt(ClassifierExperiment.ROLL_WIDTH));
           t_table.setNickname("tCtThroughput");
           m_lab.add(original_table, t_table);
-          
+
           // Make a scatterplot with it
           Scatterplot plot = new Scatterplot(t_table);
           plot.setTitle("Throughput for classifier training (" + r_w.getString(ClassifierExperiment.LEARNING_ALGORITHM) + "), roll width=" + r_w.getInt(ClassifierExperiment.ROLL_WIDTH));
@@ -97,7 +95,7 @@ public class SetupClassifierExperiments
           m_lab.add(plot);          
         }
       }
-      
+
       {
         // For roll width=1000 and update interval=1...
         Region rg_n = reg.set(ROLL_WIDTH, 1000).set(UPDATE_INTERVAL, 1);
@@ -106,7 +104,7 @@ public class SetupClassifierExperiments
         for (Region rg_c : rg_n.all(LEARNING_ALGORITHM, NUM_FEATURES))
         {
           // For each algorithm
-          ClassifierTrainingExperiment cte = getClassifierTrainingExperiment(rg_c);
+          ClassifierTrainingExperiment cte = m_factory.get(rg_c);
           original_table.add(cte);
         }
         TransformedTable t_table = new TransformedTable(new ExpandAsColumns(LEARNING_ALGORITHM, THROUGHPUT), original_table);
@@ -121,41 +119,6 @@ public class SetupClassifierExperiments
         m_lab.add(plot);
       }
     }
-  }
-
-  /**
-   * Generates a new classifier training experiment with given parameters,
-   * or fetches the existing one if it already exists.
-   * @param r The region describing the experiment's parameters
-   * @return The experiment
-   */
-  /*@ null @*/ protected ClassifierTrainingExperiment getClassifierTrainingExperiment(/*@ non_null @*/ Region r)
-  {
-    Collection<Experiment> col = m_lab.filterExperiments(r, ClassifierTrainingExperiment.class);
-    if (col.isEmpty())
-    {
-      // Experiment does not exist
-      int num_features = r.getInt(ClassifierExperiment.NUM_FEATURES);
-      int num_classes = r.getInt(ClassifierExperiment.NUM_CLASSES);
-      String algo_name = r.getString(ClassifierExperiment.LEARNING_ALGORITHM);
-      int update_interval = r.getInt(ClassifierExperiment.UPDATE_INTERVAL);
-      int roll_width = r.getInt(ClassifierExperiment.ROLL_WIDTH);
-      Processor beta = new ExtractAttributes(num_features);
-      Processor kappa = new ApplyFunction(new NthElement(num_features));
-      Attribute[] atts = createDummyAttributes(num_features, num_classes);
-      ClassifierTrainingExperiment cte = new ClassifierTrainingExperiment(algo_name, WekaUtils.getClassifier(algo_name), update_interval, roll_width, beta, kappa, 1, 1, 1, atts);
-      cte.setSource(new RandomArraySource(m_lab.getRandom(), s_maxTraceLength, num_features, atts[num_features]));
-      m_lab.add(cte);
-      return cte;
-    }
-    else
-    {
-      for (Experiment e : col)
-      {
-        return (ClassifierTrainingExperiment) e;
-      }
-    }
-    return null;
   }
 
   /**
@@ -179,5 +142,29 @@ public class SetupClassifierExperiments
     Attribute class_att = WekaUtils.createAttribute(Integer.toString(num_attributes), att_vals);
     atts[num_attributes] = class_att;
     return atts;
+  }
+
+  protected static class SetupFactory extends ExperimentFactory<MainLab,ClassifierTrainingExperiment>
+  {
+    SetupFactory(MainLab lab)
+    {
+      super(lab, ClassifierTrainingExperiment.class);
+    }
+
+    @Override
+    protected ClassifierTrainingExperiment createExperiment(Region r)
+    {
+      int num_features = r.getInt(ClassifierExperiment.NUM_FEATURES);
+      int num_classes = r.getInt(ClassifierExperiment.NUM_CLASSES);
+      String algo_name = r.getString(ClassifierExperiment.LEARNING_ALGORITHM);
+      int update_interval = r.getInt(ClassifierExperiment.UPDATE_INTERVAL);
+      int roll_width = r.getInt(ClassifierExperiment.ROLL_WIDTH);
+      Processor beta = new ExtractAttributes(num_features);
+      Processor kappa = new ApplyFunction(new NthElement(num_features));
+      Attribute[] atts = createDummyAttributes(num_features, num_classes);
+      ClassifierTrainingExperiment cte = new ClassifierTrainingExperiment(algo_name, WekaUtils.getClassifier(algo_name), update_interval, roll_width, beta, kappa, 1, 1, 1, atts);
+      cte.setSource(new RandomArraySource(m_lab.getRandom(), s_maxTraceLength, num_features, atts[num_features]));
+      return cte;
+    }
   }
 }
