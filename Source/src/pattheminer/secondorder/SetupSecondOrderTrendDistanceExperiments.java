@@ -66,7 +66,8 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
     m_lab.add(g);
     Region reg = new Region().add(NUM_TRENDS, 1, 3, 5, 7);
     ExperimentTable exp_t = new ExperimentTable(StreamExperiment.LENGTH, NUM_TRENDS, StreamExperiment.TIME);
-    exp_t.setTitle("Throughput for second-order trend distance");
+    MainLab.s_nicknamer.setNickname(exp_t, reg, "t", "2ndOrder");
+    MainLab.s_titleNamer.setTitle(exp_t, reg, "Throughput for second-order trend distance ", "");
     for (Region in_r : reg.all(NUM_TRENDS))
     {
       IdenticalSecondOrderExperiment isoe = m_factory.get(in_r);
@@ -75,7 +76,8 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
     }
     m_lab.add(exp_t);
     TransformedTable tt = new TransformedTable(new ExpandAsColumns(NUM_TRENDS, StreamExperiment.TIME), exp_t);
-    tt.setTitle(exp_t.getTitle());
+    MainLab.s_nicknamer.setNickname(tt, reg, "tt", "2ndOrder");
+    MainLab.s_titleNamer.setTitle(tt, reg, "Throughput for second-order trend distance ", " (grouped by " + NUM_TRENDS + ")");
     m_lab.add(tt);
     Scatterplot plot = new Scatterplot(tt);
     plot.setTitle("Throughput for second-order trend distance");

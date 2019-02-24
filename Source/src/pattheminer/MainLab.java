@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018 Laboratoire d'informatique formelle
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -55,6 +55,16 @@ public class MainLab extends Laboratory
    * A thread pool. Used only for multi-thread experiments.
    */
   public static transient ExecutorService s_service = Executors.newCachedThreadPool();
+  
+  /**
+   * A nicknamer
+   */
+  public static transient MainLabNicknamer s_nicknamer = new MainLabNicknamer();
+  
+  /**
+   * A title namer
+   */
+  public static transient MainLabTitleNamer s_titleNamer = new MainLabTitleNamer();
 
   /**
    * A group for experiments measuring the throughput of trend distance processors
