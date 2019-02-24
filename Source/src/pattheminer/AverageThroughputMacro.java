@@ -22,6 +22,7 @@ import ca.uqac.lif.labpal.macro.NumberMacro;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.DataFormatter;
 import ca.uqac.lif.mtnp.table.TableEntry;
+import pattheminer.trenddistance.TrendDistanceExperiment;
 
 /**
  * Macro that computes the average throughput of a processor chain. This is

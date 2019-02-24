@@ -38,26 +38,20 @@ import pattheminer.patterns.ExtractAttributes;
 import weka.core.Attribute;
 import static pattheminer.ClassifierExperiment.*;
 
-public class SetupClassifierExperiments extends SetupAgent<ClassifierTrainingExperiment>
+public class SetupClassifierExperiments extends SetupAgent
 {
   protected static int s_maxTraceLength = 10000;
-
-  public static void populate(MainLab lab)
+  
+  public SetupClassifierExperiments(/*@ non_null @*/ MainLab lab)
   {
-    SetupClassifierExperiments cm = new SetupClassifierExperiments(lab);
-    cm.fillWithExperiments();
+    super(lab);
   }
 
-  protected SetupClassifierExperiments(/*@ non_null @*/ MainLab lab)
+  @Override
+  public void fillWithExperiments()
   {
-    super(lab, new SetupFactory(lab));
-  }
-
-  /**
-   * Populates the lab with experiments
-   */
-  protected void fillWithExperiments()
-  {
+    SetupFactory factory = new SetupFactory(m_lab);
+    
     // Self-trained class prediction experiments
     {
       Group g = new Group("Self-trained class prediction throughput");
@@ -78,7 +72,7 @@ public class SetupClassifierExperiments extends SetupAgent<ClassifierTrainingExp
           original_table.setShowInList(false);
           for (Region r_ll : r_w.all(ClassifierExperiment.NUM_CLASSES, ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.NUM_FEATURES))
           {
-            ClassifierTrainingExperiment cte = m_factory.get(r_ll);
+            ClassifierTrainingExperiment cte = factory.get(r_ll);
             g.add(cte);
             original_table.add(cte);
           }
@@ -104,7 +98,7 @@ public class SetupClassifierExperiments extends SetupAgent<ClassifierTrainingExp
         for (Region rg_c : rg_n.all(LEARNING_ALGORITHM, NUM_FEATURES))
         {
           // For each algorithm
-          ClassifierTrainingExperiment cte = m_factory.get(rg_c);
+          ClassifierTrainingExperiment cte = factory.get(rg_c);
           original_table.add(cte);
         }
         TransformedTable t_table = new TransformedTable(new ExpandAsColumns(LEARNING_ALGORITHM, THROUGHPUT), original_table);

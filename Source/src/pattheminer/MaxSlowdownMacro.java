@@ -21,6 +21,7 @@ import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.macro.NumberMacro;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
+import pattheminer.trenddistance.TrendDistanceExperiment;
 
 public class MaxSlowdownMacro extends NumberMacro
 {

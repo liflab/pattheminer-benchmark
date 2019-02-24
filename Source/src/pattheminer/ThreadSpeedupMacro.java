@@ -20,6 +20,7 @@ package pattheminer;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.macro.NumberMacro;
 import ca.uqac.lif.mtnp.DataFormatter;
+import pattheminer.trenddistance.TrendDistanceExperiment;
 
 public class ThreadSpeedupMacro extends NumberMacro
 {

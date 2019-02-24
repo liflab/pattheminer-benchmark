@@ -128,12 +128,12 @@ public class MainLab extends Laboratory
     add(new LabStats(this));
 
     // Trend distance experiments
-    SetupTrendDistanceExperiments.populate(this);
+    new SetupTrendDistanceExperiments(this).fillWithExperiments();
 
     // Classifier training experiments
     if (s_includePredictiveExperiments)
     {
-      SetupClassifierExperiments.populate(this);
+      new SetupClassifierExperiments(this).fillWithExperiments();
     }
     
     // Second-order trend distance experiments

@@ -23,6 +23,7 @@ import ca.uqac.lif.mtnp.table.PrimitiveValue;
 import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
+import pattheminer.trenddistance.TrendDistanceExperiment;
 
 /**
  * Claim that checks that the running time of the same computation increases

@@ -19,7 +19,7 @@ package pattheminer;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import pattheminer.trenddistance.TrendDistanceExperiment;
 import ca.uqac.lif.labpal.provenance.ExperimentValue;
 import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TableEntry;

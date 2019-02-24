@@ -17,15 +17,12 @@
  */
 package pattheminer;
 
-import ca.uqac.lif.labpal.Experiment;
-import ca.uqac.lif.labpal.ExperimentFactory;
-
 /**
  * An object designed to help in the setup of experiments of a particular type.
  * Agents are used to avoid cluttering the lab's main method and separate
  * the setup of experiments into categories.
  */
-public abstract class SetupAgent<U extends Experiment>
+public abstract class SetupAgent
 {
   /**
    * The lab in which experiments will be created
@@ -33,20 +30,13 @@ public abstract class SetupAgent<U extends Experiment>
   /*@ non_null @*/ protected MainLab m_lab;
   
   /**
-   * The factory used to create the experiments
-   */
-  /*@ non_null @*/ protected ExperimentFactory<MainLab,U> m_factory;
-  
-  /**
    * Creates a new setup agent
    * @param lab The lab in which experiments will be created
-   * @param factory The factory used to create the experiments
    */
-  public SetupAgent(/*@ non_null @*/ MainLab lab, ExperimentFactory<MainLab,U> factory)
+  public SetupAgent(/*@ non_null @*/ MainLab lab)
   {
     super();
     m_lab = lab;
-    m_factory = factory;
   }
   
   /**

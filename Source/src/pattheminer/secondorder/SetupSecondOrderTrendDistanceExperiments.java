@@ -38,12 +38,12 @@ import static pattheminer.secondorder.SecondOrderExperiment.NUM_TRENDS;
 /**
  * Setup of experiments for the second-order trend distance.
  */
-public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<IdenticalSecondOrderExperiment>
+public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent
 {
   /**
    * The number of events to generate in each trace
    */
-  protected static int s_traceLength = 5000;
+  protected static int s_traceLength = 100000;
 
   /**
    * Creates a new setup agent
@@ -51,13 +51,7 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
    */
   public SetupSecondOrderTrendDistanceExperiments(MainLab lab)
   {
-    super(lab, new SetupFactory(lab));
-  }
-
-  public static void populate(MainLab lab)
-  {
-    SetupSecondOrderTrendDistanceExperiments m = new SetupSecondOrderTrendDistanceExperiments(lab);
-    m.fillWithExperiments();
+    super(lab);
   }
 
   /**
@@ -66,9 +60,11 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
   @Override
   public void fillWithExperiments()
   {
+    SetupFactory factory = new SetupFactory(m_lab);
+    
     Group g = new Group("Second-order experiments");
     m_lab.add(g);
-    Region reg = new Region().add(NUM_TRENDS, 1, 3, 5, 7);
+    Region reg = new Region().add(NUM_TRENDS, 1, 3, 5, 7, 9, 11);
 
     // Throughput for each value of k
     {
@@ -77,7 +73,7 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
       MainLab.s_titleNamer.setTitle(exp_t, reg, "Throughput for second-order trend distance ", "");
       for (Region in_r : reg.all(NUM_TRENDS))
       {
-        IdenticalSecondOrderExperiment isoe = m_factory.get(in_r);
+        IdenticalSecondOrderExperiment isoe = factory.get(in_r);
         g.add(isoe);
         exp_t.add(isoe);
       }
@@ -100,7 +96,7 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
       MainLab.s_titleNamer.setTitle(exp_t, reg, "Impact of " + NUM_TRENDS + " on second-order trend distance", "");
       for (Region in_r : reg.all(NUM_TRENDS))
       {
-        IdenticalSecondOrderExperiment isoe = m_factory.get(in_r);
+        IdenticalSecondOrderExperiment isoe = factory.get(in_r);
         exp_t.add(isoe);
       }
       m_lab.add(exp_t);
