@@ -30,10 +30,10 @@ import ca.uqac.lif.mtnp.table.Join;
 import ca.uqac.lif.mtnp.table.RenameColumns;
 import ca.uqac.lif.mtnp.table.TransformedTable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import pattheminer.classifiers.SetupClassifierExperiments;
+import pattheminer.secondorder.SetupSecondOrderTrendDistanceExperiments;
 import pattheminer.trenddistance.SetupTrendDistanceExperiments;
 
 /**
@@ -77,6 +77,11 @@ public class MainLab extends Laboratory
    * Whether to display experiments about multi-threading
    */
   protected static boolean s_includeThreadExperiments = false;
+  
+  /**
+   * Whether to display experiments about predictive analytics
+   */
+  protected static boolean s_includePredictiveExperiments = false;
 
   /**
    * The first window width to be used in each experiment
@@ -116,7 +121,13 @@ public class MainLab extends Laboratory
     SetupTrendDistanceExperiments.populate(this);
 
     // Classifier training experiments
-    SetupClassifierExperiments.populate(this);
+    if (s_includePredictiveExperiments)
+    {
+      SetupClassifierExperiments.populate(this);
+    }
+    
+    // Second-order trend distance experiments
+    new SetupSecondOrderTrendDistanceExperiments(this).fillWithExperiments();
 
 
     // Impact of threading
@@ -244,17 +255,5 @@ public class MainLab extends Laboratory
     return "Unknown";
   }
 
-  public Collection<Experiment> filterExperiments(Region reg, Class<?> exp_type)
-  {
-    Collection<Experiment> col = filterExperiments(reg);
-    Collection<Experiment> c_col = new HashSet<Experiment>();
-    for (Experiment e : col)
-    {
-      if (exp_type.isInstance(e))
-      {
-        c_col.add(e);
-      }
-    }
-    return c_col;
-  }
+  
 }
