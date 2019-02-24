@@ -45,11 +45,15 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
    */
   protected static int s_traceLength = 5000;
 
+  /**
+   * Creates a new setup agent
+   * @param lab The lab in which the experiments will be added
+   */
   public SetupSecondOrderTrendDistanceExperiments(MainLab lab)
   {
     super(lab, new SetupFactory(lab));
   }
-  
+
   public static void populate(MainLab lab)
   {
     SetupSecondOrderTrendDistanceExperiments m = new SetupSecondOrderTrendDistanceExperiments(lab);
@@ -65,26 +69,49 @@ public class SetupSecondOrderTrendDistanceExperiments extends SetupAgent<Identic
     Group g = new Group("Second-order experiments");
     m_lab.add(g);
     Region reg = new Region().add(NUM_TRENDS, 1, 3, 5, 7);
-    ExperimentTable exp_t = new ExperimentTable(StreamExperiment.LENGTH, NUM_TRENDS, StreamExperiment.TIME);
-    MainLab.s_nicknamer.setNickname(exp_t, reg, "t", "2ndOrder");
-    MainLab.s_titleNamer.setTitle(exp_t, reg, "Throughput for second-order trend distance ", "");
-    for (Region in_r : reg.all(NUM_TRENDS))
+
+    // Throughput for each value of k
     {
-      IdenticalSecondOrderExperiment isoe = m_factory.get(in_r);
-      g.add(isoe);
-      exp_t.add(isoe);
+      ExperimentTable exp_t = new ExperimentTable(StreamExperiment.LENGTH, NUM_TRENDS, StreamExperiment.TIME);
+      MainLab.s_nicknamer.setNickname(exp_t, reg, "t", "2ndOrder");
+      MainLab.s_titleNamer.setTitle(exp_t, reg, "Throughput for second-order trend distance ", "");
+      for (Region in_r : reg.all(NUM_TRENDS))
+      {
+        IdenticalSecondOrderExperiment isoe = m_factory.get(in_r);
+        g.add(isoe);
+        exp_t.add(isoe);
+      }
+      m_lab.add(exp_t);
+      TransformedTable tt = new TransformedTable(new ExpandAsColumns(NUM_TRENDS, StreamExperiment.TIME), exp_t);
+      MainLab.s_nicknamer.setNickname(tt, reg, "tt", "2ndOrder");
+      MainLab.s_titleNamer.setTitle(tt, reg, "Throughput for second-order trend distance ", " (grouped by " + NUM_TRENDS + ")");
+      m_lab.add(tt);
+      Scatterplot plot = new Scatterplot(tt);
+      plot.setCaption(Axis.X, "Stream length").setCaption(Axis.Y, "Time");
+      MainLab.s_nicknamer.setNickname(plot, reg, "p", "2ndOrder");
+      MainLab.s_titleNamer.setTitle(plot, reg, "Throughput for second-order trend distance ", " (grouped by " + NUM_TRENDS + ")");
+      m_lab.add(plot);
     }
-    m_lab.add(exp_t);
-    TransformedTable tt = new TransformedTable(new ExpandAsColumns(NUM_TRENDS, StreamExperiment.TIME), exp_t);
-    MainLab.s_nicknamer.setNickname(tt, reg, "tt", "2ndOrder");
-    MainLab.s_titleNamer.setTitle(tt, reg, "Throughput for second-order trend distance ", " (grouped by " + NUM_TRENDS + ")");
-    m_lab.add(tt);
-    Scatterplot plot = new Scatterplot(tt);
-    plot.setTitle("Throughput for second-order trend distance");
-    plot.setCaption(Axis.X, "Stream length").setCaption(Axis.Y, "Time");
-    m_lab.add(plot);
+
+    // Impact of k on throughput
+    {
+      ExperimentTable exp_t = new ExperimentTable(NUM_TRENDS, StreamExperiment.THROUGHPUT);
+      MainLab.s_nicknamer.setNickname(exp_t, reg, "t", "kImpact2ndOrder");
+      MainLab.s_titleNamer.setTitle(exp_t, reg, "Impact of " + NUM_TRENDS + " on second-order trend distance", "");
+      for (Region in_r : reg.all(NUM_TRENDS))
+      {
+        IdenticalSecondOrderExperiment isoe = m_factory.get(in_r);
+        exp_t.add(isoe);
+      }
+      m_lab.add(exp_t);
+      Scatterplot plot = new Scatterplot(exp_t);
+      plot.setCaption(Axis.X, "Stream length").setCaption(Axis.Y, "Time");
+      MainLab.s_nicknamer.setNickname(plot, reg, "p", "kImpact2ndOrder");
+      plot.setTitle(exp_t.getTitle());
+      m_lab.add(plot);
+    }
   }
-  
+
   /**
    * Factory that creates experiments in this category
    */
