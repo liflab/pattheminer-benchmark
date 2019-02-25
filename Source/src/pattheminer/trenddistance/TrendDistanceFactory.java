@@ -17,24 +17,32 @@
  */
 package pattheminer.trenddistance;
 
+import ca.uqac.lif.cep.Connector;
+import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.concurrency.NonBlockingPush;
 import ca.uqac.lif.cep.concurrency.ParallelWindow;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
+import ca.uqac.lif.cep.peg.JaccardIndex;
 import ca.uqac.lif.cep.peg.MapDistance;
 import ca.uqac.lif.cep.peg.PointDistance;
 import ca.uqac.lif.cep.peg.TrendDistance;
 import ca.uqac.lif.cep.peg.ml.DistanceToClosest;
 import ca.uqac.lif.cep.peg.ml.RunningMoments;
 import ca.uqac.lif.cep.tmf.Source;
+import ca.uqac.lif.cep.tmf.Window;
 import ca.uqac.lif.cep.util.Numbers;
+import ca.uqac.lif.cep.util.Sets;
 import ca.uqac.lif.json.JsonString;
 import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Random;
 import ca.uqac.lif.labpal.Region;
+import ca.uqac.lif.structures.MathLists;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
@@ -45,6 +53,17 @@ import pattheminer.patterns.CumulativeAverage;
 import pattheminer.patterns.SymbolDistribution;
 import pattheminer.patterns.SymbolDistributionClusters;
 
+import static pattheminer.trenddistance.TrendDistanceExperiment.CLOSEST_CLUSTER;
+import static pattheminer.trenddistance.TrendDistanceExperiment.N_GRAM_WIDTH;
+import static pattheminer.trenddistance.TrendDistanceExperiment.N_GRAMS;
+import static pattheminer.trenddistance.TrendDistanceExperiment.RUNNING_AVG;
+import static pattheminer.trenddistance.TrendDistanceExperiment.RUNNING_MOMENTS;
+import static pattheminer.trenddistance.TrendDistanceExperiment.SYMBOL_DISTRIBUTION;
+
+/**
+ * Factory that generates static trend distance experiments using various
+ * input sources and trend processors.
+ */
 public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanceExperiment>
 {
   public TrendDistanceFactory(MainLab lab)
@@ -57,21 +76,29 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
   {
     String trend_name = r.getString(TrendDistanceExperiment.TREND);
     int width = r.getInt(TrendDistanceExperiment.WIDTH);
-    if (trend_name.compareTo("Running average") == 0)
+    if (trend_name.compareTo(RUNNING_AVG) == 0)
     {
       return createAverageExperiment(width, false);
     }
-    else if (trend_name.compareTo("Running moments") == 0)
+    else if (trend_name.compareTo(RUNNING_MOMENTS) == 0)
     {
       return createRunningMomentsExperiment(width, false);
     }
-    else if (trend_name.compareTo("Closest cluster") == 0)
+    else if (trend_name.compareTo(CLOSEST_CLUSTER) == 0)
     {
       return createClosestClusterExperiment(width, false);
     }
-    else if (trend_name.compareTo("Symbol distribution") == 0)
+    else if (trend_name.compareTo(SYMBOL_DISTRIBUTION) == 0)
     {
       return createDistributionExperiment(width, false);
+    }
+    else if (trend_name.compareTo(N_GRAMS) == 0)
+    {
+      if (r.hasDimension(N_GRAM_WIDTH))
+      {
+        return createNgramExperiment(width, r.getInt(N_GRAM_WIDTH), false);
+      }
+      return createNgramExperiment(width, 3, false);
     }
     return null;
   }
@@ -100,7 +127,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(6, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(Numbers.subtraction, StreamVariable.X, StreamVariable.Y)), 0.5, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
-    return createNewTrendDistanceExperiment("Running average", "Subtraction", src, alarm, width, multi_thread);
+    return createNewTrendDistanceExperiment(RUNNING_AVG, "Subtraction", src, alarm, width, multi_thread);
   }
 
   /**
@@ -128,7 +155,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
     TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
-    return createNewTrendDistanceExperiment("Running moments", "Vector distance", src, alarm, width, multi_thread);
+    return createNewTrendDistanceExperiment(RUNNING_MOMENTS, "Vector distance", src, alarm, width, multi_thread);
   }
 
   /**
@@ -160,7 +187,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
     TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new DistanceToClosest(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
-    return createNewTrendDistanceExperiment("Closest cluster", "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
+    return createNewTrendDistanceExperiment(CLOSEST_CLUSTER, "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
 
   /**
@@ -189,7 +216,54 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
     TrendDistance<HashMap<?,?>,Number,Number> alarm = new TrendDistance<HashMap<?,?>,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(MapDistance.instance, StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
     Source src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
-    return createNewTrendDistanceExperiment("Symbol distribution", "Map distance", src, alarm, width, multi_thread);
+    return createNewTrendDistanceExperiment(SYMBOL_DISTRIBUTION, "Map distance", src, alarm, width, multi_thread);
+  }
+  
+  /**
+   * Creates a new experiment using the set of N-grams as the trend processor
+   * @param width The window width
+   * @param N The size of the N-grams
+   * @param multi_thread Whether to use multi-threading
+   * @return The average experiment
+   */
+  protected TrendDistanceExperiment createNgramExperiment(int width, int N, boolean multi_thread)
+  {
+    Random random = m_lab.getRandom();
+    Source src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
+    
+    // Group processor that creates and accumulates N-grams
+    GroupProcessor cumul_n_grams = new GroupProcessor(1, 1);
+    {
+      MathLists.PutInto n_gram_maker = new MathLists.PutInto();
+      Window n_gram_win = new Window(n_gram_maker, N);
+      Sets.PutIntoNew accumulate_n_grams = new Sets.PutIntoNew();
+      Connector.connect(n_gram_win, accumulate_n_grams);
+      cumul_n_grams.associateInput(0, n_gram_win, 0);
+      cumul_n_grams.associateOutput(0, accumulate_n_grams, 0);
+      cumul_n_grams.addProcessors(n_gram_win, accumulate_n_grams);
+    }
+    // Put this into a window
+    Processor wp = null;
+    if (multi_thread)
+    {
+      NonBlockingPush nbp = new NonBlockingPush(cumul_n_grams, MainLab.s_service);
+      wp = new ParallelWindow(nbp, width);
+    }
+    else
+    {
+      //wp = new Window(average, width);
+      wp = new ParallelWindow(cumul_n_grams, width);
+    }
+    Set<Object> reference = new HashSet<Object>();
+    reference.add(createList("A", "B", "A"));
+    reference.add(createList("B", "B", "A"));
+    reference.add(createList("C", "C", "C"));
+    TrendDistance<Set<Object>,Number,Number> alarm = new TrendDistance<Set<Object>,Number,Number>(reference, wp, JaccardIndex.instance, 1, Numbers.isLessThan);
+    TrendDistanceExperiment tde = createNewTrendDistanceExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
+    // For the n-gram experiment, there is an additional parameter
+    tde.setInput(N_GRAM_WIDTH, N);
+    tde.describe(N_GRAM_WIDTH, "The width of the N-grams (i.e. the value of N");
+    return tde;
   }
 
   /**
@@ -220,7 +294,18 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
     return tde;
   }
 
-
-
-
+  /**
+   * Creates a list with an array of elements
+   * @param elements The elements
+   * @return The list with the elements
+   */
+  protected static List<Object> createList(Object ... elements)
+  {
+    List<Object> out = new ArrayList<Object>(elements.length);
+    for (Object o : elements)
+    {
+      out.add(o);
+    }
+    return out;
+  }
 }

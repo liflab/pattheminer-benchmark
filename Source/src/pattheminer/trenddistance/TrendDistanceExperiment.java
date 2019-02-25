@@ -23,6 +23,13 @@ public class TrendDistanceExperiment extends TrendExperiment
 {  
   public static final transient String TYPE_NAME = "Trend distance";
   
+  public static final transient String RUNNING_AVG = "Running average";
+  public static final transient String RUNNING_MOMENTS = "Running moments";
+  public static final transient String CLOSEST_CLUSTER = "Closest cluster";
+  public static final transient String SYMBOL_DISTRIBUTION = "Symbol distribution";
+  public static final transient String N_GRAMS = "N-grams";
+  public static final transient String N_GRAM_WIDTH = "N-gram width";
+  
   public TrendDistanceExperiment()
   {
     super();

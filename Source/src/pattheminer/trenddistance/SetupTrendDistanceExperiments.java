@@ -57,6 +57,14 @@ import static pattheminer.StreamExperiment.LENGTH;
 import static pattheminer.StreamExperiment.THROUGHPUT;
 import static pattheminer.StreamExperiment.TIME;
 
+import static pattheminer.trenddistance.TrendDistanceExperiment.CLOSEST_CLUSTER;
+import static pattheminer.trenddistance.TrendDistanceExperiment.N_GRAMS;
+import static pattheminer.trenddistance.TrendDistanceExperiment.RUNNING_AVG;
+import static pattheminer.trenddistance.TrendDistanceExperiment.RUNNING_MOMENTS;
+import static pattheminer.trenddistance.TrendDistanceExperiment.SYMBOL_DISTRIBUTION;
+import static pattheminer.trenddistance.TrendDistanceExperiment.TREND;
+import static pattheminer.trenddistance.TrendDistanceExperiment.WIDTH;
+
 /**
  * Setup of experiments for the trend distance.
  */
@@ -78,11 +86,11 @@ public class SetupTrendDistanceExperiments extends SetupAgent
       g.setDescription("Measures the throughput of the trend distance processor for various trend computations.");
       m_lab.add(g);
       Region big_reg = new Region();
-      big_reg.add(TrendDistanceExperiment.WIDTH, MainLab.s_width1, MainLab.s_width2, MainLab.s_width3);
-      big_reg.add(TrendDistanceExperiment.TREND, "Running average", "Running moments", "Symbol distribution", "Closest cluster");
+      big_reg.add(WIDTH, MainLab.s_width1, MainLab.s_width2, MainLab.s_width3);
+      big_reg.add(TREND, RUNNING_AVG, RUNNING_MOMENTS, SYMBOL_DISTRIBUTION, CLOSEST_CLUSTER, N_GRAMS);
 
       // Throughput for each trend and each window width
-      for (Region r_w : big_reg.all(TrendDistanceExperiment.TREND, TrendDistanceExperiment.WIDTH))
+      for (Region r_w : big_reg.all(TREND, WIDTH))
       {
         ExperimentTable et = new ExperimentTable(LENGTH, TIME);
         et.setShowInList(false);
@@ -101,19 +109,19 @@ public class SetupTrendDistanceExperiments extends SetupAgent
       }
 
       // Impact of window width for each trend
-      for (Region r_t : big_reg.all(TrendDistanceExperiment.TREND))
+      for (Region r_t : big_reg.all(TREND))
       {
-        ExperimentTable et = new ExperimentTable(LENGTH, TrendDistanceExperiment.WIDTH, TIME);
+        ExperimentTable et = new ExperimentTable(LENGTH, WIDTH, TIME);
         m_lab.add(et);
         et.setShowInList(false);
         MainLab.s_nicknamer.setNickname(et, r_t, "t", "throughputWidth");
         MainLab.s_titleNamer.setTitle(et, r_t, "Throughput by length and width: ", "");
-        for (Region r_w : r_t.all(TrendDistanceExperiment.WIDTH))
+        for (Region r_w : r_t.all(WIDTH))
         {
           TrendDistanceExperiment tde = td_factory.get(r_w);
           et.add(tde);
         }
-        TransformedTable tt = new TransformedTable(new ExpandAsColumns(TrendDistanceExperiment.WIDTH, TIME), et);
+        TransformedTable tt = new TransformedTable(new ExpandAsColumns(WIDTH, TIME), et);
         MainLab.s_nicknamer.setNickname(tt, r_t, "t", "throughputWidthE");
         tt.setTitle(et.getTitle());
         m_lab.add(tt);
@@ -126,14 +134,14 @@ public class SetupTrendDistanceExperiments extends SetupAgent
 
       // Global throughput by window width for each trend
       {
-        ExperimentTable et = new ExperimentTable(TrendDistanceExperiment.WIDTH, TrendDistanceExperiment.TREND, THROUGHPUT);
+        ExperimentTable et = new ExperimentTable(WIDTH, TREND, THROUGHPUT);
         et.setShowInList(false);
-        for (Region r : big_reg.all(TrendDistanceExperiment.TREND, TrendDistanceExperiment.WIDTH))
+        for (Region r : big_reg.all(TREND, WIDTH))
         {
           TrendDistanceExperiment tde = td_factory.get(r);
           et.add(tde);
         }
-        TransformedTable tt = new TransformedTable(new ExpandAsColumns(TrendDistanceExperiment.TREND, THROUGHPUT), et);
+        TransformedTable tt = new TransformedTable(new ExpandAsColumns(TREND, THROUGHPUT), et);
         tt.setNickname("ttImpactWidthTrendDistance");
         tt.setTitle("Impact of window width on throughput, static trend distance");
         m_lab.add(tt);
