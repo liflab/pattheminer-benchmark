@@ -15,7 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
+package pattheminer.trenddistance;
+
+import pattheminer.StreamExperiment;
 
 public abstract class TrendExperiment extends StreamExperiment
 {
@@ -26,6 +28,14 @@ public abstract class TrendExperiment extends StreamExperiment
   public static final transient String WIDTH = "Window width";
   
   public static final transient String TYPE = "Type";
+  
+  // Trend names
+  public static final transient String RUNNING_AVG = "Running average";
+  public static final transient String RUNNING_MOMENTS = "Running moments";
+  public static final transient String CLOSEST_CLUSTER = "Closest cluster";
+  public static final transient String SYMBOL_DISTRIBUTION = "Symbol distribution";
+  public static final transient String N_GRAMS = "N-grams";
+  public static final transient String N_GRAM_WIDTH = "N-gram width";
 
   public TrendExperiment()
   {

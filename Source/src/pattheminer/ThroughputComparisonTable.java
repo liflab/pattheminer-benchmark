@@ -19,7 +19,9 @@ package pattheminer;
 
 import java.util.HashMap;
 import java.util.Map;
-import pattheminer.trenddistance.TrendDistanceExperiment;
+import pattheminer.trenddistance.TrendExperiment;
+import pattheminer.trenddistance.selftd.SelfCorrelatedExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
 import ca.uqac.lif.labpal.provenance.ExperimentValue;
 import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TableEntry;
@@ -36,7 +38,7 @@ public class ThroughputComparisonTable extends Table
 {
   protected transient String[] m_trends;
   
-  protected transient Map<String,TrendDistanceExperiment> m_trendExperiments;
+  protected transient Map<String,StaticTrendDistanceExperiment> m_trendExperiments;
   
   protected transient Map<String,SelfCorrelatedExperiment> m_selfCorrelatedExperiments;
   
@@ -44,7 +46,7 @@ public class ThroughputComparisonTable extends Table
   {
     super();
     m_trends = trends;
-    m_trendExperiments = new HashMap<String,TrendDistanceExperiment>();
+    m_trendExperiments = new HashMap<String,StaticTrendDistanceExperiment>();
     m_selfCorrelatedExperiments = new HashMap<String,SelfCorrelatedExperiment>();
     for (String t : trends)
     {
@@ -53,7 +55,7 @@ public class ThroughputComparisonTable extends Table
     }
   }
   
-  public void add(String trend, TrendDistanceExperiment e)
+  public void add(String trend, StaticTrendDistanceExperiment e)
   {
     m_trendExperiments.put(trend, e);
   }
@@ -66,7 +68,7 @@ public class ThroughputComparisonTable extends Table
   @Override
   public TempTable getDataTable(boolean arg0)
   {
-    TempTable ht = new TempTable(getId(), TrendExperiment.TREND, TrendDistanceExperiment.TYPE_NAME, SelfCorrelatedExperiment.TYPE_NAME);
+    TempTable ht = new TempTable(getId(), TrendExperiment.TREND, StaticTrendDistanceExperiment.TYPE_NAME, SelfCorrelatedExperiment.TYPE_NAME);
     fill(ht);
     return ht;
   }
@@ -85,14 +87,14 @@ public class ThroughputComparisonTable extends Table
     {
       TableEntry te = new TableEntry();
       te.put(TrendExperiment.TREND, trend);
-      TrendDistanceExperiment tde = m_trendExperiments.get(trend);
+      StaticTrendDistanceExperiment tde = m_trendExperiments.get(trend);
       if (tde != null)
       {
-        te.put(TrendDistanceExperiment.TYPE_NAME, tde.readFloat(TrendExperiment.THROUGHPUT));
+        te.put(StaticTrendDistanceExperiment.TYPE_NAME, tde.readFloat(TrendExperiment.THROUGHPUT));
       }
       else
       {
-        te.put(TrendDistanceExperiment.TYPE_NAME, 0);
+        te.put(StaticTrendDistanceExperiment.TYPE_NAME, 0);
       }
       SelfCorrelatedExperiment sce = m_selfCorrelatedExperiments.get(trend);
       if (sce != null)
@@ -117,7 +119,7 @@ public class ThroughputComparisonTable extends Table
     String trend_name = m_trends[line];
     if (col < 2)
     {
-      TrendDistanceExperiment tde = m_trendExperiments.get(trend_name);
+      StaticTrendDistanceExperiment tde = m_trendExperiments.get(trend_name);
       if (tde == null)
       {
         return null;

@@ -20,21 +20,21 @@ package pattheminer;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.macro.NumberMacro;
 import ca.uqac.lif.mtnp.DataFormatter;
-import pattheminer.trenddistance.TrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
 
 public class ThreadSpeedupMacro extends NumberMacro
 {
   /**
    * The experiment performed without threads
    */
-  protected transient TrendDistanceExperiment m_experimentNt;
+  protected transient StaticTrendDistanceExperiment m_experimentNt;
   
   /**
    * The experiment performed with threads
    */
-  protected transient TrendDistanceExperiment m_experimentMt;
+  protected transient StaticTrendDistanceExperiment m_experimentMt;
   
-  public ThreadSpeedupMacro(Laboratory lab, TrendDistanceExperiment ent, TrendDistanceExperiment emt)
+  public ThreadSpeedupMacro(Laboratory lab, StaticTrendDistanceExperiment ent, StaticTrendDistanceExperiment emt)
   {
     super(lab, "threadSpeedup", "The speedup obtained by using multiple threads for a trend distance pattern processor");
     m_experimentNt = ent;
@@ -44,8 +44,8 @@ public class ThreadSpeedupMacro extends NumberMacro
   @Override
   public Double getNumber()
   {
-    float tp_nt = m_experimentNt.readFloat(TrendDistanceExperiment.THROUGHPUT);
-    float tp_mt = m_experimentMt.readFloat(TrendDistanceExperiment.THROUGHPUT);
+    float tp_nt = m_experimentNt.readFloat(StaticTrendDistanceExperiment.THROUGHPUT);
+    float tp_mt = m_experimentMt.readFloat(StaticTrendDistanceExperiment.THROUGHPUT);
     if (tp_nt == 0)
     {
       return 0d;

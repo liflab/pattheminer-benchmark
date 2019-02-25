@@ -22,7 +22,7 @@ import ca.uqac.lif.labpal.macro.NumberMacro;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.DataFormatter;
 import ca.uqac.lif.mtnp.table.TableEntry;
-import pattheminer.trenddistance.TrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
 
 /**
  * Macro that computes the average throughput of a processor chain. This is
@@ -45,8 +45,8 @@ public class AverageThroughputMacro extends NumberMacro
     float max_x = 0, max_y = 0;
     for (TableEntry te : m_table.getDataTable().getEntries())
     {
-      float x = te.get(TrendDistanceExperiment.LENGTH).numberValue().floatValue();
-      float y = te.get(TrendDistanceExperiment.TIME).numberValue().floatValue();
+      float x = te.get(StaticTrendDistanceExperiment.LENGTH).numberValue().floatValue();
+      float y = te.get(StaticTrendDistanceExperiment.TIME).numberValue().floatValue();
       if (x > max_x)
       {
         max_x = x;

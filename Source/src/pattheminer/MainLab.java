@@ -34,7 +34,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import pattheminer.classifiers.SetupClassifierExperiments;
 import pattheminer.secondorder.SetupSecondOrderTrendDistanceExperiments;
-import pattheminer.trenddistance.SetupTrendDistanceExperiments;
+import pattheminer.trenddistance.selftd.SetupSelfCorrelatedExperiments;
+import pattheminer.trenddistance.statictd.SetupTrendDistanceExperiments;
 
 /**
  * Main laboratory for Pat The Miner
@@ -127,8 +128,11 @@ public class MainLab extends Laboratory
     // Lab stats
     add(new LabStats(this));
 
-    // Trend distance experiments
+    // Static trend distance experiments
     new SetupTrendDistanceExperiments(this).fillWithExperiments();
+    
+    // Self-correlated trend distance experiments
+    new SetupSelfCorrelatedExperiments(this).fillWithExperiments();
 
     // Classifier training experiments
     if (s_includePredictiveExperiments)

@@ -15,9 +15,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer.trenddistance;
+package pattheminer.trenddistance.statictd;
 
-import ca.uqac.lif.cep.Connector;
+import static pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment.CLOSEST_CLUSTER;
+import static pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment.N_GRAMS;
+import static pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment.N_GRAM_WIDTH;
+import static pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment.RUNNING_AVG;
+import static pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment.RUNNING_MOMENTS;
+import static pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment.SYMBOL_DISTRIBUTION;
+
 import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.concurrency.NonBlockingPush;
@@ -31,14 +37,10 @@ import ca.uqac.lif.cep.peg.TrendDistance;
 import ca.uqac.lif.cep.peg.ml.DistanceToClosest;
 import ca.uqac.lif.cep.peg.ml.RunningMoments;
 import ca.uqac.lif.cep.tmf.Source;
-import ca.uqac.lif.cep.tmf.Window;
 import ca.uqac.lif.cep.util.Numbers;
-import ca.uqac.lif.cep.util.Sets;
 import ca.uqac.lif.json.JsonString;
-import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Random;
 import ca.uqac.lif.labpal.Region;
-import ca.uqac.lif.structures.MathLists;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,32 +52,27 @@ import pattheminer.MainLab;
 import pattheminer.RandomNumberSource;
 import pattheminer.RandomSymbolSource;
 import pattheminer.patterns.CumulativeAverage;
+import pattheminer.patterns.Ngrams;
 import pattheminer.patterns.SymbolDistribution;
 import pattheminer.patterns.SymbolDistributionClusters;
-
-import static pattheminer.trenddistance.TrendDistanceExperiment.CLOSEST_CLUSTER;
-import static pattheminer.trenddistance.TrendDistanceExperiment.N_GRAM_WIDTH;
-import static pattheminer.trenddistance.TrendDistanceExperiment.N_GRAMS;
-import static pattheminer.trenddistance.TrendDistanceExperiment.RUNNING_AVG;
-import static pattheminer.trenddistance.TrendDistanceExperiment.RUNNING_MOMENTS;
-import static pattheminer.trenddistance.TrendDistanceExperiment.SYMBOL_DISTRIBUTION;
+import pattheminer.trenddistance.TrendFactory;
 
 /**
  * Factory that generates static trend distance experiments using various
  * input sources and trend processors.
  */
-public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanceExperiment>
+public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistanceExperiment>
 {
-  public TrendDistanceFactory(MainLab lab)
+  public StaticTrendDistanceFactory(MainLab lab)
   {
-    super(lab, TrendDistanceExperiment.class);
+    super(lab, StaticTrendDistanceExperiment.class);
   }
 
   @Override
-  protected TrendDistanceExperiment createExperiment(Region r)
+  protected StaticTrendDistanceExperiment createExperiment(Region r)
   {
-    String trend_name = r.getString(TrendDistanceExperiment.TREND);
-    int width = r.getInt(TrendDistanceExperiment.WIDTH);
+    String trend_name = r.getString(StaticTrendDistanceExperiment.TREND);
+    int width = r.getInt(StaticTrendDistanceExperiment.WIDTH);
     if (trend_name.compareTo(RUNNING_AVG) == 0)
     {
       return createAverageExperiment(width, false);
@@ -109,7 +106,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
    * @param multi_thread Whether to use multi-threading
    * @return The average experiment
    */
-  protected TrendDistanceExperiment createAverageExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceExperiment createAverageExperiment(int width, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     CumulativeAverage average = new CumulativeAverage();
@@ -136,7 +133,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
    * @param multi_thread Whether to use multi-threading
    * @return The experiment     
    */
-  protected TrendDistanceExperiment createRunningMomentsExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceExperiment createRunningMomentsExperiment(int width, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     RunningMoments beta = new RunningMoments(3);
@@ -165,7 +162,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
    * @param multi_thread Whether to use multi-threading
    * @return The experiment     
    */
-  protected TrendDistanceExperiment createClosestClusterExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceExperiment createClosestClusterExperiment(int width, boolean multi_thread)
   {
     int num_symbols = 2;
     Random random = m_lab.getRandom();
@@ -197,7 +194,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
    * @param multi_thread Whether to use multi-threading
    * @return The experiment     
    */
-  protected TrendDistanceExperiment createDistributionExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceExperiment createDistributionExperiment(int width, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     SymbolDistribution beta = new SymbolDistribution();
@@ -226,22 +223,14 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
    * @param multi_thread Whether to use multi-threading
    * @return The average experiment
    */
-  protected TrendDistanceExperiment createNgramExperiment(int width, int N, boolean multi_thread)
+  protected StaticTrendDistanceExperiment createNgramExperiment(int width, int N, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     Source src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
     
     // Group processor that creates and accumulates N-grams
-    GroupProcessor cumul_n_grams = new GroupProcessor(1, 1);
-    {
-      MathLists.PutInto n_gram_maker = new MathLists.PutInto();
-      Window n_gram_win = new Window(n_gram_maker, N);
-      Sets.PutIntoNew accumulate_n_grams = new Sets.PutIntoNew();
-      Connector.connect(n_gram_win, accumulate_n_grams);
-      cumul_n_grams.associateInput(0, n_gram_win, 0);
-      cumul_n_grams.associateOutput(0, accumulate_n_grams, 0);
-      cumul_n_grams.addProcessors(n_gram_win, accumulate_n_grams);
-    }
+    GroupProcessor cumul_n_grams = new Ngrams(N);
+
     // Put this into a window
     Processor wp = null;
     if (multi_thread)
@@ -259,7 +248,7 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
     reference.add(createList("B", "B", "A"));
     reference.add(createList("C", "C", "C"));
     TrendDistance<Set<Object>,Number,Number> alarm = new TrendDistance<Set<Object>,Number,Number>(reference, wp, JaccardIndex.instance, 1, Numbers.isLessThan);
-    TrendDistanceExperiment tde = createNewTrendDistanceExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
+    StaticTrendDistanceExperiment tde = createNewTrendDistanceExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
     // For the n-gram experiment, there is an additional parameter
     tde.setInput(N_GRAM_WIDTH, N);
     tde.describe(N_GRAM_WIDTH, "The width of the N-grams (i.e. the value of N");
@@ -276,21 +265,21 @@ public class TrendDistanceFactory extends ExperimentFactory<MainLab,TrendDistanc
    * @param multi_thread Whether the experiment uses multi-threading
    * @return A new trend distance experiment
    */
-  protected TrendDistanceExperiment createNewTrendDistanceExperiment(String trend, String metric, Source src, Processor alarm, int width, boolean multi_thread)
+  protected StaticTrendDistanceExperiment createNewTrendDistanceExperiment(String trend, String metric, Source src, Processor alarm, int width, boolean multi_thread)
   {
-    TrendDistanceExperiment tde = new TrendDistanceExperiment();
+    StaticTrendDistanceExperiment tde = new StaticTrendDistanceExperiment();
     tde.setSource(src);
     tde.setProcessor(alarm);
     tde.setEventStep(MainLab.s_eventStep);
-    tde.setInput(TrendDistanceExperiment.WIDTH, width);
-    tde.setInput(TrendDistanceExperiment.TREND, trend);
-    tde.setInput(TrendDistanceExperiment.METRIC, metric);
+    tde.setInput(StaticTrendDistanceExperiment.WIDTH, width);
+    tde.setInput(StaticTrendDistanceExperiment.TREND, trend);
+    tde.setInput(StaticTrendDistanceExperiment.METRIC, metric);
     JsonString jb = new JsonString("yes");
     if (!multi_thread)
     {
       jb = new JsonString("no");
     }
-    tde.setInput(TrendDistanceExperiment.MULTITHREAD, jb);
+    tde.setInput(StaticTrendDistanceExperiment.MULTITHREAD, jb);
     return tde;
   }
 
