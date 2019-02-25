@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018 Laboratoire d'informatique formelle
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -22,10 +22,10 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pullable;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.tmf.BlackHole;
-import ca.uqac.lif.cep.tmf.Source;
 import ca.uqac.lif.json.JsonList;
 import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.ExperimentException;
+import pattheminer.source.BoundedSource;
 
 /**
  * Experiment that connects a source to a processor and measures its
@@ -53,12 +53,25 @@ public abstract class StreamExperiment extends Experiment
    */
   public static final transient String MULTITHREAD = "Multi-threaded";
 
+  /**
+   * The processor that is being monitored in this experiment
+   */
   protected transient Processor m_processor;
 
-  protected transient Source m_source;
+  /**
+   * The source from which the input events will originate
+   */
+  protected transient BoundedSource m_source;
 
+  /**
+   * The interval at which the experiment updates its data on
+   * runtime and throughput
+   */
   protected int m_eventStep = 1000;
 
+  /**
+   * Creates a new empty stream experiment
+   */
   public StreamExperiment()
   {
     describe(THROUGHPUT, "The average number of events processed per second");
@@ -85,6 +98,7 @@ public abstract class StreamExperiment extends Experiment
     Connector.connect(m_processor, hole);
     long start = System.currentTimeMillis();
     int event_count = 0;
+    int source_length = m_source.getEventBound();
     while (s_p.hasNext())
     {
       if (event_count % m_eventStep == 0 && event_count > 0)
@@ -92,7 +106,7 @@ public abstract class StreamExperiment extends Experiment
         long lap = System.currentTimeMillis();
         length.add(event_count);
         time.add(lap - start);
-        float prog = ((float) event_count) / ((float) MainLab.MAX_TRACE_LENGTH);
+        float prog = ((float) event_count) / ((float) source_length);
         setProgression(prog);
       }
       Object o = s_p.pull();
@@ -103,19 +117,31 @@ public abstract class StreamExperiment extends Experiment
     write(THROUGHPUT, (1000f * (float) MainLab.MAX_TRACE_LENGTH) / ((float) (end - start)));
   }
 
+  /**
+   * Sets the processor that is being monitored in this experiment
+   * @param p The processor
+   */
   public void setProcessor(Processor p)
   {
     m_processor = p;
   }
 
-  public void setSource(Source s)
+  /**
+   * Sets the source from which the input events will originate
+   * @param s The source
+   */
+  public void setSource(BoundedSource s)
   {
     m_source = s;
   }
 
+  /**
+   * Sets the interval at which the experiment updates its data on
+   * runtime and throughput
+   * @param step The interval
+   */
   public void setEventStep(int step)
   {
     m_eventStep = step;
   }
-
 }

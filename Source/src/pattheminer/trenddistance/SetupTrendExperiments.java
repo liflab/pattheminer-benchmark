@@ -1,3 +1,20 @@
+/*
+    A benchmark for Pat The Miner
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package pattheminer.trenddistance;
 
 import static pattheminer.StreamExperiment.LENGTH;
@@ -7,6 +24,7 @@ import static pattheminer.trenddistance.TrendExperiment.CLOSEST_CLUSTER;
 import static pattheminer.trenddistance.TrendExperiment.N_GRAMS;
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_AVG;
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_MOMENTS;
+import static pattheminer.trenddistance.TrendExperiment.AVG_SLICE_LENGTH;
 import static pattheminer.trenddistance.TrendExperiment.SYMBOL_DISTRIBUTION;
 import static pattheminer.trenddistance.TrendExperiment.TREND;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
@@ -52,8 +70,8 @@ public abstract class SetupTrendExperiments<T extends TrendExperiment> extends S
       g.setDescription(m_groupDescription);
       m_lab.add(g);
       Region big_reg = new Region();
-      big_reg.add(WIDTH, MainLab.s_width1, MainLab.s_width2, MainLab.s_width3);
-      big_reg.add(TREND, RUNNING_AVG, RUNNING_MOMENTS, SYMBOL_DISTRIBUTION, CLOSEST_CLUSTER, N_GRAMS);
+      big_reg.add(WIDTH, MainLab.s_widths);
+      big_reg.add(TREND, RUNNING_AVG, RUNNING_MOMENTS, SYMBOL_DISTRIBUTION, CLOSEST_CLUSTER, N_GRAMS, AVG_SLICE_LENGTH);
 
       // Throughput for each trend and each window width
       for (Region r_w : big_reg.all(TREND, WIDTH))

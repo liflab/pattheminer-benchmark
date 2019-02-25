@@ -15,66 +15,31 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
+package pattheminer.source;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;
 
 /**
- * A source of randomly generated symbols.
+ * A source of randomly generated numbers.
  */
-public class RandomSymbolSource extends RandomSource
+public class RandomNumberSource extends RandomSource
 {
-  /**
-   * The number of distinct symbols to choose from
-   */
-  protected int m_numDistinct = 3;
-  
-  protected /*@ non_null @*/ String[] m_symbols;
   
   /**
    * Creates a new random number source.
    * @param r The random number generator used to generate the numbers
    * @param num_events The number of events to produce
-   * @param num_symbols The number of distinct symbols to choose from 
    */
-  public RandomSymbolSource(/*@ non_null @*/ Random r, int num_events, int num_symbols)
+  public RandomNumberSource(Random r, int num_events)
   {
     super(r, num_events);
-    m_numDistinct = num_symbols;
-    m_symbols = fillSymbols(m_numDistinct);
-  }
-  
-  /**
-   * Creates a new random number source.
-   * @param r The random number generator used to generate the numbers
-   * @param num_events The number of events to produce
-   */
-  public RandomSymbolSource(Random r, int num_events)
-  {
-    this(r, num_events, 3);
   }
   
   @Override
-  protected String getEvent()
+  protected Float getEvent()
   {
-    int pos = m_random.nextInt(m_numDistinct);
-    return m_symbols[pos];
-  }
-  
-  protected static String[] fillSymbols(int n)
-  {
-    String[] symbs = new String[n];
-    for (int i = 0; i < n; i++)
-    {
-      symbs[i] = Integer.toString(i);
-    }
-    return symbs;
-  }
-  
-  public /*@ non_null @*/ String[] getSymbols()
-  {
-    return m_symbols;
+    return m_random.nextFloat();
   }
 
   @Override
@@ -82,5 +47,5 @@ public class RandomSymbolSource extends RandomSource
   {
     // Not supported
     return null;
-  }  
+  }
 }

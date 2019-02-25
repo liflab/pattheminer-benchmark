@@ -15,37 +15,28 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
+package pattheminer.source;
 
-import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;
 
 /**
- * A source of randomly generated numbers.
+ * A source of randomly-generated events.
  */
-public class RandomNumberSource extends RandomSource
+public abstract class RandomSource extends BoundedSource
 {
+  /**
+   * The random number generator used to generate the numbers
+   */
+  protected transient /*@ non_null @*/ Random m_random;
   
   /**
-   * Creates a new random number source.
-   * @param r The random number generator used to generate the numbers
+   * Creates a new random source
+   * @param r A random generator
    * @param num_events The number of events to produce
    */
-  public RandomNumberSource(Random r, int num_events)
+  public RandomSource(Random r, int num_events)
   {
-    super(r, num_events);
-  }
-  
-  @Override
-  protected Float getEvent()
-  {
-    return m_random.nextFloat();
-  }
-
-  @Override
-  public Processor duplicate(boolean with_state)
-  {
-    // Not supported
-    return null;
+    super(num_events);
+    m_random = r;
   }
 }

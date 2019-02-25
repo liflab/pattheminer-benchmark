@@ -26,6 +26,7 @@ import ca.uqac.lif.cep.peg.ml.KMeansFunction;
 import ca.uqac.lif.cep.peg.ml.ProcessorMiningFunction;
 import ca.uqac.lif.labpal.Random;
 import pattheminer.patterns.SymbolDistribution;
+import pattheminer.source.RandomSymbolSource;
 
 public class DistributionKmeansExperiment extends MiningExperiment
 {

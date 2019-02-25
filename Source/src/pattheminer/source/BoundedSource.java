@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018 Laboratoire d'informatique formelle
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -15,23 +15,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
-
-import java.util.Queue;
+package pattheminer.source;
 
 import ca.uqac.lif.cep.tmf.Source;
-import ca.uqac.lif.labpal.Random;
+import java.util.Queue;
 
 /**
- * A source of randomly-generated events.
+ * A BeepBeep {@link Source} that produces a fixed number of events.
  */
-public abstract class RandomSource extends Source
+public abstract class BoundedSource extends Source
 {
-  /**
-   * The random number generator used to generate the numbers
-   */
-  protected transient /*@ non_null @*/ Random m_random;
-  
   /**
    * The number of events to produce
    */
@@ -42,12 +35,24 @@ public abstract class RandomSource extends Source
    */
   protected int m_eventCount;
   
-  public RandomSource(Random r, int num_events)
+  /**
+   * Creates a new bounded source
+   * @param num_events
+   */
+  public BoundedSource(int num_events)
   {
     super(1);
-    m_random = r;
     m_numEvents = num_events;
     m_eventCount = 0;
+  }
+  
+  /**
+   * Gets the total number of events to produce
+   * @return The number of events
+   */
+  public int getEventBound()
+  {
+    return m_numEvents;
   }
   
   @Override
@@ -65,13 +70,8 @@ public abstract class RandomSource extends Source
   }
   
   /**
-   * Gets the total number of events to produce
-   * @return The number of events
+   * Generates the next event
+   * @return The next event
    */
-  public int getEventBound()
-  {
-    return m_numEvents;
-  }
-
   protected abstract Object getEvent();
 }

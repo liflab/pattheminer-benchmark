@@ -29,13 +29,20 @@ public abstract class TrendExperiment extends StreamExperiment
   
   public static final transient String TYPE = "Type";
   
+  public static final transient String SLICE_LENGTH = "Slice length";
+  
+  public static final transient String N_GRAM_WIDTH = "N-gram width";
+  
+  public static final transient String NUM_SLICES = "Number of slices";
+  
   // Trend names
   public static final transient String RUNNING_AVG = "Running average";
   public static final transient String RUNNING_MOMENTS = "Running moments";
   public static final transient String CLOSEST_CLUSTER = "Closest cluster";
+  public static final transient String AVG_SLICE_LENGTH = "Average slice length";
   public static final transient String SYMBOL_DISTRIBUTION = "Symbol distribution";
   public static final transient String N_GRAMS = "N-grams";
-  public static final transient String N_GRAM_WIDTH = "N-gram width";
+  
 
   public TrendExperiment()
   {

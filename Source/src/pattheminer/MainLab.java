@@ -56,27 +56,16 @@ public class MainLab extends Laboratory
    * A thread pool. Used only for multi-thread experiments.
    */
   public static transient ExecutorService s_service = Executors.newCachedThreadPool();
-  
+
   /**
    * A nicknamer
    */
   public static transient MainLabNicknamer s_nicknamer = new MainLabNicknamer();
-  
+
   /**
    * A title namer
    */
   public static transient MainLabTitleNamer s_titleNamer = new MainLabTitleNamer();
-
-  /**
-   * A group for experiments measuring the throughput of trend distance processors
-   */
-  protected transient Group m_groupTrendDistance;
-
-  /**
-   * A group for experiments measuring the throughput of self-correlated
-   * trend distance processors
-   */
-  protected transient Group m_groupSelfCorrelated;
 
   /**
    * A group for experiments measuring the throughput of self-trained
@@ -88,7 +77,7 @@ public class MainLab extends Laboratory
    * Whether to display experiments about multi-threading
    */
   protected static boolean s_includeThreadExperiments = false;
-  
+
   /**
    * Whether to display experiments about predictive analytics
    */
@@ -97,17 +86,7 @@ public class MainLab extends Laboratory
   /**
    * The first window width to be used in each experiment
    */
-  public static transient int s_width1 = 50;
-
-  /**
-   * The second window width to be used in each experiment
-   */
-  public static transient int s_width2 = 100;
-
-  /**
-   * The third window width to be used in each experiment
-   */
-  public static transient int s_width3 = 200;
+  public static transient Number[] s_widths = {50, 100, 150, 200, 250};
 
   @Override
   public void setup()
@@ -130,7 +109,7 @@ public class MainLab extends Laboratory
 
     // Static trend distance experiments
     new SetupTrendDistanceExperiments(this).fillWithExperiments();
-    
+
     // Self-correlated trend distance experiments
     new SetupSelfCorrelatedExperiments(this).fillWithExperiments();
 
@@ -139,7 +118,7 @@ public class MainLab extends Laboratory
     {
       new SetupClassifierExperiments(this).fillWithExperiments();
     }
-    
+
     // Second-order trend distance experiments
     new SetupSecondOrderTrendDistanceExperiments(this).fillWithExperiments();
 
@@ -176,7 +155,7 @@ public class MainLab extends Laboratory
         add(claim);
       }
     }
-    */
+     */
 
 
     // Trend extraction experiments
@@ -218,7 +197,7 @@ public class MainLab extends Laboratory
     add(t_by_num_logs);
     return t_by_num_logs;
   }
-  
+
   public ExperimentTable createTable(StreamExperiment tde, String trend, int width)
   {
     String title = "Running time for " + trend + ", window width = " + width;
@@ -269,5 +248,5 @@ public class MainLab extends Laboratory
     return "Unknown";
   }
 
-  
+
 }

@@ -4,7 +4,7 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import pattheminer.RandomSource;
+import pattheminer.source.RandomSource;
 import weka.core.Attribute;
 
 public class RandomArraySource extends RandomSource

@@ -20,6 +20,7 @@ package pattheminer;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.peg.ml.ProcessorMiningFunction;
 import pattheminer.patterns.CumulativeAverage;
+import pattheminer.source.RandomNumberSource;
 
 public class WeightedAverageExperiment extends MiningExperiment
 {

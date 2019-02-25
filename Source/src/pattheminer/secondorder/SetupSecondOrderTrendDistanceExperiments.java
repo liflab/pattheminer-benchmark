@@ -28,10 +28,10 @@ import ca.uqac.lif.mtnp.plot.gnuplot.Scatterplot;
 import ca.uqac.lif.mtnp.table.ExpandAsColumns;
 import ca.uqac.lif.mtnp.table.TransformedTable;
 import pattheminer.MainLab;
-import pattheminer.RandomNumberSource;
 import pattheminer.SetupAgent;
 import pattheminer.StreamExperiment;
 import pattheminer.patterns.CumulativeAverage;
+import pattheminer.source.RandomNumberSource;
 
 import static pattheminer.secondorder.SecondOrderExperiment.NUM_TRENDS;
 
