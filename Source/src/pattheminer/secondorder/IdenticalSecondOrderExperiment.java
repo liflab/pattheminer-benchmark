@@ -40,6 +40,14 @@ public class IdenticalSecondOrderExperiment extends SecondOrderExperiment
   }
   
   /**
+   * Creates an empty experiment
+   */
+  IdenticalSecondOrderExperiment()
+  {
+    super();
+  }
+  
+  /**
    * Duplicates the same processor <i>k</i> times into an array. 
    * @param p The processor to duplicate
    * @param k The number of times to duplicate it

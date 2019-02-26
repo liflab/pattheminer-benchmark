@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import pattheminer.classifiers.SetupClassifierExperiments;
 import pattheminer.secondorder.SetupSecondOrderTrendDistanceExperiments;
+import pattheminer.trenddistance.context.SetupContextualExperiments;
 import pattheminer.trenddistance.selftd.SetupSelfCorrelatedExperiments;
 import pattheminer.trenddistance.statictd.SetupTrendDistanceExperiments;
 
@@ -72,16 +73,21 @@ public class MainLab extends Laboratory
    * class prediction processors
    */
   protected transient Group m_groupSelfTrainedClassPrediction;
+  
+  /**
+   * Whether to display experiments about contextual patterns
+   */
+  protected boolean m_includeContextualExperiments = true;
 
   /**
    * Whether to display experiments about multi-threading
    */
-  protected static boolean s_includeThreadExperiments = false;
+  protected boolean m_includeThreadExperiments = false;
 
   /**
    * Whether to display experiments about predictive analytics
    */
-  protected static boolean s_includePredictiveExperiments = false;
+  protected boolean m_includePredictiveExperiments = false;
 
   /**
    * The first window width to be used in each experiment
@@ -98,11 +104,7 @@ public class MainLab extends Laboratory
 
     // Command line arguments
     ArgumentMap args = getCliArguments();
-    if (args.hasOption("with-mt"))
-    {
-      // Include multi-thread experiments
-      s_includeThreadExperiments = true;
-    }
+    m_includeThreadExperiments = args.hasOption("with-mt");
 
     // Lab stats
     add(new LabStats(this));
@@ -113,14 +115,22 @@ public class MainLab extends Laboratory
     // Self-correlated trend distance experiments
     new SetupSelfCorrelatedExperiments(this).fillWithExperiments();
 
-    // Classifier training experiments
-    if (s_includePredictiveExperiments)
+    // Contextual trend distance experiments
+    if (m_includeContextualExperiments)
     {
-      new SetupClassifierExperiments(this).fillWithExperiments();
+      new SetupContextualExperiments(this).fillWithExperiments();
     }
 
     // Second-order trend distance experiments
     new SetupSecondOrderTrendDistanceExperiments(this).fillWithExperiments();
+    
+    
+    
+    // Classifier training experiments
+    if (m_includePredictiveExperiments)
+    {
+      new SetupClassifierExperiments(this).fillWithExperiments();
+    }
 
 
     // Impact of threading
@@ -223,6 +233,7 @@ public class MainLab extends Laboratory
   public void setupCli(CliParser parser)
   {
     parser.addArgument(new Argument().withLongName("with-mt").withDescription("Include experiments about multi-threading"));
+    parser.addArgument(new Argument().withLongName("with-ct").withDescription("Include experiments about context"));
   }
 
   public static void main(String[] args)

@@ -21,6 +21,10 @@ import ca.uqac.lif.cep.peg.SecondOrderTrendDistance;
 import ca.uqac.lif.cep.peg.TrendDistance;
 import pattheminer.StreamExperiment;
 
+/**
+ * Experiment measuring the throughput of the second-order trend
+ * distance pattern.
+ */
 public class SecondOrderExperiment extends StreamExperiment
 {
   /**
@@ -33,13 +37,29 @@ public class SecondOrderExperiment extends StreamExperiment
    */
   protected transient TrendDistance<?,?,?>[] m_firstOrder;
   
+  /**
+   * The second-order trend distance processor
+   */
   protected transient TrendDistance<?,?,?> m_secOrder;
   
-  public SecondOrderExperiment(TrendDistance<?,?,?> sec_order, TrendDistance<?,?,?> ... first_order)
+  /**
+   * Creates a new empty second-order experiment
+   */
+  SecondOrderExperiment()
   {
     super();
     setDescription("Evaluates the throughput of the second-order trend distance pattern.");
     describe(NUM_TRENDS, "The number of first-order trends included in the pattern");
+  }
+  
+  /**
+   * Creates a new second-order experiment
+   * @param sec_order The trend distance pattern used for the second-order
+   * @param first_order The list of first-order trend distance patterns
+   */
+  public SecondOrderExperiment(TrendDistance<?,?,?> sec_order, TrendDistance<?,?,?> ... first_order)
+  {
+    this();
     setInput(NUM_TRENDS, first_order.length);
     m_firstOrder = first_order;
     m_secOrder = sec_order;
