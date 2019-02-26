@@ -42,6 +42,6 @@ public abstract class SetupAgent
   /**
    * Adds new experiments to an existing lab
    */
-  protected abstract void fillWithExperiments();
+  public abstract void fillWithExperiments();
 
 }

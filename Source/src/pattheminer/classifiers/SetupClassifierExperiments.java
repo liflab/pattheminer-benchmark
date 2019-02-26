@@ -17,6 +17,8 @@
  */
 package pattheminer.classifiers;
 
+import static pattheminer.classifiers.ClassifierExperiment.*;
+
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
 import ca.uqac.lif.cep.peg.weka.WekaUtils;
@@ -29,14 +31,11 @@ import ca.uqac.lif.mtnp.plot.TwoDimensionalPlot.Axis;
 import ca.uqac.lif.mtnp.plot.gnuplot.Scatterplot;
 import ca.uqac.lif.mtnp.table.ExpandAsColumns;
 import ca.uqac.lif.mtnp.table.TransformedTable;
-import pattheminer.ClassifierExperiment;
-import pattheminer.ClassifierTrainingExperiment;
 import pattheminer.MainLab;
 import pattheminer.SetupAgent;
 import pattheminer.StreamExperiment;
 import pattheminer.patterns.ExtractAttributes;
 import weka.core.Attribute;
-import static pattheminer.ClassifierExperiment.*;
 
 public class SetupClassifierExperiments extends SetupAgent
 {

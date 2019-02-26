@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import pattheminer.MainLab;
 import pattheminer.source.WeekdaySource;
-import pattheminer.trenddistance.TrendExperiment;
 import pattheminer.trenddistance.TrendFactory;
 
 import static pattheminer.trenddistance.TrendExperiment.TREND;

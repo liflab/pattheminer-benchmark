@@ -15,10 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
+package pattheminer.extraction;
 
 import java.util.Set;
-
 import ca.uqac.lif.cep.peg.Sequence;
 import ca.uqac.lif.cep.peg.ml.ProcessorMiningFunction;
 import ca.uqac.lif.labpal.Experiment;

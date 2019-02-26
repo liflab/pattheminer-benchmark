@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
+package pattheminer.trenddistance.threads;
 
 import ca.uqac.lif.labpal.Claim;
 import ca.uqac.lif.labpal.Laboratory;

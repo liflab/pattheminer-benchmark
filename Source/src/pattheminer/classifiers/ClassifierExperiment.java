@@ -15,9 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
+package pattheminer.classifiers;
 
 import ca.uqac.lif.cep.peg.weka.UpdateClassifier;
+import pattheminer.StreamExperiment;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 

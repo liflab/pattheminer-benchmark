@@ -20,23 +20,19 @@ package pattheminer;
 import ca.uqac.lif.labpal.CliParser;
 import ca.uqac.lif.labpal.CliParser.Argument;
 import ca.uqac.lif.labpal.CliParser.ArgumentMap;
-import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.Group;
 import ca.uqac.lif.labpal.Laboratory;
-import ca.uqac.lif.labpal.Region;
-import ca.uqac.lif.labpal.table.ExperimentTable;
-import ca.uqac.lif.mtnp.plot.gnuplot.Scatterplot;
-import ca.uqac.lif.mtnp.table.Join;
-import ca.uqac.lif.mtnp.table.RenameColumns;
-import ca.uqac.lif.mtnp.table.TransformedTable;
-import java.util.Collection;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import pattheminer.classifiers.SetupClassifierExperiments;
+import pattheminer.extraction.SetupTrendExtractionExperiments;
 import pattheminer.secondorder.SetupSecondOrderTrendDistanceExperiments;
+import pattheminer.trenddistance.SetupStaticVsSelf;
 import pattheminer.trenddistance.context.SetupContextualExperiments;
 import pattheminer.trenddistance.selftd.SetupSelfCorrelatedExperiments;
 import pattheminer.trenddistance.statictd.SetupTrendDistanceExperiments;
+import pattheminer.trenddistance.threads.SetupThreadExperiments;
 
 /**
  * Main laboratory for Pat The Miner
@@ -120,11 +116,15 @@ public class MainLab extends Laboratory
     {
       new SetupContextualExperiments(this).fillWithExperiments();
     }
+    
+    // Comparison experiments
+    new SetupStaticVsSelf(this).fillWithExperiments();
 
     // Second-order trend distance experiments
     new SetupSecondOrderTrendDistanceExperiments(this).fillWithExperiments();
     
-    
+    // Trend extraction experiments
+    new SetupTrendExtractionExperiments(this).fillWithExperiments();
     
     // Classifier training experiments
     if (m_includePredictiveExperiments)
@@ -132,103 +132,13 @@ public class MainLab extends Laboratory
       new SetupClassifierExperiments(this).fillWithExperiments();
     }
 
-
     // Impact of threading
-    /*
-    if (s_includeThreadExperiments)
+    if (m_includeThreadExperiments)
     {
-      Group g_threading = new Group("Impact of multi-threading (trend distance)");
-      add(g_threading);
-      {
-        int for_width = s_width3;
-        String for_trend = "Running moments";
-        TrendDistanceExperiment exp_nt = (TrendDistanceExperiment) getAnyExperiment(
-            new Region().add(TrendDistanceExperiment.TREND, for_trend).add(TrendDistanceExperiment.WIDTH, for_width));
-        TrendDistanceExperiment exp_mt = generateRunningMomentsExperiment(for_width, true);
-        ExperimentTable et_nt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_nt);
-        ExperimentTable et_mt = new ExperimentTable(TrendDistanceExperiment.LENGTH, TrendDistanceExperiment.TIME).add(exp_mt);
-        TransformedTable t_impact_mt = new TransformedTable(new Join(TrendDistanceExperiment.LENGTH),
-            new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "No threads"), et_nt),
-            new TransformedTable(new RenameColumns(TrendDistanceExperiment.LENGTH, "With threads"), et_mt));
-        t_impact_mt.setTitle("Impact of multi-threading");
-        t_impact_mt.setNickname("tImpactMt");
-        add(t_impact_mt);
-        Scatterplot plot = new Scatterplot(t_impact_mt);
-        plot.setTitle("Impact of multi-threading");
-        plot.setCaption(Axis.X, "Number of events").setCaption(Axis.Y, "Processing time (ms)");
-        plot.setNickname("pImpactMt");
-        add(plot);
-        g_threading.add(exp_nt, exp_mt);
-        ThreadSpeedupMacro macro = new ThreadSpeedupMacro(this, exp_nt, exp_mt);
-        add(macro);
-        ThreadSpeedupClaim claim = new ThreadSpeedupClaim(this, macro);
-        add(claim);
-      }
-    }
-     */
-
-
-    // Trend extraction experiments
-    Group g_te = new Group("Trend extraction");
-    add(g_te);
-    {
-      Region reg = new Region().add(MiningExperiment.NUM_LOGS, 100, 250, 500);
-      reg.add(MiningExperiment.LOG_LENGTH, 10000, 20000, 50000);
-
-      ExperimentTable t_20000 = generateKMeansExperiment(reg, 10000, g_te);
-      ExperimentTable t_50000 = generateKMeansExperiment(reg, 20000, g_te);
-      ExperimentTable t_100000 = generateKMeansExperiment(reg, 50000, g_te);
-      TransformedTable tt = new TransformedTable(new Join(MiningExperiment.NUM_LOGS), 
-          new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "10000"), t_20000),
-          new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "20000"), t_50000),
-          new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "50000"), t_100000));
-      tt.setTitle("Trend extraction speed for symbol distribution and K-means");
-      add(tt);
-      Scatterplot k_plot = new Scatterplot(tt);
-      k_plot.setNickname("pKMeansLength");
-      k_plot.setTitle("Trend extraction speed for symbol distribution and K-means");
-      add(k_plot);
-      MinLogsPerSecondMacro mlpsm = new MinLogsPerSecondMacro(this, "minLogsKMeans", 500, tt);
-      add(mlpsm);
+      new SetupThreadExperiments(this).fillWithExperiments();
     }
   }
-
-  protected ExperimentTable generateKMeansExperiment(Region r_nl, int log_length, Group g)
-  {
-    ExperimentTable t_by_num_logs = new ExperimentTable(MiningExperiment.NUM_LOGS, MiningExperiment.DURATION);
-    t_by_num_logs.setTitle("Trend extraction speed for symbol distribution and K-means (log length " + r_nl.getInt(MiningExperiment.LOG_LENGTH) + ")");
-    for (Region r_ll : r_nl.all(MiningExperiment.NUM_LOGS))
-    {
-      DistributionKmeansExperiment dke = new DistributionKmeansExperiment(getRandom(), r_ll.getInt(MiningExperiment.NUM_LOGS), log_length);
-      add(dke);
-      g.add(dke);
-      t_by_num_logs.add(dke);
-    }
-    add(t_by_num_logs);
-    return t_by_num_logs;
-  }
-
-  public ExperimentTable createTable(StreamExperiment tde, String trend, int width)
-  {
-    String title = "Running time for " + trend + ", window width = " + width;
-    ExperimentTable et = new ExperimentTable(StreamExperiment.LENGTH, StreamExperiment.TIME);
-    et.setTitle(title);
-    et.add(tde);
-    add(et);
-    return et;
-
-  }
-
-  public Experiment getAnyExperiment(Region r)
-  {
-    Collection<Experiment> ce = filterExperiments(r);
-    for (Experiment e : ce)
-    {
-      return e;
-    }
-    return null;
-  }
-
+  
   @Override
   public void setupCli(CliParser parser)
   {
@@ -241,23 +151,4 @@ public class MainLab extends Laboratory
     // Nothing else to do here
     MainLab.initialize(args, MainLab.class);
   }
-
-  /**
-   * Converts a number into a "LaTeX" name (as LaTeX forbids macro names
-   * that contain numbers)
-   * @param x The number
-   * @return The name
-   */
-  public static String toLatex(int x)
-  {
-    if (x == 50)
-      return "Fifty";
-    if (x == 100)
-      return "Hundred";
-    if (x == 200)
-      return "TwoHundred";
-    return "Unknown";
-  }
-
-
 }

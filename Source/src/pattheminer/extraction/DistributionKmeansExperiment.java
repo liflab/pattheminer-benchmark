@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
+package pattheminer.extraction;
 
 import java.util.ArrayList;
 
@@ -25,6 +25,7 @@ import ca.uqac.lif.cep.functions.ApplyFunction;
 import ca.uqac.lif.cep.peg.ml.KMeansFunction;
 import ca.uqac.lif.cep.peg.ml.ProcessorMiningFunction;
 import ca.uqac.lif.labpal.Random;
+import pattheminer.MapToVector;
 import pattheminer.patterns.SymbolDistribution;
 import pattheminer.source.RandomSymbolSource;
 

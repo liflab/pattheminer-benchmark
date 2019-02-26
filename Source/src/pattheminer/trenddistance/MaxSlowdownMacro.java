@@ -15,59 +15,49 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer;
-
-import java.util.Map;
+package pattheminer.trenddistance;
 
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.macro.NumberMacro;
-import ca.uqac.lif.mtnp.DataFormatter;
 import ca.uqac.lif.mtnp.table.PrimitiveValue;
 import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
+import pattheminer.trenddistance.selftd.SelfCorrelatedExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
 
-public class MinLogsPerSecondMacro extends NumberMacro
+public class MaxSlowdownMacro extends NumberMacro
 {
   protected transient Table m_table;
   
-  protected transient int m_line;
-  
-  public MinLogsPerSecondMacro(Laboratory lab, String name, int line, Table table)
+  public MaxSlowdownMacro(Laboratory lab, String name, int width, Table table)
   {
-    super(lab, name, "Minimum number of logs per second processed with the K-means mining algorithm");
+    super(lab, name, "Maximum slowdown (in percentage) of self-correlated trend distance vs. trend distance, for a window width of " + width);
     m_table = table;
-    m_line = line;
   }
 
   @Override
-  public Double getNumber()
+  public Integer getNumber()
   {
     TempTable tt = m_table.getDataTable();
-    double max_value = Double.MIN_VALUE;
-    boolean found = false;
+    double slowdown = 0;
     for (TableEntry te : tt.getEntries())
     {
-      if (te.get(MiningExperiment.NUM_LOGS).numberValue().intValue() != m_line)
+      PrimitiveValue pv_t = te.get(StaticTrendDistanceExperiment.TYPE_NAME);
+      PrimitiveValue pv_s = te.get(SelfCorrelatedExperiment.TYPE_NAME);
+      if (pv_t == null || pv_s == null)
       {
         continue;
       }
-      for (Map.Entry<String,PrimitiveValue> me : te.entrySet())
+      float tp_t = pv_t.numberValue().floatValue();
+      float tp_s = pv_s.numberValue().floatValue();
+      if (tp_t == 0 || tp_s == 0)
       {
-        if (me.getKey().compareTo(MiningExperiment.NUM_LOGS) == 0)
-          continue;
-        PrimitiveValue pv = me.getValue();
-        if (pv != null && !pv.isNull())
-        {
-          max_value = Math.max(max_value, me.getValue().numberValue().doubleValue());
-          found = true;
-        }
+        continue;
       }
+      double c_slowdown = (tp_t - tp_s) / tp_t;
+      slowdown = Math.max(slowdown, c_slowdown);
     }
-    if (found && max_value > 0)
-    {
-      return DataFormatter.roundToSignificantFigures((double) m_line * 1000d / max_value, 2);
-    }
-    return 0d;
+    return (int) (slowdown * 100);
   }
 }

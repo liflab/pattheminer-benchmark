@@ -1,4 +1,4 @@
-package pattheminer;
+package pattheminer.extraction;
 
 import java.util.HashSet;
 import java.util.Set;
