@@ -68,7 +68,7 @@ public class AverageSliceLength extends GroupProcessor
     return new AverageSliceLength();
   }
   
-  protected static class SliceLength extends GroupProcessor
+  public static class SliceLength extends GroupProcessor
   {
     public SliceLength()
     {

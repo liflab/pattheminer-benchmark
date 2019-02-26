@@ -100,31 +100,34 @@ public class RandomLabelSource extends RandomSource
       tuple = new Object[] {m_highestSliceId, m_eventCount, LABEL_START};
       m_highestSliceId++;
     }
-    assert state_size == m_numSlices;
-    int num_e = m_sliceStates.get(m_sliceIndex);
-    if (num_e < m_sliceLength)
-    {
-      // This slice is shorter than the prescribed length: emit an "other" event
-      tuple = new Object[] {m_sliceIndex, m_eventCount, LABEL_OTHER};
-      m_sliceStates.put(m_sliceIndex, num_e + 1);
-      m_sliceIndex++;
-      if (m_sliceIndex >= m_highestSliceId)
-      {
-        m_sliceIndex = m_lowestSliceId;
-      }
-    }
     else
     {
-      // This slice has reached the prescribed length: emit "end" and
-      // remove it from the map
-      assert num_e == m_sliceLength;
-      tuple = new Object[] {m_sliceIndex, m_eventCount, LABEL_END};
-      m_sliceStates.remove(m_sliceIndex);
-      m_lowestSliceId++;
-      m_sliceIndex++;
-      if (m_sliceIndex >= m_highestSliceId)
+      assert state_size == m_numSlices;
+      int num_e = m_sliceStates.get(m_sliceIndex);
+      if (num_e < m_sliceLength - 1)
       {
-        m_sliceIndex = m_lowestSliceId;
+        // This slice is shorter than the prescribed length: emit an "other" event
+        tuple = new Object[] {m_sliceIndex, m_eventCount, LABEL_OTHER};
+        m_sliceStates.put(m_sliceIndex, num_e + 1);
+        m_sliceIndex++;
+        if (m_sliceIndex >= m_highestSliceId)
+        {
+          m_sliceIndex = m_lowestSliceId;
+        }
+      }
+      else
+      {
+        // This slice has reached the prescribed length: emit "end" and
+        // remove it from the map
+        assert num_e == m_sliceLength;
+        tuple = new Object[] {m_sliceIndex, m_eventCount, LABEL_END};
+        m_sliceStates.remove(m_sliceIndex);
+        m_lowestSliceId++;
+        m_sliceIndex++;
+        if (m_sliceIndex >= m_highestSliceId)
+        {
+          m_sliceIndex = m_lowestSliceId;
+        }
       }
     }
     return tuple;

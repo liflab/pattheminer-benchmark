@@ -282,7 +282,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
     BoundedSource src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
     
     // Group processor that creates and accumulates N-grams
-    AverageSliceLength asl = new AverageSliceLength();
+    AverageSliceLength.SliceLength asl = new AverageSliceLength.SliceLength();
 
     // Put this into a window
     Processor wp = null;
