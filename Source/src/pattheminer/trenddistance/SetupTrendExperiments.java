@@ -30,6 +30,7 @@ import static pattheminer.trenddistance.TrendExperiment.TREND;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
 
 import ca.uqac.lif.labpal.Group;
+import ca.uqac.lif.labpal.Namer;
 import ca.uqac.lif.labpal.Region;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.plot.TwoDimensionalPlot.Axis;
@@ -88,6 +89,7 @@ public abstract class SetupTrendExperiments<T extends TrendExperiment> extends S
         }
         g.add(tde);
         et.add(tde);
+        m_lab.add(new AverageThroughputMacro(m_lab, et, "tpAvg" + Namer.latexify(r_w.getString(TREND) + r_w.getInt(WIDTH) + m_suffix), " with a window of " + r_w.getInt(WIDTH)));
         /* 
         These plots are not really necessary
         Scatterplot plot = new Scatterplot(et);
@@ -120,7 +122,7 @@ public abstract class SetupTrendExperiments<T extends TrendExperiment> extends S
         m_lab.add(tt);
         Scatterplot plot = new Scatterplot(tt);
         plot.setCaption(Axis.X, "Stream length").setCaption(Axis.Y, "Time (ms)");
-        MainLab.s_nicknamer.setNickname(plot, r_t, "p", "throughputWidthE");
+        MainLab.s_nicknamer.setNickname(plot, r_t, "p", "throughputWidthE" + m_suffix);
         MainLab.s_titleNamer.setTitle(plot, r_t, "Throughput by length and width: ", "");
         m_lab.add(plot);
       }
@@ -152,32 +154,5 @@ public abstract class SetupTrendExperiments<T extends TrendExperiment> extends S
     //m_lab.add(new AverageThroughputMacro(m_lab, table_50, "tp" + nickname_prefix + "Fifty", beta_name + " with a window of " + MainLab.s_width1));
     //m_lab.add(new AverageThroughputMacro(m_lab, table_200, "tp" + nickname_prefix + "TwoHundred", beta_name + " with a window of " + MainLab.s_width3));
     //m_lab.add(new MonotonicWindowClaim(tt, beta_name, Integer.toString(MainLab.s_width1), Integer.toString(MainLab.s_width2), Integer.toString(MainLab.s_width3)));
-    /*
-    // Fixed pattern vs. self correlated
-    {
-      Region r = new Region();
-      r.add(TrendExperiment.WIDTH, MainLab.s_width1, MainLab.s_width2, MainLab.s_width3);
-      String[] trends = new String[]{"Average", "Running moments", "Symbol distribution", "Closest cluster"};
-      r.add(TrendExperiment.TREND, trends);
-      for (Region sub_r : r.all(TrendExperiment.WIDTH))
-      {
-        int w = sub_r.getInt(TrendExperiment.WIDTH);
-        ThroughputComparisonTable tab = new ThroughputComparisonTable(trends);
-        tab.setTitle("Throughput comparison (window width = " + MainLab.toLatex(w) + ")");
-        tab.setNickname("tThroughputComparison" + w);
-        for (Region sub_r2 : sub_r.all(TrendExperiment.TREND))
-        {
-          Region r_t = new Region(sub_r2).add(TrendExperiment.TYPE, TrendDistanceExperiment.TYPE_NAME);
-          TrendDistanceExperiment exp_t = (TrendDistanceExperiment) m_lab.getAnyExperiment(r_t);
-          Region r_s = new Region(sub_r2).add(TrendExperiment.TYPE, SelfCorrelatedExperiment.TYPE_NAME);
-          SelfCorrelatedExperiment exp_s = (SelfCorrelatedExperiment) m_lab.getAnyExperiment(r_s);
-          tab.add(sub_r2.getString(TrendExperiment.TREND), exp_t);
-          tab.add(sub_r2.getString(TrendExperiment.TREND), exp_s);
-        }
-        m_lab.add(tab);
-        m_lab.add(new MaxSlowdownMacro(m_lab, "maxSlowdown" + MainLab.toLatex(w), w, tab));
-      }
-    }
-     */
   }
 }

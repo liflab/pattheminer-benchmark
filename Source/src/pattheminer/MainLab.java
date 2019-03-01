@@ -100,7 +100,10 @@ public class MainLab extends Laboratory
 
     // Command line arguments
     ArgumentMap args = getCliArguments();
-    m_includeThreadExperiments = args.hasOption("with-mt");
+    if (args != null)
+    {
+      m_includeThreadExperiments = args.hasOption("with-mt");
+    }
 
     // Lab stats
     add(new LabStats(this));

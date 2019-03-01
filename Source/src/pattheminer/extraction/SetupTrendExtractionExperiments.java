@@ -18,6 +18,7 @@
 package pattheminer.extraction;
 
 import ca.uqac.lif.labpal.Group;
+import ca.uqac.lif.labpal.Namer;
 import ca.uqac.lif.labpal.Region;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.plot.gnuplot.Scatterplot;
@@ -54,6 +55,7 @@ public class SetupTrendExtractionExperiments extends SetupAgent
           new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "50000"), t_50000),
           new TransformedTable(new RenameColumns(MiningExperiment.NUM_LOGS, "100000"), t_100000));
       tt.setTitle("Trend extraction speed for symbol distribution and K-means");
+      tt.setNickname("tKMeansLength");
       m_lab.add(tt);
       Scatterplot k_plot = new Scatterplot(tt);
       k_plot.setNickname("pKMeansLength");
@@ -68,6 +70,7 @@ public class SetupTrendExtractionExperiments extends SetupAgent
   {
     ExperimentTable t_by_num_logs = new ExperimentTable(MiningExperiment.NUM_LOGS, MiningExperiment.DURATION);
     t_by_num_logs.setTitle("Trend extraction speed for symbol distribution and K-means (log length " + r_nl.getInt(MiningExperiment.LOG_LENGTH) + ")");
+    t_by_num_logs.setNickname("teSpeed" + Namer.latexify(Integer.toString(log_length)));
     for (Region r_ll : r_nl.all(MiningExperiment.NUM_LOGS))
     {
       DistributionKmeansExperiment dke = new DistributionKmeansExperiment(m_lab.getRandom(), r_ll.getInt(MiningExperiment.NUM_LOGS), log_length);
