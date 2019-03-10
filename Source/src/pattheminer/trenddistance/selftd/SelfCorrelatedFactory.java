@@ -18,21 +18,27 @@
 package pattheminer.trenddistance.selftd;
 
 import static pattheminer.trenddistance.TrendExperiment.TREND;
+import static pattheminer.trenddistance.TrendExperiment.AVG_SLICE_LENGTH;
 import static pattheminer.trenddistance.TrendExperiment.CLOSEST_CLUSTER;
+import static pattheminer.trenddistance.TrendExperiment.NUM_SLICES;
 import static pattheminer.trenddistance.TrendExperiment.N_GRAMS;
 import static pattheminer.trenddistance.TrendExperiment.N_GRAM_WIDTH;
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_AVG;
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_MOMENTS;
+import static pattheminer.trenddistance.TrendExperiment.SLICE_LENGTH;
 import static pattheminer.trenddistance.TrendExperiment.SYMBOL_DISTRIBUTION;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
 
 import ca.uqac.lif.cep.Processor;
+import ca.uqac.lif.cep.concurrency.NonBlockingPush;
+import ca.uqac.lif.cep.concurrency.ParallelWindow;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.peg.JaccardIndex;
 import ca.uqac.lif.cep.peg.MapDistance;
 import ca.uqac.lif.cep.peg.PointDistance;
 import ca.uqac.lif.cep.peg.SelfCorrelatedTrendDistance;
+import ca.uqac.lif.cep.peg.TrendDistance;
 import ca.uqac.lif.cep.peg.ml.RunningMoments;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.json.JsonString;
@@ -43,11 +49,13 @@ import java.util.HashMap;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import pattheminer.MainLab;
+import pattheminer.patterns.AverageSliceLength;
 import pattheminer.patterns.CumulativeAverage;
 import pattheminer.patterns.Ngrams;
 import pattheminer.patterns.SymbolDistribution;
 import pattheminer.patterns.SymbolDistributionClusters;
 import pattheminer.source.BoundedSource;
+import pattheminer.source.RandomLabelSource;
 import pattheminer.source.RandomNumberSource;
 import pattheminer.source.RandomSymbolSource;
 import pattheminer.trenddistance.TrendFactory;
@@ -63,7 +71,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
   {
     super(lab, SelfCorrelatedExperiment.class);
   }
-  
+
   @Override
   protected SelfCorrelatedExperiment createExperiment(Region r)
   {
@@ -93,9 +101,17 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
       }
       return createSelfNgramExperiment(width, 3, false);
     }
+    else if (trend_name.compareTo(AVG_SLICE_LENGTH) == 0)
+    {
+      if (r.hasDimension(NUM_SLICES))
+      {
+        return createSelfSliceLengthExperiment(width, r.getInt(NUM_SLICES), r.getInt(SLICE_LENGTH), false);
+      }
+      return createSelfSliceLengthExperiment(width, 3, 10, false);
+    }
     return null;
   }
-  
+
   protected SelfCorrelatedExperiment createSelfAverageExperiment(int width, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
@@ -136,7 +152,38 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
     return createNewSelfCorrelatedExperiment(CLOSEST_CLUSTER, "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
-  
+
+  protected SelfCorrelatedExperiment createSelfSliceLengthExperiment(int width, int num_slices, int slice_length, boolean multi_thread)
+  {
+    Random random = m_lab.getRandom();
+
+    BoundedSource src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
+
+    // Group processor that creates and accumulates N-grams
+    AverageSliceLength.SliceLength asl = new AverageSliceLength.SliceLength();
+
+    // Put this into a window
+    Processor wp = null;
+    if (multi_thread)
+    {
+      NonBlockingPush nbp = new NonBlockingPush(asl, MainLab.s_service);
+      wp = new ParallelWindow(nbp, width);
+    }
+    else
+    {
+      //wp = new Window(average, width);
+      wp = new ParallelWindow(asl, width);
+    }
+    TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(10, wp, Numbers.subtraction, 1, Numbers.isLessThan);
+    SelfCorrelatedExperiment tde = createNewSelfCorrelatedExperiment(AVG_SLICE_LENGTH, "Subtraction", src, alarm, width, multi_thread);
+    // For the slice experiment, there are two additional parameters
+    tde.setInput(NUM_SLICES, num_slices);
+    tde.describe(NUM_SLICES, "The number of slices");
+    tde.setInput(AVG_SLICE_LENGTH, slice_length);
+    tde.describe(AVG_SLICE_LENGTH, "The length of each slice");
+    return tde;
+  }
+
   protected SelfCorrelatedExperiment createSelfNgramExperiment(int width, int N, boolean multi_thread)
   {
     int num_symbols = 2;
@@ -145,7 +192,11 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     SelfCorrelatedTrendDistance<Collection<?>,Number,Number> alarm = new SelfCorrelatedTrendDistance<Collection<?>,Number,Number>(width, width, beta, 
         JaccardIndex.instance, 0.25, Numbers.isLessThan);
     BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
-    return createNewSelfCorrelatedExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
+    SelfCorrelatedExperiment tde = createNewSelfCorrelatedExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
+    // For the n-gram experiment, there is an additional parameter
+    tde.setInput(N_GRAM_WIDTH, N);
+    tde.describe(N_GRAM_WIDTH, "The width of the N-grams (i.e. the value of N");
+    return tde;
   }
 
   protected SelfCorrelatedExperiment createNewSelfCorrelatedExperiment(String trend, String metric, BoundedSource src, Processor alarm, int width, boolean multi_thread)
