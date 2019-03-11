@@ -17,9 +17,6 @@
  */
 package pattheminer.extraction;
 
-import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.peg.ml.ProcessorMiningFunction;
-import pattheminer.patterns.CumulativeAverage;
 import pattheminer.source.RandomNumberSource;
 
 public class WeightedAverageExperiment extends MiningExperiment
@@ -31,7 +28,7 @@ public class WeightedAverageExperiment extends MiningExperiment
     setInput(MINING_ALGORITHM, "Weighted average");
     RandomNumberSource src = new RandomNumberSource(getRandom(), log_length);
     m_sequenceSetGenerator = new SequenceSetGenerator(src, num_logs);
-    Processor beta = new CumulativeAverage();
+    //Processor beta = new CumulativeAverage();
     //m_miningFunction = new ProcessorMiningFunction<Object,ArrayList<?>>(beta, new ApplyFunction(new KMeansFunction(2)));
     // TODO
   }

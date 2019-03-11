@@ -9,20 +9,48 @@ It provides various functions and processors to perform the following things:</p
 a reference "trend"</li>
 <li>Compute reference trends from an event stream or a collection of reference
 event streams</li>
+<!--
+This part is disabled as it is not in the submitted paper!
 <li>Learn associations between windows of the same trace using a machine
 learning classifier</li>
+-->
 </ol>
 
 <p>This benchmark measures the performance of these functionalities, using
 various types of input event streams, pattern computations, and distance metrics.</p>
 
-<p>The results in this benchmark are mentioned in the following publication(s):</p>
+<p>The results in this benchmark are mentioned in the following publication:</p>
 
 <ul>
 <li>M. Roudjane, R. Khoury, D. Rebaïne, S. Hallé. (2019). Statistics and Data Mining
 for Event Stream Analytics. In <i>Information Systems</i>, Elsevier. Submitted.</li>
+</ul>
+
+<p>This paper itself is an extended version of the following publication:</p>
+
+<ul>
 <li>M. Roudjane, R. Khoury, D. Rebaïne, S. Hallé. (2018). Real-Time Data Mining for
 Event Streams. In <i>Proc. EDOC 2018</i>, IEEE Computer Society, 123-134.
-DOI: 10.1109/EDOC.2018.00025. <strong>This paper uses an earlier version of this
-lab.</strong></li>
+DOI: 10.1109/EDOC.2018.00025. <strong>This paper uses an
+<a href="https://zenodo.org/record/1252497">earlier version of this
+lab</a>, hosted on Zenodo.</strong></li>
 </ul>
+
+<h3>Prerequisites</h3>
+
+<p>There are no prerequisites to run this lab. The self-contained JAR file is
+a bundle of all the dependent libraries:</p>
+
+<ul>
+<li><a href="https://liflab.github.io/beepbeep-3">BeepBeep</a></li>
+<li><a href="https://github.com/liflab/PatTheMiner">Pat The Miner</a></li>
+<li><a href="http://commons.apache.org/proper/commons-math">Apache Commons Math</li>
+<li><a href="https://www.cs.waikato.ac.nz/ml/weka/index.html">WEKA</a></li>
+</ul>
+
+<p>All the logs processed in the lab are either synthetically generated at runtime,
+or static files located inside the bundled JAR.</p>
+
+<h3>How to run this lab</h3>
+
+<p>See the <a href=/help">Help</a> page for more information.</p>
