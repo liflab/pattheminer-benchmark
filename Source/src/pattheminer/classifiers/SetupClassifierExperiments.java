@@ -21,6 +21,8 @@ import static pattheminer.classifiers.ClassifierExperiment.*;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
+import ca.uqac.lif.cep.functions.Constant;
+import ca.uqac.lif.cep.functions.RaiseArity;
 import ca.uqac.lif.cep.peg.weka.WekaUtils;
 import ca.uqac.lif.cep.util.NthElement;
 import ca.uqac.lif.labpal.ExperimentFactory;
@@ -155,7 +157,8 @@ public class SetupClassifierExperiments extends SetupAgent
       Processor beta = new ExtractAttributes(num_features);
       Processor kappa = new ApplyFunction(new NthElement(num_features));
       Attribute[] atts = createDummyAttributes(num_features, num_classes);
-      ClassifierTrainingExperiment cte = new ClassifierTrainingExperiment(algo_name, WekaUtils.getClassifier(algo_name), update_interval, roll_width, beta, kappa, 1, 1, 1, atts);
+      RaiseArity slice_f = new RaiseArity(1, new Constant(0));
+      ClassifierTrainingExperiment cte = new ClassifierTrainingExperiment(algo_name, WekaUtils.getClassifier(algo_name), update_interval, roll_width, slice_f, beta, kappa, 1, 1, 1, atts);
       cte.setSource(new RandomArraySource(m_lab.getRandom(), s_maxTraceLength, num_features, atts[num_features]));
       return cte;
     }

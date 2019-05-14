@@ -18,7 +18,8 @@
 package pattheminer.classifiers;
 
 import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.peg.weka.ClassifierTraining;
+import ca.uqac.lif.cep.functions.Function;
+import ca.uqac.lif.cep.peg.forecast.PredictiveLearning;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 
@@ -45,10 +46,10 @@ public class ClassifierTrainingExperiment extends ClassifierExperiment
   public static final transient String N = "n";
   
   /**
-   * The instance of the {@link ClassifierTraining} processor used to train
+   * The instance of the {@link PredictiveLearning} processor used to train
    * the classifier.
    */
-  protected transient ClassifierTraining m_classifierTraining;
+  protected transient PredictiveLearning m_predictiveLearning;
     
   /**
    * Creates a new empty prediction experiment. You should not call this
@@ -62,7 +63,7 @@ public class ClassifierTrainingExperiment extends ClassifierExperiment
   /**
    * Creates a new prediction experiment
    */
-  public ClassifierTrainingExperiment(String learning_algorithm, Classifier c, int update_interval, int roll_width, Processor beta, Processor kappa, int t, int m, int n, Attribute ... attributes)
+  public ClassifierTrainingExperiment(String learning_algorithm, Classifier c, int update_interval, int roll_width, Function slice_f, Processor beta, Processor kappa, int t, int m, int n, Attribute ... attributes)
   {
     super(learning_algorithm, c, update_interval, roll_width, attributes);
     setDescription("Experiment that trains a classifier by comparing two windows of the same stream.");
@@ -72,7 +73,7 @@ public class ClassifierTrainingExperiment extends ClassifierExperiment
     setInput(T, t);
     setInput(M, m);
     setInput(N, n);
-    m_classifierTraining = new ClassifierTraining(beta, kappa, m_updateClassifier, t, m, n);
-    setProcessor(m_classifierTraining);
+    m_predictiveLearning = new PredictiveLearning(slice_f, beta, m, t, kappa, n, m_updateClassifier);
+    setProcessor(m_predictiveLearning);
   }
 }
