@@ -25,8 +25,8 @@ import ca.uqac.lif.labpal.Laboratory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import pattheminer.classifiers.SetupClassifierExperiments;
 import pattheminer.extraction.SetupTrendExtractionExperiments;
+import pattheminer.forecast.SetupClassifierExperiments;
 import pattheminer.secondorder.SetupSecondOrderTrendDistanceExperiments;
 import pattheminer.trenddistance.SetupStaticVsSelf;
 import pattheminer.trenddistance.context.SetupContextualExperiments;

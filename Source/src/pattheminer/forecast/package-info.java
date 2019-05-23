@@ -5,4 +5,4 @@
  * @author sylvain
  *
  */
-package pattheminer.classifiers;
+package pattheminer.forecast;

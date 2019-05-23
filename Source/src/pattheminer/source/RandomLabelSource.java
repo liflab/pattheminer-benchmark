@@ -22,6 +22,10 @@ import ca.uqac.lif.labpal.Random;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A source of randomly-generated labelled events, used for testing and
+ * benchmarking.
+ */
 public class RandomLabelSource extends RandomSource
 {
   /**

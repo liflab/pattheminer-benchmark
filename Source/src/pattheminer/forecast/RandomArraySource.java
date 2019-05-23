@@ -1,4 +1,4 @@
-package pattheminer.classifiers;
+package pattheminer.forecast;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;

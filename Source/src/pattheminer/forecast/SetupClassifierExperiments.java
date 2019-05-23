@@ -15,9 +15,9 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer.classifiers;
+package pattheminer.forecast;
 
-import static pattheminer.classifiers.ClassifierExperiment.*;
+import static pattheminer.forecast.ClassifierExperiment.*;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
@@ -55,7 +55,7 @@ public class SetupClassifierExperiments extends SetupAgent
     
     // Self-trained class prediction experiments
     {
-      Group g = new Group("Self-trained class prediction throughput");
+      Group g = new Group("Self-learning prediction throughput");
       g.setDescription("Measures the throughput of the self-trained class prediction processor for various trend computations.");
       m_lab.add(g);
       Region reg = new Region();
@@ -73,7 +73,7 @@ public class SetupClassifierExperiments extends SetupAgent
           original_table.setShowInList(false);
           for (Region r_ll : r_w.all(ClassifierExperiment.NUM_CLASSES, ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.NUM_FEATURES))
           {
-            ClassifierTrainingExperiment cte = factory.get(r_ll);
+            PredictiveLearningExperiment cte = factory.get(r_ll);
             g.add(cte);
             original_table.add(cte);
           }
@@ -99,7 +99,7 @@ public class SetupClassifierExperiments extends SetupAgent
         for (Region rg_c : rg_n.all(LEARNING_ALGORITHM, NUM_FEATURES))
         {
           // For each algorithm
-          ClassifierTrainingExperiment cte = factory.get(rg_c);
+          PredictiveLearningExperiment cte = factory.get(rg_c);
           original_table.add(cte);
         }
         TransformedTable t_table = new TransformedTable(new ExpandAsColumns(LEARNING_ALGORITHM, THROUGHPUT), original_table);
@@ -139,15 +139,15 @@ public class SetupClassifierExperiments extends SetupAgent
     return atts;
   }
 
-  protected static class SetupFactory extends ExperimentFactory<MainLab,ClassifierTrainingExperiment>
+  protected static class SetupFactory extends ExperimentFactory<MainLab,PredictiveLearningExperiment>
   {
     SetupFactory(MainLab lab)
     {
-      super(lab, ClassifierTrainingExperiment.class);
+      super(lab, PredictiveLearningExperiment.class);
     }
 
     @Override
-    protected ClassifierTrainingExperiment createExperiment(Region r)
+    protected PredictiveLearningExperiment createExperiment(Region r)
     {
       int num_features = r.getInt(ClassifierExperiment.NUM_FEATURES);
       int num_classes = r.getInt(ClassifierExperiment.NUM_CLASSES);
@@ -158,7 +158,7 @@ public class SetupClassifierExperiments extends SetupAgent
       Processor kappa = new ApplyFunction(new NthElement(num_features));
       Attribute[] atts = createDummyAttributes(num_features, num_classes);
       RaiseArity slice_f = new RaiseArity(1, new Constant(0));
-      ClassifierTrainingExperiment cte = new ClassifierTrainingExperiment(algo_name, WekaUtils.getClassifier(algo_name), update_interval, roll_width, slice_f, beta, kappa, 1, 1, 1, atts);
+      PredictiveLearningExperiment cte = new PredictiveLearningExperiment(algo_name, WekaUtils.getClassifier(algo_name), update_interval, roll_width, slice_f, beta, kappa, 1, 1, 1, atts);
       cte.setSource(new RandomArraySource(m_lab.getRandom(), s_maxTraceLength, num_features, atts[num_features]));
       return cte;
     }

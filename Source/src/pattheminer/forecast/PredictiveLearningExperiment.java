@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer.classifiers;
+package pattheminer.forecast;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Function;
@@ -27,7 +27,7 @@ import weka.core.Attribute;
  * Experiment that trains a classifier by comparing two windows of the same
  * stream.
  */
-public class ClassifierTrainingExperiment extends ClassifierExperiment
+public class PredictiveLearningExperiment extends ClassifierExperiment
 {
   
   /**
@@ -55,7 +55,7 @@ public class ClassifierTrainingExperiment extends ClassifierExperiment
    * Creates a new empty prediction experiment. You should not call this
    * constructor directly.
    */
-  ClassifierTrainingExperiment()
+  PredictiveLearningExperiment()
   {
     // Do nothing
   }
@@ -63,7 +63,7 @@ public class ClassifierTrainingExperiment extends ClassifierExperiment
   /**
    * Creates a new prediction experiment
    */
-  public ClassifierTrainingExperiment(String learning_algorithm, Classifier c, int update_interval, int roll_width, Function slice_f, Processor beta, Processor kappa, int t, int m, int n, Attribute ... attributes)
+  public PredictiveLearningExperiment(String learning_algorithm, Classifier c, int update_interval, int roll_width, Function slice_f, Processor beta, Processor kappa, int t, int m, int n, Attribute ... attributes)
   {
     super(learning_algorithm, c, update_interval, roll_width, attributes);
     setDescription("Experiment that trains a classifier by comparing two windows of the same stream.");
