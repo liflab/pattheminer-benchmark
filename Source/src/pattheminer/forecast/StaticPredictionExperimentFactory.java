@@ -1,18 +1,38 @@
+/*
+    A benchmark for Pat The Miner
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package pattheminer.forecast;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Constant;
 import ca.uqac.lif.cep.functions.Function;
+import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.IdentityFunction;
-import ca.uqac.lif.cep.functions.RaiseArity;
+import ca.uqac.lif.cep.functions.StreamVariable;
+import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Region;
 import pattheminer.MainLab;
 import pattheminer.forecast.features.RunningAverage;
 
-import static pattheminer.forecast.StaticPredictionExperiment.F;
-import static pattheminer.forecast.StaticPredictionExperiment.M;
-import static pattheminer.forecast.StaticPredictionExperiment.PHI;
+import static pattheminer.forecast.PredictionExperiment.NUM_SLICES;
+import static pattheminer.forecast.PredictionExperiment.F;
+import static pattheminer.forecast.PredictionExperiment.M;
+import static pattheminer.forecast.PredictionExperiment.PHI;
 import static pattheminer.forecast.StaticPredictionExperiment.PI;
 import static pattheminer.forecast.StaticPredictionExperiment.PREDICTION;
 import static pattheminer.forecast.StaticPredictionExperiment.PREDICTION_AVG;
@@ -54,10 +74,16 @@ public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab
     BoundedSource source = new RandomNumberSource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH);
     Processor phi = new RunningAverage();
     Function pi = new IdentityFunction(1);
-    StaticPredictionExperiment exp = new StaticPredictionExperiment(source, new RaiseArity(1, new Constant(0)), r.getInt(M), phi, pi);
-    exp.setInput(F, "Constant 0");
+    int num_slices = r.getInt(NUM_SLICES);
+    Function slice_fct = new FunctionTree(Numbers.floor,
+        new FunctionTree(Numbers.division, 
+            new FunctionTree(Numbers.multiplication, StreamVariable.X, new Constant(1000)),
+            new Constant(num_slices)));
+    StaticPredictionExperiment exp = new StaticPredictionExperiment(source, slice_fct, r.getInt(M), phi, pi);
+    exp.setInput(F, num_slices + " equal interval(s)");
     exp.setInput(PHI, RunningAverage.NAME);
     exp.setInput(PI, "Identity");
+    exp.setInput(NUM_SLICES, num_slices);
     return exp;
   }
 

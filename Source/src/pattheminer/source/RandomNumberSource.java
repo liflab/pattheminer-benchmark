@@ -25,7 +25,6 @@ import ca.uqac.lif.labpal.Random;
  */
 public class RandomNumberSource extends RandomSource
 {
-  
   /**
    * Creates a new random number source.
    * @param r The random number generator used to generate the numbers

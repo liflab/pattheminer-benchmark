@@ -36,6 +36,7 @@ import ca.uqac.lif.mtnp.plot.gnuplot.Scatterplot;
 import ca.uqac.lif.mtnp.table.ExpandAsColumns;
 import ca.uqac.lif.mtnp.table.TransformedTable;
 import pattheminer.MainLab;
+import pattheminer.MainLabNicknamer;
 import pattheminer.SetupAgent;
 import pattheminer.StreamExperiment;
 import pattheminer.patterns.ExtractAttributes;
@@ -44,7 +45,7 @@ import weka.core.Attribute;
 public class SetupPredictionExperiments extends SetupAgent
 {
   protected static int s_maxTraceLength = 10000;
-  
+
   public SetupPredictionExperiments(/*@ non_null @*/ MainLab lab)
   {
     super(lab);
@@ -62,32 +63,54 @@ public class SetupPredictionExperiments extends SetupAgent
       Region main_region = new Region();
       main_region.add(PREDICTION, StaticPredictionExperiment.PREDICTION_AVG);
       main_region.add(M, 5, 10, 30, 100);
+      main_region.add(NUM_SLICES, 1, 5, 10, 30, 100);
       main_region.add(MULTITHREAD, JsonFalse.instance);
       {
-        // Throughput by window width for each prediction
-        ExperimentTable et = new ExperimentTable(M, PREDICTION, StreamExperiment.THROUGHPUT);
-        et.setShowInList(false);
-        m_lab.add(et);
-        for (Region reg : main_region.all(PREDICTION, M))
+        // Throughput by window width for each prediction, for fixed number of slices
+        for (Region in_reg : main_region.all(NUM_SLICES))
         {
-          StaticPredictionExperiment exp = factory.get(reg);
-          if (exp == null)
-            continue;
-          g.add(exp);
-          et.add(exp);
+          ExperimentTable et = new ExperimentTable(M, PREDICTION, StreamExperiment.THROUGHPUT);
+          et.setShowInList(false);
+          m_lab.add(et);
+          for (Region reg : in_reg.all(PREDICTION, M))
+          {
+            StaticPredictionExperiment exp = factory.get(reg);
+            if (exp == null)
+              continue;
+            g.add(exp);
+            et.add(exp);
+          }
+          TransformedTable tt = new TransformedTable(new ExpandAsColumns(PREDICTION, StreamExperiment.THROUGHPUT), et);
+          tt.setTitle("Static prediction throughput by window width (" + in_reg.getInt(NUM_SLICES) + " slices)");
+          tt.setNickname(MainLabNicknamer.latexify("tStaticPredictionThroughputWidth" + in_reg.getInt(NUM_SLICES) + "slices"));
+          m_lab.add(tt);
         }
-        TransformedTable tt = new TransformedTable(new ExpandAsColumns(PREDICTION, StreamExperiment.THROUGHPUT), et);
-        tt.setTitle("Static prediction throughput by window width");
-        tt.setNickname("tStaticPredictionThroughputWidth");
-        m_lab.add(tt);
+      }
+      {
+        // Throughput by number of slices width for each prediction, for fixed window width
+        for (Region in_reg : main_region.all(M))
+        {
+          ExperimentTable et = new ExperimentTable(NUM_SLICES, PREDICTION, StreamExperiment.THROUGHPUT);
+          et.setShowInList(false);
+          m_lab.add(et);
+          for (Region reg : in_reg.all(PREDICTION, NUM_SLICES))
+          {
+            StaticPredictionExperiment exp = factory.get(reg);
+            if (exp == null)
+              continue;
+            g.add(exp);
+            et.add(exp);
+          }
+          TransformedTable tt = new TransformedTable(new ExpandAsColumns(PREDICTION, StreamExperiment.THROUGHPUT), et);
+          tt.setTitle("Static prediction throughput by number of slices (window width = " + in_reg.getInt(M) + ")");
+          tt.setNickname(MainLabNicknamer.latexify("tStaticPredictionThroughputSlices" + in_reg.getInt(M) + "width"));
+          m_lab.add(tt);
+        }
       }
     }
-    
-    
+
     SetupFactory factory = new SetupFactory(m_lab);
-    
-    
-    
+
     // Self-trained class prediction experiments
     {
       Group g = new Group("Self-learning prediction throughput");
