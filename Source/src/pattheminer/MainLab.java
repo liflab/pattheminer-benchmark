@@ -26,7 +26,7 @@ import ca.uqac.lif.labpal.Laboratory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import pattheminer.extraction.SetupTrendExtractionExperiments;
-import pattheminer.forecast.SetupClassifierExperiments;
+import pattheminer.forecast.SetupPredictionExperiments;
 import pattheminer.secondorder.SetupSecondOrderTrendDistanceExperiments;
 import pattheminer.trenddistance.SetupStaticVsSelf;
 import pattheminer.trenddistance.context.SetupContextualExperiments;
@@ -103,6 +103,7 @@ public class MainLab extends Laboratory
     if (args != null)
     {
       m_includeThreadExperiments = args.hasOption("with-mt");
+      m_includePredictiveExperiments = args.hasOption("with-pred");
     }
 
     // Lab stats
@@ -132,7 +133,7 @@ public class MainLab extends Laboratory
     // Classifier training experiments
     if (m_includePredictiveExperiments)
     {
-      new SetupClassifierExperiments(this).fillWithExperiments();
+      new SetupPredictionExperiments(this).fillWithExperiments();
     }
 
     // Impact of threading
@@ -147,6 +148,7 @@ public class MainLab extends Laboratory
   {
     parser.addArgument(new Argument().withLongName("with-mt").withDescription("Include experiments about multi-threading"));
     parser.addArgument(new Argument().withLongName("with-ct").withDescription("Include experiments about context"));
+    parser.addArgument(new Argument().withLongName("with-pred").withDescription("Include prediction experiments"));
   }
 
   public static void main(String[] args)

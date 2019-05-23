@@ -18,6 +18,7 @@
 package pattheminer.forecast;
 
 import static pattheminer.forecast.ClassifierExperiment.*;
+import static pattheminer.forecast.StaticPredictionExperiment.*;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
@@ -25,6 +26,7 @@ import ca.uqac.lif.cep.functions.Constant;
 import ca.uqac.lif.cep.functions.RaiseArity;
 import ca.uqac.lif.cep.peg.weka.WekaUtils;
 import ca.uqac.lif.cep.util.NthElement;
+import ca.uqac.lif.json.JsonFalse;
 import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Group;
 import ca.uqac.lif.labpal.Region;
@@ -39,11 +41,11 @@ import pattheminer.StreamExperiment;
 import pattheminer.patterns.ExtractAttributes;
 import weka.core.Attribute;
 
-public class SetupClassifierExperiments extends SetupAgent
+public class SetupPredictionExperiments extends SetupAgent
 {
   protected static int s_maxTraceLength = 10000;
   
-  public SetupClassifierExperiments(/*@ non_null @*/ MainLab lab)
+  public SetupPredictionExperiments(/*@ non_null @*/ MainLab lab)
   {
     super(lab);
   }
@@ -51,7 +53,40 @@ public class SetupClassifierExperiments extends SetupAgent
   @Override
   public void fillWithExperiments()
   {
+    {
+      // Static prediction experiments
+      StaticPredictionExperimentFactory factory = new StaticPredictionExperimentFactory(m_lab);
+      Group g = new Group("Static prediction throughput");
+      g.setDescription("Measures the throughput of the static prediction pattern for various feature computations.");
+      m_lab.add(g);
+      Region main_region = new Region();
+      main_region.add(PREDICTION, StaticPredictionExperiment.PREDICTION_AVG);
+      main_region.add(M, 5, 10, 30, 100);
+      main_region.add(MULTITHREAD, JsonFalse.instance);
+      {
+        // Throughput by window width for each prediction
+        ExperimentTable et = new ExperimentTable(M, PREDICTION, StreamExperiment.THROUGHPUT);
+        et.setShowInList(false);
+        m_lab.add(et);
+        for (Region reg : main_region.all(PREDICTION, M))
+        {
+          StaticPredictionExperiment exp = factory.get(reg);
+          if (exp == null)
+            continue;
+          g.add(exp);
+          et.add(exp);
+        }
+        TransformedTable tt = new TransformedTable(new ExpandAsColumns(PREDICTION, StreamExperiment.THROUGHPUT), et);
+        tt.setTitle("Static prediction throughput by window width");
+        tt.setNickname("tStaticPredictionThroughputWidth");
+        m_lab.add(tt);
+      }
+    }
+    
+    
     SetupFactory factory = new SetupFactory(m_lab);
+    
+    
     
     // Self-trained class prediction experiments
     {

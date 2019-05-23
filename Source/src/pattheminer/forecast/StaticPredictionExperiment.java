@@ -20,25 +20,10 @@ package pattheminer.forecast;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.peg.forecast.StaticPrediction;
-import pattheminer.StreamExperiment;
 import pattheminer.source.BoundedSource;
 
-public class StaticPredictionExperiment extends StreamExperiment
+public class StaticPredictionExperiment extends PredictionExperiment
 {
-  /**
-   * The slicing function (f)
-   */
-  public static final transient String F = "Slicing function (f)";
-  
-  /**
-   * The width of the window used to compute the feature (m)
-   */
-  public static final transient String M = "Feature window width (m)";
-  
-  /**
-   * The feature computed on a window (&phi;)
-   */
-  public static final transient String PHI = "Feature processor (phi)";
   
   /**
    * The function used to make a forecast on the window (&pi;)
@@ -51,6 +36,11 @@ public class StaticPredictionExperiment extends StreamExperiment
   public static final transient String PREDICTION = "Prediction";
   
   /**
+   * One of the possible predictions: average
+   */
+  public static final transient String PREDICTION_AVG = "Average prediction";
+  
+  /**
    * Creates a new static prediction experiment
    * @param source
    * @param f The slicing function (f)
@@ -61,13 +51,14 @@ public class StaticPredictionExperiment extends StreamExperiment
   public StaticPredictionExperiment(BoundedSource source, Function f, int m, Processor phi, Function pi)
   {
     super();
-    describe(F, "The slicing function (f)");
-    describe(M, "The width of the window used to compute the feature (m)");
-    describe(PHI, "The feature computed on a window (&phi;)");
+    addKeyToHide(F);
+    addKeyToHide(PHI);
+    addKeyToHide(PI);
     describe(PI, "The function used to make a forecast on the window (&pi;)");
     describe(PREDICTION, "The name of the prediction being made");
     StaticPrediction sp = new StaticPrediction(f, phi, m, pi);
     setSource(source);
     setProcessor(sp);
+    setInput(M, m);
   }
 }

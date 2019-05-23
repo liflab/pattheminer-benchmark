@@ -14,6 +14,11 @@ import ca.uqac.lif.cep.util.Numbers;
  */
 public class RunningAverage extends GroupProcessor
 {
+  /**
+   * A name given to this processor chain
+   */
+  public static final transient String NAME = "Running average";
+  
   public RunningAverage()  
   {
     super(1, 1);
@@ -31,7 +36,7 @@ public class RunningAverage extends GroupProcessor
     associateInput(0, f, 0);
     associateOutput(0, div, 0);
   }
-  
+
   public RunningAverage duplicate(boolean with_state)
   {
     return new RunningAverage();
