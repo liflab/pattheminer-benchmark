@@ -41,6 +41,11 @@ public class StaticPredictionExperiment extends PredictionExperiment
   public static final transient String PREDICTION_AVG = "Average prediction";
   
   /**
+   * One of the possible predictions: linear regression
+   */
+  public static final transient String PREDICTION_REGRESSION = "Linear regression";
+  
+  /**
    * Creates a new static prediction experiment
    * @param source
    * @param f The slicing function (f)

@@ -61,7 +61,8 @@ public class SetupPredictionExperiments extends SetupAgent
       g.setDescription("Measures the throughput of the static prediction pattern for various feature computations.");
       m_lab.add(g);
       Region main_region = new Region();
-      main_region.add(PREDICTION, StaticPredictionExperiment.PREDICTION_AVG);
+      main_region.add(PREDICTION, StaticPredictionExperiment.PREDICTION_AVG, 
+          StaticPredictionExperiment.PREDICTION_REGRESSION);
       main_region.add(M, 5, 10, 30, 100);
       main_region.add(NUM_SLICES, 1, 5, 10, 30, 100);
       main_region.add(MULTITHREAD, JsonFalse.instance);

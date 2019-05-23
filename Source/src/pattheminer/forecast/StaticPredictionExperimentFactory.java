@@ -18,15 +18,19 @@
 package pattheminer.forecast;
 
 import ca.uqac.lif.cep.Processor;
+import ca.uqac.lif.cep.functions.ApplyFunctionArgument;
 import ca.uqac.lif.cep.functions.Constant;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.IdentityFunction;
 import ca.uqac.lif.cep.functions.StreamVariable;
+import ca.uqac.lif.cep.peg.util.EvaluateAt;
+import ca.uqac.lif.cep.tmf.WindowFunction;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Region;
 import pattheminer.MainLab;
+import pattheminer.forecast.features.LinearRegression;
 import pattheminer.forecast.features.RunningAverage;
 
 import static pattheminer.forecast.PredictionExperiment.NUM_SLICES;
@@ -36,6 +40,7 @@ import static pattheminer.forecast.PredictionExperiment.PHI;
 import static pattheminer.forecast.StaticPredictionExperiment.PI;
 import static pattheminer.forecast.StaticPredictionExperiment.PREDICTION;
 import static pattheminer.forecast.StaticPredictionExperiment.PREDICTION_AVG;
+import static pattheminer.forecast.StaticPredictionExperiment.PREDICTION_REGRESSION;
 
 import pattheminer.source.BoundedSource;
 import pattheminer.source.RandomNumberSource;
@@ -61,11 +66,16 @@ public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab
     {
       exp = setupAveragePrediction(r);
     }
+    else if (prediction.compareTo(PREDICTION_REGRESSION) == 0)
+    {
+      exp = setupRegressionPrediction(r);
+    }
     if (exp == null)
     {
       return null;
     }
     exp.setInput(PREDICTION, prediction);
+    exp.setEventStep(MainLab.s_eventStep);
     return exp;
   }
   
@@ -83,6 +93,25 @@ public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab
     exp.setInput(F, num_slices + " equal interval(s)");
     exp.setInput(PHI, RunningAverage.NAME);
     exp.setInput(PI, "Identity");
+    exp.setInput(NUM_SLICES, num_slices);
+    return exp;
+  }
+  
+  /*@ non_null @*/ protected StaticPredictionExperiment setupRegressionPrediction(/*@ non_null @*/ Region r)
+  {
+    int m = r.getInt(M);
+    BoundedSource source = new RandomNumberSource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH);
+    Processor phi = new WindowFunction(new LinearRegression(m));
+    Function pi = new EvaluateAt(ApplyFunctionArgument.instance, m);
+    int num_slices = r.getInt(NUM_SLICES);
+    Function slice_fct = new FunctionTree(Numbers.floor,
+        new FunctionTree(Numbers.division, 
+            new FunctionTree(Numbers.multiplication, StreamVariable.X, new Constant(1000)),
+            new Constant(num_slices)));
+    StaticPredictionExperiment exp = new StaticPredictionExperiment(source, slice_fct, m, phi, pi);
+    exp.setInput(F, num_slices + " equal interval(s)");
+    exp.setInput(PHI, RunningAverage.NAME);
+    exp.setInput(PI, "Linear regression function at m");
     exp.setInput(NUM_SLICES, num_slices);
     return exp;
   }
