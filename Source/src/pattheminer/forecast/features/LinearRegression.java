@@ -20,16 +20,35 @@ package pattheminer.forecast.features;
 import ca.uqac.lif.cep.Context;
 import ca.uqac.lif.cep.functions.Constant;
 import ca.uqac.lif.cep.functions.Function;
-import ca.uqac.lif.cep.functions.RaiseArity;
+import ca.uqac.lif.cep.functions.FunctionTree;
+import ca.uqac.lif.cep.functions.StreamVariable;
+import ca.uqac.lif.cep.util.Numbers;
 import java.util.Set;
 
+/**
+ * Computes a linear regression slope on a set of <i>n</i> points.
+ * More specifically, this function receives an array of <i>n</i> values
+ * <i>y</i><sub>0</sub>, &hellip;, <i>y</i><sub><i>n</i>-1</sub>, and
+ * computes the regression line that best fits the points
+ * (<i>i</i>, <i>y</i><sub><i>i</i></sub>) for <i>i</i> between 0 and
+ * <i>n</i>-1. The output of the function is another function in one variable,
+ * of the form <i>ax</i>+<i>b</i>.
+ * <p>
+ * The code that computes the regression is adapted from
+ * <a href="https://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html"><tt>LinearRegression.java</tt></a>,
+ * taken from the following book:
+ * <blockquote>
+ * R. Sedgewick, K. Wayne. (2011). Algorithms, 4th edition.
+ * <i>Addison-Wesley Professional</i>. ISBN 978-0321573513.
+ * </blockquote>
+ */
 public class LinearRegression extends Function
 {
   /**
    * The number of points on which regression is computed
    */
   protected int m_inArity;
-  
+
   public LinearRegression(int in_arity)
   {
     super();
@@ -39,8 +58,33 @@ public class LinearRegression extends Function
   @Override
   public void evaluate(Object[] inputs, Object[] outputs, Context context)
   {
-    // TODO pas fini
-    outputs[0] = new RaiseArity(1, new Constant(0));
+    float y[] = new float[m_inArity];
+    for (int i = 0; i < m_inArity; i++)
+    {
+      y[i] = ((Number) inputs[i]).floatValue();
+    }
+    // first pass
+    float sumx = 0, sumy = 0; //, sumx2 = 0;
+    for (int i = 0; i < m_inArity; i++) {
+      sumx  += i;
+      //sumx2 += i*i;
+      sumy  += y[i];
+    }
+    float xbar = sumx / m_inArity;
+    float ybar = sumy / m_inArity;
+
+    // second pass: compute summary statistics
+    float xxbar = 0, xybar = 0; //yybar = 0;
+    for (int i = 0; i < m_inArity; i++) {
+      xxbar += (i - xbar) * (i - xbar);
+      //yybar += (y[i] - ybar) * (y[i] - ybar);
+      xybar += (i - xbar) * (y[i] - ybar);
+    }
+    float slope  = xybar / xxbar;
+    float intercept = ybar - slope * xbar;
+    FunctionTree fct = new FunctionTree(Numbers.addition,
+        new FunctionTree(Numbers.multiplication, new Constant(slope), StreamVariable.X), new Constant(intercept));
+    outputs[0] = fct;
   }
 
   @Override

@@ -66,4 +66,26 @@ public class StaticPredictionExperiment extends PredictionExperiment
     setProcessor(sp);
     setInput(M, m);
   }
+  
+  /**
+   * Creates a new static prediction experiment
+   * @param source
+   * @param f The slicing function (f)
+   * @param m The width of the window used to compute the feature (m)
+   * @param phi The feature computed on a window (&phi;)
+   * @param pi The function used to make a forecast on the window (&pi;)
+   */
+  public StaticPredictionExperiment(BoundedSource source, Function f, Function phi, Function pi)
+  {
+    super();
+    addKeyToHide(F);
+    addKeyToHide(PHI);
+    addKeyToHide(PI);
+    describe(PI, "The function used to make a forecast on the window (&pi;)");
+    describe(PREDICTION, "The name of the prediction being made");
+    StaticPrediction sp = new StaticPrediction(f, phi, pi);
+    setSource(source);
+    setProcessor(sp);
+    setInput(M, phi.getInputArity());
+  }
 }

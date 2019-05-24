@@ -101,14 +101,14 @@ public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab
   {
     int m = r.getInt(M);
     BoundedSource source = new RandomNumberSource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH);
-    Processor phi = new WindowFunction(new LinearRegression(m));
-    Function pi = new EvaluateAt(ApplyFunctionArgument.instance, m);
+    Function phi = new LinearRegression(m);
+    Function pi = new EvaluateAt(m);
     int num_slices = r.getInt(NUM_SLICES);
     Function slice_fct = new FunctionTree(Numbers.floor,
         new FunctionTree(Numbers.division, 
             new FunctionTree(Numbers.multiplication, StreamVariable.X, new Constant(1000)),
             new Constant(num_slices)));
-    StaticPredictionExperiment exp = new StaticPredictionExperiment(source, slice_fct, m, phi, pi);
+    StaticPredictionExperiment exp = new StaticPredictionExperiment(source, slice_fct, phi, pi);
     exp.setInput(F, num_slices + " equal interval(s)");
     exp.setInput(PHI, RunningAverage.NAME);
     exp.setInput(PI, "Linear regression function at m");
