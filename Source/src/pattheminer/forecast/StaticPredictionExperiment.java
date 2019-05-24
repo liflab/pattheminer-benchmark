@@ -46,6 +46,14 @@ public class StaticPredictionExperiment extends PredictionExperiment
   public static final transient String PREDICTION_REGRESSION = "Linear regression";
   
   /**
+   * Empty constructor; used only for deserialization
+   */
+  StaticPredictionExperiment()
+  {
+    // Do nothing
+  }
+  
+  /**
    * Creates a new static prediction experiment
    * @param source
    * @param f The slicing function (f)

@@ -19,6 +19,7 @@ package pattheminer.forecast;
 
 import static pattheminer.forecast.ClassifierExperiment.*;
 import static pattheminer.forecast.StaticPredictionExperiment.*;
+import static pattheminer.forecast.PredictiveLearningExperiment.*;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
@@ -39,8 +40,6 @@ import pattheminer.MainLab;
 import pattheminer.MainLabNicknamer;
 import pattheminer.SetupAgent;
 import pattheminer.StreamExperiment;
-import pattheminer.patterns.ExtractAttributes;
-import weka.core.Attribute;
 
 public class SetupPredictionExperiments extends SetupAgent
 {
@@ -110,13 +109,42 @@ public class SetupPredictionExperiments extends SetupAgent
       }
     }
 
-    SetupFactory factory = new SetupFactory(m_lab);
-
     // Self-trained class prediction experiments
     {
-      Group g = new Group("Self-learning prediction throughput");
-      g.setDescription("Measures the throughput of the self-trained class prediction processor for various trend computations.");
+      PredictiveLearningExperimentFactory factory = new PredictiveLearningExperimentFactory(m_lab);
+      Group g = new Group("Predictive learning throughput (global)");
+      g.setDescription("Measures the throughput of the predictive learning pattern for various feature, class and predictive functions.");
       m_lab.add(g);
+      {
+        // Throughput by number of slices for each problem
+        Region main_region = new Region();
+        main_region.add(NUM_FEATURES, 3);
+        main_region.add(ROLL_WIDTH, 1000);
+        main_region.add(NUM_CLASSES, 2);
+        main_region.add(UPDATE_INTERVAL, 2);
+        main_region.add(LEARNING_ALGORITHM, "J48");
+        main_region.add(NUM_LABELS, 10);
+        main_region.add(NUM_SLICES, 1, 5, 10, 30, 100);
+        main_region.add(M, 3);
+        main_region.add(PATTERN, PredictiveLearningExperiment.PATTERN_AVG_DURATION,
+            PredictiveLearningExperiment.PATTERN_NEXT_EVENT);
+        ExperimentTable et = new ExperimentTable(NUM_SLICES, PATTERN, THROUGHPUT);
+        et.setShowInList(false);
+        m_lab.add(et);
+        for (Region reg : main_region.all(NUM_SLICES, PATTERN))
+        {
+          PredictiveLearningExperiment exp = factory.get(reg);
+          if (exp == null)
+            continue;
+          g.add(exp);
+          et.add(exp);
+        }
+        TransformedTable tt = new TransformedTable(new ExpandAsColumns(PATTERN, THROUGHPUT), et);
+        tt.setTitle("Predictive learning throughput by number of slices");
+        tt.setNickname("tPredictiveLearningThroughputBySlices");
+        m_lab.add(tt);
+      }
+      
       Region reg = new Region();
       reg.add(NUM_FEATURES, 1, 3, 5);
       reg.add(ROLL_WIDTH, 0, 1000);
@@ -133,6 +161,8 @@ public class SetupPredictionExperiments extends SetupAgent
           for (Region r_ll : r_w.all(ClassifierExperiment.NUM_CLASSES, ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.NUM_FEATURES))
           {
             PredictiveLearningExperiment cte = factory.get(r_ll);
+            if (cte == null)
+              continue;
             g.add(cte);
             original_table.add(cte);
           }
@@ -172,54 +202,6 @@ public class SetupPredictionExperiments extends SetupAgent
         plot.setCaption(Axis.X, "Number of features").setCaption(Axis.Y, "Time (ms)");
         m_lab.add(plot);
       }
-    }
-  }
-
-  /**
-   * Creates an array of dummy numerical attributes.
-   * @param num_attributes The number of attributes to create.
-   * @return The array of attributes
-   */
-  /*@ requires num_attributes >= 1 @*/
-  protected static Attribute[] createDummyAttributes(int num_attributes, int num_values)
-  {
-    Attribute[] atts = new Attribute[num_attributes + 1];
-    for (int i = 0; i < num_attributes; i++)
-    {
-      atts[i] = new Attribute(Integer.toString(i));
-    }
-    String[] att_vals = new String[num_values];
-    for (int i = 0; i < num_values; i++)
-    {
-      att_vals[i] = Integer.toString(i);
-    }
-    Attribute class_att = WekaUtils.createAttribute(Integer.toString(num_attributes), att_vals);
-    atts[num_attributes] = class_att;
-    return atts;
-  }
-
-  protected static class SetupFactory extends ExperimentFactory<MainLab,PredictiveLearningExperiment>
-  {
-    SetupFactory(MainLab lab)
-    {
-      super(lab, PredictiveLearningExperiment.class);
-    }
-
-    @Override
-    protected PredictiveLearningExperiment createExperiment(Region r)
-    {
-      int num_features = r.getInt(ClassifierExperiment.NUM_FEATURES);
-      int num_classes = r.getInt(ClassifierExperiment.NUM_CLASSES);
-      String algo_name = r.getString(ClassifierExperiment.LEARNING_ALGORITHM);
-      int update_interval = r.getInt(ClassifierExperiment.UPDATE_INTERVAL);
-      int roll_width = r.getInt(ClassifierExperiment.ROLL_WIDTH);
-      Processor beta = new ExtractAttributes(num_features);
-      Processor kappa = new ApplyFunction(new NthElement(num_features));
-      Attribute[] atts = createDummyAttributes(num_features, num_classes);
-      RaiseArity slice_f = new RaiseArity(1, new Constant(0));
-      PredictiveLearningExperiment cte = new PredictiveLearningExperiment(algo_name, WekaUtils.getClassifier(algo_name), update_interval, roll_width, slice_f, beta, kappa, 1, 1, 1, atts);
-      cte.setSource(new RandomArraySource(m_lab.getRandom(), s_maxTraceLength, num_features, atts[num_features]));
-      return cte;
     }
   }
 }

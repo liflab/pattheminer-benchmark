@@ -20,26 +20,38 @@ package pattheminer.forecast;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.peg.forecast.PredictiveLearning;
-import weka.classifiers.Classifier;
-import weka.core.Attribute;
 
 /**
  * Experiment that trains a classifier by comparing two windows of the same
  * stream.
  */
-public class PredictiveLearningExperiment extends ClassifierExperiment
+public class PredictiveLearningExperiment extends PredictionExperiment
 {
+  /**
+   * The name of the pattern being learned
+   */
+  public static final transient String PATTERN = "Pattern";
+  
+  /**
+   * One of the possible patterns: average duration
+   */
+  public static final transient String PATTERN_AVG_DURATION = "Average duration";
+  
+  /**
+   * One of the possible patterns: most probable next event
+   */
+  public static final transient String PATTERN_NEXT_EVENT = "Most probable next event";
+  
+  /**
+   * The number of labels
+   */
+  public static final transient String NUM_LABELS = "Labels";
   
   /**
    * The offset between the "trend" and the "class" windows
    */
   public static final transient String T = "t";
-  
-  /**
-   * Width of the feature window
-   */
-  public static final transient String M = "m";
-  
+    
   /**
    * Width of the class window
    */
@@ -63,17 +75,17 @@ public class PredictiveLearningExperiment extends ClassifierExperiment
   /**
    * Creates a new prediction experiment
    */
-  public PredictiveLearningExperiment(String learning_algorithm, Classifier c, int update_interval, int roll_width, Function slice_f, Processor beta, Processor kappa, int t, int m, int n, Attribute ... attributes)
+  public PredictiveLearningExperiment(Processor update_classifier, Function slice_f, Processor beta, Processor kappa, int t, int m, int n)
   {
-    super(learning_algorithm, c, update_interval, roll_width, attributes);
+    super();
     setDescription("Experiment that trains a classifier by comparing two windows of the same stream.");
     describe(T, "Offset (in number of events) between the trend and the class windows");
-    describe(M, "Width of the trend window");
     describe(N, "Width of the class window");
+    describe(NUM_LABELS, "The number of distinct event names that can occur in a log");
     setInput(T, t);
     setInput(M, m);
     setInput(N, n);
-    m_predictiveLearning = new PredictiveLearning(slice_f, beta, m, t, kappa, n, m_updateClassifier);
+    m_predictiveLearning = new PredictiveLearning(slice_f, beta, m, t, kappa, n, update_classifier);
     setProcessor(m_predictiveLearning);
   }
 }

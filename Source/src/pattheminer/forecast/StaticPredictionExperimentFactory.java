@@ -96,7 +96,7 @@ public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab
     exp.setInput(NUM_SLICES, num_slices);
     return exp;
   }
-  
+    
   /*@ non_null @*/ protected StaticPredictionExperiment setupRegressionPrediction(/*@ non_null @*/ Region r)
   {
     int m = r.getInt(M);

@@ -29,7 +29,7 @@ public abstract class PredictionExperiment extends StreamExperiment
   /**
    * The width of the window used to compute the feature (m)
    */
-  public static final transient String M = "Feature window width (m)";
+  public static final transient String M = "m";
   
   /**
    * The feature computed on a window (&phi;)

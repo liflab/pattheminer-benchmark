@@ -39,11 +39,6 @@ public class RandomLabelSource extends RandomSource
   public static final String LABEL_END = "End";
 
   /**
-   * The label given to a dummy "other" event
-   */
-  public static final String LABEL_OTHER = "Foo";
-
-  /**
    * The length of each slice
    */
   protected int m_sliceLength;
@@ -75,13 +70,25 @@ public class RandomLabelSource extends RandomSource
   protected Map<Integer,Integer> m_sliceStates;
 
   /**
+   * The number of event labels (other than "start" and "end") that can occur
+   */
+  protected int m_numLabels = 1;
+
+  /**
+   * The other labels
+   */
+  protected String[] m_otherLabels;
+
+  /**
    * Creates a new random label source
    * @param r A random generator
    * @param num_events The number of events to produce
    * @param slice_length The length of each slice
    * @param num_slices The number of slices to keep alive at any given time
+   * @param num_labels The number of labels (other than "start" and "end")
+   * that can occur
    */
-  public RandomLabelSource(Random r, int num_events, int slice_length, int num_slices)
+  public RandomLabelSource(Random r, int num_events, int slice_length, int num_slices, int num_labels)
   {
     super(r, num_events);
     m_sliceLength = slice_length;
@@ -90,6 +97,24 @@ public class RandomLabelSource extends RandomSource
     m_lowestSliceId = 0;
     m_highestSliceId = 0;
     m_sliceStates = new HashMap<Integer,Integer>();
+    m_numLabels = num_labels;
+    m_otherLabels = new String[m_numLabels];
+    for (int i = 0; i < m_numLabels; i++)
+    {
+      m_otherLabels[i] = generateRandomString(5);
+    }
+  }
+
+  /**
+   * Creates a new random label source
+   * @param r A random generator
+   * @param num_events The number of events to produce
+   * @param slice_length The length of each slice
+   * @param num_slices The number of slices to keep alive at any given time
+   */
+  public RandomLabelSource(Random r, int num_events, int slice_length, int num_slices)
+  {
+    this(r, num_events, slice_length, num_slices, 1);
   }
 
   @Override
@@ -111,7 +136,8 @@ public class RandomLabelSource extends RandomSource
       if (num_e < m_sliceLength - 1)
       {
         // This slice is shorter than the prescribed length: emit an "other" event
-        tuple = new Object[] {m_sliceIndex, m_eventCount, LABEL_OTHER};
+        String random_label = m_otherLabels[m_random.nextInt(m_numLabels)];
+        tuple = new Object[] {m_sliceIndex, m_eventCount, random_label};
         m_sliceStates.put(m_sliceIndex, num_e + 1);
         m_sliceIndex++;
         if (m_sliceIndex >= m_highestSliceId)
@@ -143,4 +169,32 @@ public class RandomLabelSource extends RandomSource
     throw new UnsupportedOperationException("This source cannot be duplicated");
   } 
 
+  /**
+   * Generates a new random alphanumerical string
+   * @param length The length of the string
+   * @return The string
+   */
+  protected String generateRandomString(int length)
+  {
+    int leftLimit = 97; // letter 'a'
+    int rightLimit = 122; // letter 'z'
+    StringBuilder buffer = new StringBuilder(length);
+    for (int i = 0; i < length; i++)
+    {
+      int randomLimitedInt = leftLimit + (int) 
+          (m_random.nextFloat() * (rightLimit - leftLimit + 1));
+      buffer.append((char) randomLimitedInt);
+    }
+    return buffer.toString();
+  }
+  
+  @Override
+  public void reset()
+  {
+    super.reset();
+    m_highestSliceId = 0;
+    m_lowestSliceId = 0;
+    m_sliceStates.clear();
+    m_sliceIndex = 0;
+  }
 }
