@@ -18,14 +18,12 @@
 package pattheminer.forecast;
 
 import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.functions.ApplyFunctionArgument;
 import ca.uqac.lif.cep.functions.Constant;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.IdentityFunction;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.peg.util.EvaluateAt;
-import ca.uqac.lif.cep.tmf.WindowFunction;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Region;
@@ -45,6 +43,9 @@ import static pattheminer.forecast.StaticPredictionExperiment.PREDICTION_REGRESS
 import pattheminer.source.BoundedSource;
 import pattheminer.source.RandomNumberSource;
 
+/**
+ * Experiment factory for the static prediction workflow pattern
+ */
 public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab,StaticPredictionExperiment>
 {
   

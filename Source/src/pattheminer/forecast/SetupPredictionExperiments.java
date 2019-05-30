@@ -21,14 +21,7 @@ import static pattheminer.forecast.ClassifierExperiment.*;
 import static pattheminer.forecast.StaticPredictionExperiment.*;
 import static pattheminer.forecast.PredictiveLearningExperiment.*;
 
-import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.functions.ApplyFunction;
-import ca.uqac.lif.cep.functions.Constant;
-import ca.uqac.lif.cep.functions.RaiseArity;
-import ca.uqac.lif.cep.peg.weka.WekaUtils;
-import ca.uqac.lif.cep.util.NthElement;
 import ca.uqac.lif.json.JsonFalse;
-import ca.uqac.lif.labpal.ExperimentFactory;
 import ca.uqac.lif.labpal.Group;
 import ca.uqac.lif.labpal.Region;
 import ca.uqac.lif.labpal.table.ExperimentTable;
@@ -41,15 +34,21 @@ import pattheminer.MainLabNicknamer;
 import pattheminer.SetupAgent;
 import pattheminer.StreamExperiment;
 
+/**
+ * Setup agent for all experiments related to predictive analytics.
+ */
 public class SetupPredictionExperiments extends SetupAgent
 {
-  protected static int s_maxTraceLength = 10000;
-
+  /**
+   * Creates a new instance of the setup agent
+   * @param lab The lab to which the agent is associated
+   */
   public SetupPredictionExperiments(/*@ non_null @*/ MainLab lab)
   {
     super(lab);
   }
 
+  @SuppressWarnings({ "static-access", "unused" })
   @Override
   public void fillWithExperiments()
   {
@@ -63,7 +62,7 @@ public class SetupPredictionExperiments extends SetupAgent
       main_region.add(PREDICTION, StaticPredictionExperiment.PREDICTION_AVG, 
           StaticPredictionExperiment.PREDICTION_REGRESSION);
       main_region.add(M, 5, 10, 30, 100);
-      main_region.add(NUM_SLICES, 1, 5, 10, 30, 100);
+      main_region.add(NUM_SLICES, 100);
       main_region.add(MULTITHREAD, JsonFalse.instance);
       {
         // Throughput by window width for each prediction, for fixed number of slices
@@ -109,7 +108,7 @@ public class SetupPredictionExperiments extends SetupAgent
       }
     }
 
-    // Self-trained class prediction experiments
+    // Predictive learning experiments
     {
       PredictiveLearningExperimentFactory factory = new PredictiveLearningExperimentFactory(m_lab);
       Group g = new Group("Predictive learning throughput (global)");
@@ -118,20 +117,24 @@ public class SetupPredictionExperiments extends SetupAgent
       {
         // Throughput by number of slices for each problem
         Region main_region = new Region();
-        main_region.add(NUM_FEATURES, 3);
-        main_region.add(ROLL_WIDTH, 1000);
-        main_region.add(NUM_CLASSES, 2);
-        main_region.add(UPDATE_INTERVAL, 2);
-        main_region.add(LEARNING_ALGORITHM, "J48");
-        main_region.add(NUM_LABELS, 10);
-        main_region.add(NUM_SLICES, 1, 5, 10, 30, 100);
-        main_region.add(M, 3);
+        {
+          // We fix values for most parameters used by the experiments
+          main_region.add(NUM_FEATURES, 3);
+          main_region.add(ROLL_WIDTH, 1000);
+          main_region.add(NUM_CLASSES, 2);
+          main_region.add(UPDATE_INTERVAL, 2);
+          main_region.add(LEARNING_ALGORITHM, "J48");
+          main_region.add(NUM_LABELS, 5);
+          main_region.add(NUM_SLICES, 100);
+        }
+        // We only vary the number of slices and the pattern being computed
+        main_region.add(M, 1, 2, 3, 4);
         main_region.add(PATTERN, PredictiveLearningExperiment.PATTERN_AVG_DURATION,
-            PredictiveLearningExperiment.PATTERN_NEXT_EVENT);
-        ExperimentTable et = new ExperimentTable(NUM_SLICES, PATTERN, THROUGHPUT);
+            PredictiveLearningExperiment.PATTERN_NEXT_EVENT, PredictiveLearningExperiment.PATTERN_CLASSIFIER);
+        ExperimentTable et = new ExperimentTable(M, PATTERN, THROUGHPUT);
         et.setShowInList(false);
         m_lab.add(et);
-        for (Region reg : main_region.all(NUM_SLICES, PATTERN))
+        for (Region reg : main_region.all(M, PATTERN))
         {
           PredictiveLearningExperiment exp = factory.get(reg);
           if (exp == null)
@@ -140,67 +143,116 @@ public class SetupPredictionExperiments extends SetupAgent
           et.add(exp);
         }
         TransformedTable tt = new TransformedTable(new ExpandAsColumns(PATTERN, THROUGHPUT), et);
-        tt.setTitle("Predictive learning throughput by number of slices");
-        tt.setNickname("tPredictiveLearningThroughputBySlices");
+        tt.setTitle("Predictive learning throughput by window width");
+        tt.setNickname("tPredictiveLearningThroughputByWidth");
         m_lab.add(tt);
       }
-      
-      Region reg = new Region();
-      reg.add(NUM_FEATURES, 1, 3, 5);
-      reg.add(ROLL_WIDTH, 0, 1000);
-      reg.add(NUM_CLASSES, 2);
-      reg.add(UPDATE_INTERVAL, 1);
-      reg.add(LEARNING_ALGORITHM, "J48", "Voted Perceptron");
 
+      if (false)
       {
-        // For each roll width, make a plot of running time
-        for (Region r_w : reg.all(ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.ROLL_WIDTH))
+        // Experiments specific to the classifier learning problem
+        Group g_cl = new Group("Classifier learning throughput");
+        g_cl.setDescription("Measures the throughtput of a specific instance of the predictive learning pattern which uses a machine learning algorithm and produces a classifier.");
+        m_lab.add(g_cl);
+        Region reg = new Region();
+        reg.add(NUM_FEATURES, 1, 3, 5);
+        reg.add(ROLL_WIDTH, 0, 1000);
+        reg.add(NUM_CLASSES, 2);
+        reg.add(UPDATE_INTERVAL, 1);
+        reg.add(LEARNING_ALGORITHM, "J48", "Voted Perceptron");
+        reg.add(PATTERN, PredictiveLearningExperiment.PATTERN_CLASSIFIER);
+
         {
-          ExperimentTable original_table = new ExperimentTable(ClassifierExperiment.NUM_FEATURES, StreamExperiment.LENGTH, StreamExperiment.TIME);
-          original_table.setShowInList(false);
-          for (Region r_ll : r_w.all(ClassifierExperiment.NUM_CLASSES, ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.NUM_FEATURES))
+          // For each roll width, make a plot of running time
+          for (Region r_w : reg.all(ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.ROLL_WIDTH))
           {
-            PredictiveLearningExperiment cte = factory.get(r_ll);
-            if (cte == null)
-              continue;
-            g.add(cte);
+            ExperimentTable original_table = new ExperimentTable(ClassifierExperiment.NUM_FEATURES, StreamExperiment.LENGTH, StreamExperiment.TIME);
+            original_table.setShowInList(false);
+            for (Region r_ll : r_w.all(ClassifierExperiment.NUM_CLASSES, ClassifierExperiment.LEARNING_ALGORITHM, ClassifierExperiment.NUM_FEATURES))
+            {
+              PredictiveLearningExperiment cte = factory.get(r_ll);
+              if (cte == null)
+                continue;
+              g_cl.add(cte);
+              original_table.add(cte);
+            }
+            TransformedTable t_table = new TransformedTable(new ExpandAsColumns(ClassifierExperiment.NUM_FEATURES, ClassifierExperiment.TIME), original_table);
+            t_table.setTitle("Throughput for classifier learning (" + r_w.getString(ClassifierExperiment.LEARNING_ALGORITHM) + "), roll width=" + r_w.getInt(ClassifierExperiment.ROLL_WIDTH));
+            m_lab.s_nicknamer.setNickname(t_table, r_w, "tCtThroughput", "");
+            m_lab.add(original_table, t_table);
+
+            // Make a scatterplot with it
+            Scatterplot plot = new Scatterplot(t_table);
+            plot.setTitle("Throughput for classifier learning (" + r_w.getString(ClassifierExperiment.LEARNING_ALGORITHM) + "), roll width=" + r_w.getInt(ClassifierExperiment.ROLL_WIDTH));
+            m_lab.s_nicknamer.setNickname(plot, r_w, "pCtThroughput", "");
+            plot.setCaption(Axis.X, "Number of events").setCaption(Axis.Y, "Time (ms)");
+            m_lab.add(plot);          
+          }
+        }
+
+        {
+          // For roll width=1000 and update interval=1...
+          Region rg_n = reg.set(ROLL_WIDTH, 1000).set(UPDATE_INTERVAL, 1);
+          ExperimentTable original_table = new ExperimentTable(NUM_FEATURES, LEARNING_ALGORITHM, THROUGHPUT);
+          original_table.setShowInList(false);
+          for (Region rg_c : rg_n.all(LEARNING_ALGORITHM, NUM_FEATURES))
+          {
+            // For each algorithm
+            PredictiveLearningExperiment cte = factory.get(rg_c);
             original_table.add(cte);
           }
-          TransformedTable t_table = new TransformedTable(new ExpandAsColumns(ClassifierExperiment.NUM_FEATURES, ClassifierExperiment.TIME), original_table);
-          t_table.setTitle("Throughput for classifier training (" + r_w.getString(ClassifierExperiment.LEARNING_ALGORITHM) + "), roll width=" + r_w.getInt(ClassifierExperiment.ROLL_WIDTH));
-          t_table.setNickname("tCtThroughput");
+          TransformedTable t_table = new TransformedTable(new ExpandAsColumns(LEARNING_ALGORITHM, THROUGHPUT), original_table);
+          t_table.setTitle("Throughput by features for classifier learning, roll width=" + rg_n.getInt(ROLL_WIDTH));
+          m_lab.s_nicknamer.setNickname(t_table, rg_n, "tCtFThroughput", "");
           m_lab.add(original_table, t_table);
-
           // Make a scatterplot with it
           Scatterplot plot = new Scatterplot(t_table);
-          plot.setTitle("Throughput for classifier training (" + r_w.getString(ClassifierExperiment.LEARNING_ALGORITHM) + "), roll width=" + r_w.getInt(ClassifierExperiment.ROLL_WIDTH));
-          plot.setNickname("pCtThroughput");
-          plot.setCaption(Axis.X, "Number of events").setCaption(Axis.Y, "Time (ms)");
-          m_lab.add(plot);          
+          plot.setTitle("Throughput by features for classifier learning, roll width=" + rg_n.getInt(ClassifierExperiment.ROLL_WIDTH));
+          m_lab.s_nicknamer.setNickname(plot, rg_n, "pCtFThroughput", "");
+          plot.setCaption(Axis.X, "Number of features").setCaption(Axis.Y, "Time (ms)");
+          m_lab.add(plot);
         }
       }
+    }
 
+    // Self-learning experiments
+    {
+      SelfLearningExperimentFactory factory = new SelfLearningExperimentFactory(m_lab);
+      Group g = new Group("Self-learning throughput (global)");
+      g.setDescription("Measures the throughput of the self-learning prediction pattern for various feature, class and predictive functions.");
+      m_lab.add(g);
       {
-        // For roll width=1000 and update interval=1...
-        Region rg_n = reg.set(ROLL_WIDTH, 1000).set(UPDATE_INTERVAL, 1);
-        ExperimentTable original_table = new ExperimentTable(NUM_FEATURES, LEARNING_ALGORITHM, THROUGHPUT);
-        original_table.setShowInList(false);
-        for (Region rg_c : rg_n.all(LEARNING_ALGORITHM, NUM_FEATURES))
+        // Throughput by number of slices for each problem
+        Region main_region = new Region();
         {
-          // For each algorithm
-          PredictiveLearningExperiment cte = factory.get(rg_c);
-          original_table.add(cte);
+          // We fix values for most parameters used by the experiments
+          main_region.add(NUM_FEATURES, 3);
+          main_region.add(ROLL_WIDTH, 1000);
+          main_region.add(NUM_CLASSES, 2);
+          main_region.add(UPDATE_INTERVAL, 2);
+          main_region.add(LEARNING_ALGORITHM, "J48");
+          main_region.add(NUM_LABELS, 5);
+          main_region.add(NUM_SLICES, 100);
         }
-        TransformedTable t_table = new TransformedTable(new ExpandAsColumns(LEARNING_ALGORITHM, THROUGHPUT), original_table);
-        t_table.setTitle("Throughput by features for classifier training, roll width=" + rg_n.getInt(ROLL_WIDTH));
-        t_table.setNickname("tCtFThroughput");
-        m_lab.add(original_table, t_table);
-        // Make a scatterplot with it
-        Scatterplot plot = new Scatterplot(t_table);
-        plot.setTitle("Throughput by features for classifier training, roll width=" + rg_n.getInt(ClassifierExperiment.ROLL_WIDTH));
-        plot.setNickname("pCtFThroughput");
-        plot.setCaption(Axis.X, "Number of features").setCaption(Axis.Y, "Time (ms)");
-        m_lab.add(plot);
+        // We only vary the number of slices and the pattern being computed
+        main_region.add(M, 1, 2, 3, 4);
+        main_region.add(PATTERN, SelfLearningExperiment.PATTERN_AVG_DURATION,
+            SelfLearningExperiment.PATTERN_NEXT_EVENT, SelfLearningExperiment.PATTERN_CLASSIFIER);
+        ExperimentTable et = new ExperimentTable(M, PATTERN, THROUGHPUT);
+        et.setShowInList(false);
+        m_lab.add(et);
+        for (Region reg : main_region.all(M, PATTERN))
+        {
+          SelfLearningExperiment exp = factory.get(reg);
+          if (exp == null)
+            continue;
+          g.add(exp);
+          et.add(exp);
+        }
+        TransformedTable tt = new TransformedTable(new ExpandAsColumns(PATTERN, THROUGHPUT), et);
+        tt.setTitle("Self-learning throughput by window width");
+        tt.setNickname("tSelfLearningThroughputByWidth");
+        m_lab.add(tt);
       }
     }
   }

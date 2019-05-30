@@ -9,26 +9,45 @@ It provides various functions and processors to perform the following things:</p
 a reference "trend"</li>
 <li>Compute reference trends from an event stream or a collection of reference
 event streams</li>
-<!--
-This part is disabled as it is not in the submitted paper!
+<li>Compute predictions on future events of a stream based on a predefined</li>
+<li>Build a predictive function based on past instances of a process</li>
 <li>Learn associations between windows of the same trace using a machine
 learning classifier</li>
--->
 </ol>
 
 <p>This benchmark measures the performance of these functionalities, using
-various types of input event streams, pattern computations, and distance metrics.</p>
+various types of input event streams, pattern computations, distance metrics,
+feature vectors, and learning algorithms.</p>
+
+<h3>Structure of the benchmark</h3>
+
+<p>The benchmark can be instructed to run experiments of two types:</p>
+
+<ul>
+<li><em>Trend</em> experiments corresponds to throughput measurements on the
+<em>static trend distance</em> and <em>self-correlated trend distance</em>
+workflow patterns.</li>
+<li><em>Predictive</em> experiments corresponds to throughput measurements on the
+<em>static prediction</em> and <em>predictive learning</em> and
+<em>self-correlated prediction</em> workflow patterns.</li>
+</ul>
+
+<p>See information below on how to access these two sets of experiments.</p>
+
+<h3>References</h3>
 
 <p>The results in this benchmark are mentioned in the following publication:</p>
 
 <ul>
-<li>M. Roudjane, R. Khoury, D. Rebaïne, S. Hallé. (2019). Statistics and Data Mining
-for Event Stream Analytics. In <i>Information Systems</i>, Elsevier. Submitted.</li>
+<li>M. Roudjane, R. Khoury, D. Rebaïne, S. Hallé. (2019). Predictive Analytics
+for Event Stream Processing. Proc. EDOC 2019. Submitted.</li>
 </ul>
 
-<p>This paper itself is an extended version of the following publication:</p>
+<p>Pat The Miner itself has been the subject of the following publications:</p>
 
 <ul>
+<li>M. Roudjane, R. Khoury, D. Rebaïne, S. Hallé. (2019). Statistics and Data Mining
+for Event Stream Analytics. In <i>Information Systems</i>, Elsevier. Submitted.</li>
 <li>M. Roudjane, R. Khoury, D. Rebaïne, S. Hallé. (2018). Real-Time Data Mining for
 Event Streams. In <i>Proc. EDOC 2018</i>, IEEE Computer Society, 123-134.
 DOI: 10.1109/EDOC.2018.00025. <strong>This paper uses an
@@ -53,4 +72,19 @@ or static files located inside the bundled JAR.</p>
 
 <h3>How to run this lab</h3>
 
+<p>This lab can be run by typing, at the command line:</p>
+
+<pre>
+java -jar pattheminer-benchmark.jar [options]
+</pre>
+
+<p>where <i>options</i> can be:</p>
+
+<ul>
+<li><tt>--with-trend</tt>: shows experiments for trend computations (corresponds
+to the experiments in the EDOC 2018 paper mentioned above)</li>
+<li><tt>--with-pred</tt>: show experiments for predictive analytics (corresponds
+to the experiments in the EDOC 2019 paper mentioned above)</li>
+</ul>
+ 
 <p>See the <a href=/help">Help</a> page for more information.</p>

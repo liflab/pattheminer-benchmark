@@ -22,16 +22,19 @@ import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.labpal.Region;
 import pattheminer.MainLab;
 
-public class PredictiveLearningExperimentFactory extends LearningExperimentFactory<PredictiveLearningExperiment>
+/**
+ * Experiment factory for the self-prediction workflow pattern
+ */
+public class SelfLearningExperimentFactory extends LearningExperimentFactory<SelfLearningExperiment>
 {
-  PredictiveLearningExperimentFactory(/*@ non_null @*/ MainLab lab)
+  SelfLearningExperimentFactory(/*@ non_null @*/ MainLab lab)
   {
-    super(lab, PredictiveLearningExperiment.class);
+    super(lab, SelfLearningExperiment.class);
   }
   
   @Override
-  protected PredictiveLearningExperiment getExperiment(Region r, Processor update_classifier, Function slice_f, Processor phi, Processor kappa, int t, int m, int n)
+  protected SelfLearningExperiment getExperiment(Region r, Processor update_classifier, Function slice_f, Processor phi, Processor kappa, int t, int m, int n)
   {
-    return new PredictiveLearningExperiment(update_classifier, slice_f, phi, kappa, t, m, n);
+    return new SelfLearningExperiment(update_classifier, slice_f, phi, kappa, t, m, n);
   }
 }

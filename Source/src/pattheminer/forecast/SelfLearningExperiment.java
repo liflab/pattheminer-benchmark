@@ -19,26 +19,25 @@ package pattheminer.forecast;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Function;
-import ca.uqac.lif.cep.peg.forecast.PredictiveLearning;
+import ca.uqac.lif.cep.peg.forecast.SelfLearningPrediction;
 
 /**
- * Experiment that trains a classifier by comparing two windows of the same
- * stream.
+ * Experiment that trains a classifier on past windows of a stream,
+ * and uses this classifier to compute a prediction on the current window.
  */
-public class PredictiveLearningExperiment extends LearningExperiment
+public class SelfLearningExperiment extends LearningExperiment
 { 
-
   /**
-   * The instance of the {@link PredictiveLearning} processor used to train
+   * The instance of the {@link SelfLearningPrediction} processor used to train
    * the classifier.
    */
-  protected transient PredictiveLearning m_predictiveLearning;
+  protected transient SelfLearningPrediction m_learningProcessor;
 
   /**
    * Creates a new empty prediction experiment. You should not call this
    * constructor directly.
    */
-  PredictiveLearningExperiment()
+  SelfLearningExperiment()
   {
     // Do nothing
   }
@@ -46,12 +45,11 @@ public class PredictiveLearningExperiment extends LearningExperiment
   /**
    * Creates a new prediction experiment
    */
-  public PredictiveLearningExperiment(Processor update_classifier, Function slice_f, Processor beta, Processor kappa, int t, int m, int n)
+  public SelfLearningExperiment(Processor update_classifier, Function slice_f, Processor beta, Processor kappa, int t, int m, int n)
   {
     super(t, m, n);
-    setDescription("Experiment that trains a classifier by comparing two windows of the same stream.");
     setDescription("Experiment that trains a classifier on past windows of a stream, and uses this classifier to compute a prediction on the current window.");
-    m_predictiveLearning = new PredictiveLearning(slice_f, beta, m, t, kappa, n, update_classifier);
-    setProcessor(m_predictiveLearning);
+    m_learningProcessor = new SelfLearningPrediction(slice_f, beta, m, t, kappa, n, update_classifier);
+    setProcessor(m_learningProcessor);
   }
 }

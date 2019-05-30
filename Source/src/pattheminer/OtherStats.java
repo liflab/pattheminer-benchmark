@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
+    Copyright (C) 2018 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -15,23 +15,32 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer.forecast;
+package pattheminer;
 
-import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.functions.Function;
-import ca.uqac.lif.labpal.Region;
-import pattheminer.MainLab;
+import ca.uqac.lif.json.JsonElement;
+import ca.uqac.lif.json.JsonNumber;
+import ca.uqac.lif.labpal.macro.MacroMap;
+import java.util.Map;
 
-public class PredictiveLearningExperimentFactory extends LearningExperimentFactory<PredictiveLearningExperiment>
+/**
+ * Computes various statistics over the execution of the lab
+ */
+public class OtherStats extends MacroMap
 {
-  PredictiveLearningExperimentFactory(/*@ non_null @*/ MainLab lab)
+
+  /**
+   * Instantiates the macro and defines its named data points
+   * @param lab The lab from which to fetch the values
+   */
+  public OtherStats(MainLab lab)
   {
-    super(lab, PredictiveLearningExperiment.class);
+    super(lab);
+    add("numevents", "The number of events in the randomly generated streams");
   }
   
   @Override
-  protected PredictiveLearningExperiment getExperiment(Region r, Processor update_classifier, Function slice_f, Processor phi, Processor kappa, int t, int m, int n)
+  public void computeValues(Map<String, JsonElement> map)
   {
-    return new PredictiveLearningExperiment(update_classifier, slice_f, phi, kappa, t, m, n);
+    map.put("numevents", new JsonNumber(MainLab.MAX_TRACE_LENGTH - 1));
   }
 }

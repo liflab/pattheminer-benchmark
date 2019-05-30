@@ -20,9 +20,7 @@ package pattheminer;
 import ca.uqac.lif.labpal.CliParser;
 import ca.uqac.lif.labpal.CliParser.Argument;
 import ca.uqac.lif.labpal.CliParser.ArgumentMap;
-import ca.uqac.lif.labpal.Group;
 import ca.uqac.lif.labpal.Laboratory;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import pattheminer.extraction.SetupTrendExtractionExperiments;
@@ -63,12 +61,6 @@ public class MainLab extends Laboratory
    * A title namer
    */
   public static transient MainLabTitleNamer s_titleNamer = new MainLabTitleNamer();
-
-  /**
-   * A group for experiments measuring the throughput of self-trained
-   * class prediction processors
-   */
-  protected transient Group m_groupSelfTrainedClassPrediction;
   
   /**
    * Whether to display experiments about contextual patterns
@@ -79,6 +71,11 @@ public class MainLab extends Laboratory
    * Whether to display experiments about multi-threading
    */
   protected boolean m_includeThreadExperiments = false;
+  
+  /**
+   * Whether to display experiments about trends
+   */
+  protected boolean m_includeTrendExperiments = true;
 
   /**
    * Whether to display experiments about predictive analytics
@@ -96,7 +93,7 @@ public class MainLab extends Laboratory
     // Basic metadata
     setTitle("Benchmark for Pat The Miner v2");
     setAuthor("Laboratoire d'informatique formelle");
-    setDoi("TODO");
+    //setDoi("TODO");
 
     // Command line arguments
     ArgumentMap args = getCliArguments();
@@ -104,42 +101,54 @@ public class MainLab extends Laboratory
     {
       m_includeThreadExperiments = args.hasOption("with-mt");
       m_includePredictiveExperiments = args.hasOption("with-pred");
+      if (m_includePredictiveExperiments)
+      {
+        // By default, predictive experiments hide trend experiments
+        m_includeTrendExperiments = false;
+      }
+      // ...unless they are explicitly requested
+      m_includeTrendExperiments = args.hasOption("with-trend");
     }
 
     // Lab stats
     add(new LabStats(this));
-
-    // Static trend distance experiments
-    new SetupTrendDistanceExperiments(this).fillWithExperiments();
-
-    // Self-correlated trend distance experiments
-    new SetupSelfCorrelatedExperiments(this).fillWithExperiments();
-
-    // Contextual trend distance experiments
-    if (m_includeContextualExperiments)
+    add(new OtherStats(this));
+    
+    // Trend experiments (corresponds to EDOC 2018 and Information Systems)
+    if (m_includeTrendExperiments)
     {
-      new SetupContextualExperiments(this).fillWithExperiments();
+      // Static trend distance experiments
+      new SetupTrendDistanceExperiments(this).fillWithExperiments();
+
+      // Self-correlated trend distance experiments
+      new SetupSelfCorrelatedExperiments(this).fillWithExperiments();
+
+      // Contextual trend distance experiments
+      if (m_includeContextualExperiments)
+      {
+        new SetupContextualExperiments(this).fillWithExperiments();
+      }
+      
+      // Comparison experiments
+      new SetupStaticVsSelf(this).fillWithExperiments();
+
+      // Second-order trend distance experiments
+      new SetupSecondOrderTrendDistanceExperiments(this).fillWithExperiments();
+      
+      // Trend extraction experiments
+      new SetupTrendExtractionExperiments(this).fillWithExperiments();
+      
+      // Impact of threading
+      if (m_includeThreadExperiments)
+      {
+        new SetupThreadExperiments(this).fillWithExperiments();
+      }
     }
     
-    // Comparison experiments
-    new SetupStaticVsSelf(this).fillWithExperiments();
-
-    // Second-order trend distance experiments
-    new SetupSecondOrderTrendDistanceExperiments(this).fillWithExperiments();
-    
-    // Trend extraction experiments
-    new SetupTrendExtractionExperiments(this).fillWithExperiments();
-    
-    // Classifier training experiments
+    // Classifier training experiments (corresponds to EDOC 2019)
     if (m_includePredictiveExperiments)
     {
       new SetupPredictionExperiments(this).fillWithExperiments();
-    }
-
-    // Impact of threading
-    if (m_includeThreadExperiments)
-    {
-      new SetupThreadExperiments(this).fillWithExperiments();
     }
   }
   
@@ -149,11 +158,12 @@ public class MainLab extends Laboratory
     parser.addArgument(new Argument().withLongName("with-mt").withDescription("Include experiments about multi-threading"));
     parser.addArgument(new Argument().withLongName("with-ct").withDescription("Include experiments about context"));
     parser.addArgument(new Argument().withLongName("with-pred").withDescription("Include prediction experiments"));
+    parser.addArgument(new Argument().withLongName("with-trend").withDescription("Include trend experiments"));
   }
 
   public static void main(String[] args)
   {
     // Nothing else to do here
     MainLab.initialize(args, MainLab.class);
-  }
+  }  
 }
