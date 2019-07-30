@@ -45,7 +45,7 @@ public class SetupThreadExperiments extends SetupAgent
   @Override
   public void fillWithExperiments()
   {
-    StaticTrendDistanceFactory factory = new StaticTrendDistanceFactory(m_lab);
+    StaticTrendDistanceFactory factory = new StaticTrendDistanceFactory(m_lab, m_lab.useFiles());
     Group g_threading = new Group("Impact of multi-threading (trend distance)");
     m_lab.add(g_threading);
     {

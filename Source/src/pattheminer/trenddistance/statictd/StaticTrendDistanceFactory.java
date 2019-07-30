@@ -68,9 +68,9 @@ import pattheminer.trenddistance.TrendFactory;
  */
 public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistanceExperiment>
 {
-  public StaticTrendDistanceFactory(MainLab lab)
+  public StaticTrendDistanceFactory(MainLab lab, boolean use_files)
   {
-    super(lab, StaticTrendDistanceExperiment.class);
+    super(lab, StaticTrendDistanceExperiment.class, use_files);
   }
 
   @Override
@@ -228,7 +228,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
     BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
     return createNewTrendDistanceExperiment(SYMBOL_DISTRIBUTION, "Map distance", src, alarm, width, multi_thread);
   }
-  
+
   /**
    * Creates a new experiment using the set of N-grams as the trend processor
    * @param width The window width
@@ -240,7 +240,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
   {
     Random random = m_lab.getRandom();
     BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
-    
+
     // Group processor that creates and accumulates N-grams
     GroupProcessor cumul_n_grams = new Ngrams(N);
 
@@ -267,7 +267,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
     tde.describe(N_GRAM_WIDTH, "The width of the N-grams (i.e. the value of N");
     return tde;
   }
-  
+
   /**
    * Creates a new experiment using the set of N-grams as the trend processor
    * @param width The window width
@@ -278,9 +278,9 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
   protected StaticTrendDistanceExperiment createSliceLengthExperiment(int width, int num_slices, int slice_length, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
-    
+
     BoundedSource<?> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
-    
+
     // Group processor that creates and accumulates N-grams
     AverageSliceLength.SliceLength asl = new AverageSliceLength.SliceLength();
 
