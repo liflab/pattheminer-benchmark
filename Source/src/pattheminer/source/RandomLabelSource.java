@@ -17,7 +17,6 @@
  */
 package pattheminer.source;
 
-import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;
 import java.util.HashMap;
 import java.util.Map;
@@ -164,9 +163,9 @@ public class RandomLabelSource extends RandomSource<Object[]>
   }
 
   @Override
-  public Processor duplicate(boolean with_state)
+  public RandomLabelSource duplicate(boolean with_state)
   {
-    throw new UnsupportedOperationException("This source cannot be duplicated");
+    return new RandomLabelSource(m_random, m_numEvents, m_sliceLength, m_numSlices, m_numLabels);
   } 
 
   /**

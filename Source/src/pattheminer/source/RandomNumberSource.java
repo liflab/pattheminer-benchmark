@@ -17,7 +17,6 @@
  */
 package pattheminer.source;
 
-import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;
 
 /**
@@ -42,10 +41,9 @@ public class RandomNumberSource extends RandomSource<Float>
   }
 
   @Override
-  public Processor duplicate(boolean with_state)
+  public RandomNumberSource duplicate(boolean with_state)
   {
-    // Not supported
-    return null;
+    return new RandomNumberSource(m_random, m_numEvents);
   }
 
   @Override

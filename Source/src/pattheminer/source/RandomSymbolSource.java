@@ -17,7 +17,6 @@
  */
 package pattheminer.source;
 
-import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.labpal.Random;
 
 /**
@@ -78,10 +77,9 @@ public class RandomSymbolSource extends RandomSource<String>
   }
 
   @Override
-  public Processor duplicate(boolean with_state)
+  public RandomSymbolSource duplicate(boolean with_state)
   {
-    // Not supported
-    return null;
+    return new RandomSymbolSource(m_random, m_numEvents, m_numDistinct);
   }
 
   @Override

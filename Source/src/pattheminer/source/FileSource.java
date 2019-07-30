@@ -46,7 +46,25 @@ public abstract class FileSource<T> extends BoundedSource<T>
    * A scanner used to read lines from the file
    */
   protected Scanner m_scanner;
+  
+  /**
+   * The folder where the trace file will be written and read
+   */
+  protected String m_dataFolder = "./";
 
+  /**
+   * Creates a new file source
+   * @param num_events The number of events to generate
+   * @param source The underlying source that will actually generate the events
+   * @param data_folder The folder where the trace file will be written and read
+   */
+  public FileSource(int num_events, BoundedSource<T> source, String data_folder)
+  {
+    super(num_events);
+    m_source = source;
+    m_dataFolder = data_folder;
+  }
+  
   /**
    * Creates a new file source
    * @param num_events The number of events to generate
@@ -54,8 +72,7 @@ public abstract class FileSource<T> extends BoundedSource<T>
    */
   public FileSource(int num_events, BoundedSource<T> source)
   {
-    super(num_events);
-    m_source = source;
+    this(num_events, source, "./");
   }
 
   /**
@@ -108,7 +125,7 @@ public abstract class FileSource<T> extends BoundedSource<T>
   @Override
   public void prepare() throws ProcessorException
   {
-    String filename = m_source.getFilename();
+    String filename = m_dataFolder + m_source.getFilename();
     PrintStream ps = null;
     try
     {
