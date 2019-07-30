@@ -95,4 +95,10 @@ public class RandomSymbolSource extends RandomSource<String>
   {
     return e;
   }
+  
+  @Override
+  public String getFilename()
+  {
+    return "symbol-" + m_numEvents + "-" + m_numDistinct + ".csv";
+  }
 }

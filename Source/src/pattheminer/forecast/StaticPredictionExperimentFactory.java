@@ -82,7 +82,7 @@ public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab
   
   /*@ non_null @*/ protected StaticPredictionExperiment setupAveragePrediction(/*@ non_null @*/ Region r)
   {
-    BoundedSource source = new RandomNumberSource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> source = new RandomNumberSource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH);
     Processor phi = new RunningAverage();
     Function pi = new IdentityFunction(1);
     int num_slices = r.getInt(NUM_SLICES);
@@ -101,7 +101,7 @@ public class StaticPredictionExperimentFactory extends ExperimentFactory<MainLab
   /*@ non_null @*/ protected StaticPredictionExperiment setupRegressionPrediction(/*@ non_null @*/ Region r)
   {
     int m = r.getInt(M);
-    BoundedSource source = new RandomNumberSource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> source = new RandomNumberSource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH);
     Function phi = new LinearRegression(m);
     Function pi = new EvaluateAt(m);
     int num_slices = r.getInt(NUM_SLICES);

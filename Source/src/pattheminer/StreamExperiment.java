@@ -61,7 +61,7 @@ public abstract class StreamExperiment extends Experiment
   /**
    * The source from which the input events will originate
    */
-  protected transient BoundedSource m_source;
+  protected transient BoundedSource<?> m_source;
 
   /**
    * The interval at which the experiment updates its data on
@@ -130,7 +130,7 @@ public abstract class StreamExperiment extends Experiment
    * Sets the source from which the input events will originate
    * @param s The source
    */
-  public void setSource(BoundedSource s)
+  public void setSource(BoundedSource<?> s)
   {
     m_source = s;
   }
@@ -143,5 +143,17 @@ public abstract class StreamExperiment extends Experiment
   public void setEventStep(int step)
   {
     m_eventStep = step;
+  }
+  
+  @Override
+  public boolean prerequisitesFulfilled()
+  {
+    return m_source.isReady();
+  }
+  
+  @Override
+  public void fulfillPrerequisites()
+  {
+    m_source.prepare();
   }
 }

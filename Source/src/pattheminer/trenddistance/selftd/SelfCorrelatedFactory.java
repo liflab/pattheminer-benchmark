@@ -118,7 +118,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     CumulativeAverage beta = new CumulativeAverage();
     SelfCorrelatedTrendDistance<Number,Number,Number> alarm = new SelfCorrelatedTrendDistance<Number,Number,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(Numbers.subtraction, StreamVariable.X, StreamVariable.Y)), 0.5, Numbers.isLessThan);
-    BoundedSource src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
     return createNewSelfCorrelatedExperiment(RUNNING_AVG, "Subtraction", src, alarm, width, multi_thread);
   }
 
@@ -128,7 +128,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     RunningMoments beta = new RunningMoments(3);
     SelfCorrelatedTrendDistance<DoublePoint,Number,Number> alarm = new SelfCorrelatedTrendDistance<DoublePoint,Number,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
-    BoundedSource src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
     return createNewSelfCorrelatedExperiment(RUNNING_MOMENTS, "Subtraction", src, alarm, width, multi_thread);
   }
 
@@ -138,7 +138,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     SymbolDistribution beta = new SymbolDistribution();
     SelfCorrelatedTrendDistance<HashMap<?,?>,Number,Number> alarm = new SelfCorrelatedTrendDistance<HashMap<?,?>,Number,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(MapDistance.instance, StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
-    BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
     return createNewSelfCorrelatedExperiment(SYMBOL_DISTRIBUTION, "Map distance", src, alarm, width, multi_thread);
   }
 
@@ -149,7 +149,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     SymbolDistributionClusters beta = new SymbolDistributionClusters();
     SelfCorrelatedTrendDistance<DoublePoint,Number,Number> alarm = new SelfCorrelatedTrendDistance<DoublePoint,Number,Number>(width, width, beta, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
-    BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
+    BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
     return createNewSelfCorrelatedExperiment(CLOSEST_CLUSTER, "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
 
@@ -157,7 +157,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
   {
     Random random = m_lab.getRandom();
 
-    BoundedSource src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
+    BoundedSource<?> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
 
     // Group processor that creates and accumulates N-grams
     AverageSliceLength.SliceLength asl = new AverageSliceLength.SliceLength();
@@ -191,7 +191,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     Ngrams beta = new Ngrams(N);
     SelfCorrelatedTrendDistance<Collection<?>,Number,Number> alarm = new SelfCorrelatedTrendDistance<Collection<?>,Number,Number>(width, width, beta, 
         JaccardIndex.instance, 0.25, Numbers.isLessThan);
-    BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
+    BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
     SelfCorrelatedExperiment tde = createNewSelfCorrelatedExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
     // For the n-gram experiment, there is an additional parameter
     tde.setInput(N_GRAM_WIDTH, N);
@@ -199,7 +199,7 @@ public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment
     return tde;
   }
 
-  protected SelfCorrelatedExperiment createNewSelfCorrelatedExperiment(String trend, String metric, BoundedSource src, Processor alarm, int width, boolean multi_thread)
+  protected SelfCorrelatedExperiment createNewSelfCorrelatedExperiment(String trend, String metric, BoundedSource<?> src, Processor alarm, int width, boolean multi_thread)
   {
     SelfCorrelatedExperiment tde = new SelfCorrelatedExperiment();
     tde.setSource(src);

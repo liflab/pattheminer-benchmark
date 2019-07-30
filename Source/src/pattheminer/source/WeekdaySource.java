@@ -132,4 +132,10 @@ public class WeekdaySource extends RandomSource<Object[]>
     out.append(e[0]).append(",").append(e[1]);
     return out.toString();
   }
+  
+  @Override
+  public String getFilename()
+  {
+    return "weekday-" + m_numEvents + "-" + m_weekdayLength + ".csv";
+  }
 }

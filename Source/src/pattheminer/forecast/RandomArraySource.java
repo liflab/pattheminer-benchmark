@@ -7,7 +7,7 @@ import java.util.Enumeration;
 import pattheminer.source.RandomSource;
 import weka.core.Attribute;
 
-public class RandomArraySource extends RandomSource
+public class RandomArraySource extends RandomSource<Object[]>
 {
   /**
    * The number of attributes
@@ -29,7 +29,7 @@ public class RandomArraySource extends RandomSource
   }
   
   @Override
-  protected Object getEvent()
+  protected Object[] getEvent()
   {
     Object[] out = new Object[m_numAttributes + 1];
     for (int i = 0; i < m_numAttributes; i++)
@@ -46,4 +46,31 @@ public class RandomArraySource extends RandomSource
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public Object[] readEvent(String line)
+  {
+    String[] parts = line.split(",");
+    return parts;
+  }
+
+  @Override
+  public String printEvent(Object[] e)
+  {
+    StringBuilder out = new StringBuilder();
+    for (int i = 0; i < e.length; i++)
+    {
+      if (i > 0)
+      {
+        out.append(",");
+      }
+      out.append(e[i]);
+    }
+    return out.toString();
+  }
+
+  @Override
+  public String getFilename()
+  {
+    return "array-" + m_numEvents + "-" + m_numAttributes + ".csv";
+  }
 }

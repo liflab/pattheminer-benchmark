@@ -61,7 +61,7 @@ public class StaticPredictionExperiment extends PredictionExperiment
    * @param phi The feature computed on a window (&phi;)
    * @param pi The function used to make a forecast on the window (&pi;)
    */
-  public StaticPredictionExperiment(BoundedSource source, Function f, int m, Processor phi, Function pi)
+  public StaticPredictionExperiment(BoundedSource<?> source, Function f, int m, Processor phi, Function pi)
   {
     super();
     addKeyToHide(F);
@@ -83,7 +83,7 @@ public class StaticPredictionExperiment extends PredictionExperiment
    * @param phi The feature computed on a window (&phi;)
    * @param pi The function used to make a forecast on the window (&pi;)
    */
-  public StaticPredictionExperiment(BoundedSource source, Function f, Function phi, Function pi)
+  public StaticPredictionExperiment(BoundedSource<?> source, Function f, Function phi, Function pi)
   {
     super();
     addKeyToHide(F);

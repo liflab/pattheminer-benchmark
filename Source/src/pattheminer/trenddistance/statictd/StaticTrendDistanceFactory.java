@@ -136,7 +136,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
     }
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(6, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(Numbers.subtraction, StreamVariable.X, StreamVariable.Y)), 0.5, Numbers.isLessThan);
-    BoundedSource src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
     return createNewTrendDistanceExperiment(RUNNING_AVG, "Subtraction", src, alarm, width, multi_thread);
   }
 
@@ -164,7 +164,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
     }
     TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new PointDistance(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
-    BoundedSource src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
     return createNewTrendDistanceExperiment(RUNNING_MOMENTS, "Vector distance", src, alarm, width, multi_thread);
   }
 
@@ -196,7 +196,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
     }
     TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(new DistanceToClosest(new EuclideanDistance()), StreamVariable.X, StreamVariable.Y)), 0.25, Numbers.isLessThan);
-    BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
+    BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH, num_symbols);
     return createNewTrendDistanceExperiment(CLOSEST_CLUSTER, "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
 
@@ -225,7 +225,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
     }
     TrendDistance<HashMap<?,?>,Number,Number> alarm = new TrendDistance<HashMap<?,?>,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(MapDistance.instance, StreamVariable.X, StreamVariable.Y)), 2, Numbers.isLessThan);
-    BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
     return createNewTrendDistanceExperiment(SYMBOL_DISTRIBUTION, "Map distance", src, alarm, width, multi_thread);
   }
   
@@ -239,7 +239,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
   protected StaticTrendDistanceExperiment createNgramExperiment(int width, int N, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
-    BoundedSource src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
+    BoundedSource<?> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
     
     // Group processor that creates and accumulates N-grams
     GroupProcessor cumul_n_grams = new Ngrams(N);
@@ -279,7 +279,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
   {
     Random random = m_lab.getRandom();
     
-    BoundedSource src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
+    BoundedSource<?> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
     
     // Group processor that creates and accumulates N-grams
     AverageSliceLength.SliceLength asl = new AverageSliceLength.SliceLength();
@@ -316,7 +316,7 @@ public class StaticTrendDistanceFactory extends TrendFactory<StaticTrendDistance
    * @param multi_thread Whether the experiment uses multi-threading
    * @return A new trend distance experiment
    */
-  protected StaticTrendDistanceExperiment createNewTrendDistanceExperiment(String trend, String metric, BoundedSource src, Processor alarm, int width, boolean multi_thread)
+  protected StaticTrendDistanceExperiment createNewTrendDistanceExperiment(String trend, String metric, BoundedSource<?> src, Processor alarm, int width, boolean multi_thread)
   {
     StaticTrendDistanceExperiment tde = new StaticTrendDistanceExperiment();
     tde.setSource(src);

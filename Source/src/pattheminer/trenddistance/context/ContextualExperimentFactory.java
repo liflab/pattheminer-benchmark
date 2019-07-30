@@ -89,7 +89,7 @@ public class ContextualExperimentFactory extends TrendFactory<ContextualExperime
     }
     
     Processor context = new ApplyFunction(new FunctionTree(WeekdaySource.IsWeekday.instance, new NthElement(0)));
-    BoundedSource source = new WeekdaySource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH, 20);
+    BoundedSource<?> source = new WeekdaySource(m_lab.getRandom(), MainLab.MAX_TRACE_LENGTH, 20);
     Map<Object,Object> trends = new HashMap<Object,Object>();
     trends.put(true, 100);
     trends.put(false, 10);
@@ -102,7 +102,7 @@ public class ContextualExperimentFactory extends TrendFactory<ContextualExperime
   }
   
   @SuppressWarnings("unchecked")
-  protected ContextualExperiment createNewContextualExperiment(String trend_name, String metric, BoundedSource source, Processor beta, int n, Processor context, int m, Map<?,?> trends, Function distance, Number threshold, BinaryFunction<Number,Number,Boolean> comparison, boolean multi_thread)
+  protected ContextualExperiment createNewContextualExperiment(String trend_name, String metric, BoundedSource<?> source, Processor beta, int n, Processor context, int m, Map<?,?> trends, Function distance, Number threshold, BinaryFunction<Number,Number,Boolean> comparison, boolean multi_thread)
   {
     ContextualExperiment tde = new ContextualExperiment();
     ChoiceFunction<String,Number> cf = new ChoiceFunction<String,Number>(String.class, Number.class, (Map<String,Number>) trends);

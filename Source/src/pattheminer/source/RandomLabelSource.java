@@ -216,4 +216,10 @@ public class RandomLabelSource extends RandomSource<Object[]>
     out.append(e[0]).append(",").append(e[1]).append(",").append(e[2]);
     return out.toString();
   }
+
+  @Override
+  public String getFilename()
+  {
+    return "label-" + m_numEvents + "-" + m_sliceLength + "-" + m_numSlices + ".csv";
+  }
 }

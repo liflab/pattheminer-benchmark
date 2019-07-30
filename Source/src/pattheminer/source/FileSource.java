@@ -24,23 +24,22 @@ import java.io.PrintStream;
 import java.util.Queue;
 import java.util.Scanner;
 
-import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.ProcessorException;
-import ca.uqac.lif.cep.io.Print;
-import ca.uqac.lif.cep.tmf.Pump;
-import ca.uqac.lif.cep.tmf.Source;
 
 /**
  * Source that writes events into an external file, and
  * then fetches its events from that file
  */
-public abstract class FileSource extends Source
+public abstract class FileSource<T> extends BoundedSource<T>
 {
   /**
    * The name of the file to read from
    */
   /*@ non_null @*/ protected String m_filename;
   
+  /**
+   * The underlying source that will actually generate the events
+   */
   protected BoundedSource<?> m_source;
 
   /**
@@ -50,13 +49,12 @@ public abstract class FileSource extends Source
 
   /**
    * Creates a new file source
-   * @param r A random generator
-   * @param num_events The number of events to produce
-   * @param filename The name of the file to read from
+   * @param num_events The number of events to generate
+   * @param source The underlying source that will actually generate the events
    */
-  public FileSource(BoundedSource<?> source)
+  public FileSource(int num_events, BoundedSource<T> source)
   {
-    super(1);
+    super(num_events);
     m_source = source;
   }
 
@@ -65,6 +63,7 @@ public abstract class FileSource extends Source
    * from already exists
    * @return <tt>true</tt> if the file exists, <tt>false</tt> otherwise
    */
+  @Override
   public boolean isReady()
   {
     File f = new File(m_filename);
@@ -106,22 +105,21 @@ public abstract class FileSource extends Source
    */
   /*@ null @*/ protected abstract Object getEvent(/*@ non_null @*/ String line);
 
-  /**
-   * Generates the file with the events to read from
-   */
-  public void generateFile() throws FileNotFoundException
+  @Override
+  public void prepare() throws ProcessorException
   {
-    Source source = getSource();
-    Pump pump = new Pump();
-    Print to_file = new Print(new PrintStream(new FileOutputStream(new File(m_filename))));
-    Connector.connect(source, pump, to_file);
-    pump.run();
-    to_file.close();
+    String filename = m_source.getFilename();
+    PrintStream ps = null;
+    try
+    {
+      ps = new PrintStream(new FileOutputStream(new File(filename)));
+    }
+    catch (FileNotFoundException e)
+    {
+      throw new ProcessorException(e);
+    }
+    BoundedSource<?> source = (BoundedSource<?>) m_source.duplicate();
+    source.printTo(ps);
+    ps.close();
   }
-  
-  /**
-   * Gets a source to produce the events
-   * @return
-   */
-  public abstract Source getSource();
 }

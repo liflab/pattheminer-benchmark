@@ -59,4 +59,10 @@ public class RandomNumberSource extends RandomSource<Float>
   {
     return e.toString();
   }
+  
+  @Override
+  public String getFilename()
+  {
+    return "numbers-" + m_numEvents + ".csv";
+  }
 }

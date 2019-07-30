@@ -123,7 +123,7 @@ public class TraceGenerator
       System.exit(1);
     }
     int num_events = Integer.parseInt(parameters.getOptionValue("length"));
-    RandomSource source = null;
+    RandomSource<?> source = null;
     String type = parameters.getOptionValue("type");
     if (type.compareToIgnoreCase("label") == 0)
     {

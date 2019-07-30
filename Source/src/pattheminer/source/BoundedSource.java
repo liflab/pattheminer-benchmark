@@ -17,7 +17,9 @@
  */
 package pattheminer.source;
 
+import ca.uqac.lif.cep.ProcessorException;
 import ca.uqac.lif.cep.tmf.Source;
+import java.io.PrintStream;
 import java.util.Queue;
 
 /**
@@ -37,7 +39,7 @@ public abstract class BoundedSource<T> extends Source
   
   /**
    * Creates a new bounded source
-   * @param num_events
+   * @param num_events The number of events to generate
    */
   public BoundedSource(int num_events)
   {
@@ -88,5 +90,45 @@ public abstract class BoundedSource<T> extends Source
    * @param e The event
    * @return The line of text
    */
-  public abstract String printEvent(T e);
+  /*@ non_null @*/ public abstract String printEvent(T e);
+  
+  /**
+   * Generates the entire event trace and writes it to a print stream
+   * @param out The print stream to write to
+   */
+  public final void printTo(PrintStream out)
+  {
+    for (int i = 0; i < m_numEvents; i++)
+    {
+      T e = getEvent();
+      String line = printEvent(e);
+      out.println(line);      
+    }
+  }
+  
+  /**
+   * Determines if the source is ready to serve events
+   * @return <tt>true</tt> if the source is ready, <tt>false</tt> otherwise
+   */
+  public boolean isReady()
+  {
+    return true;
+  }
+  
+  /**
+   * Prepares the source to generate events. Normally, this method is called if
+   * {@link #isReady()} returns false.
+   * @throws ProcessorException If the preparation encounters a problem
+   */
+  public void prepare() throws ProcessorException
+  {
+    // Nothing to do by default
+    return;
+  }
+  
+  /**
+   * Gets the name of the file corresponding to this source
+   * @return The filename
+   */
+  /*@ non_null @*/ public abstract String getFilename();
 }
