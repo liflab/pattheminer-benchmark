@@ -23,21 +23,14 @@ import ca.uqac.lif.cep.Pullable;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.tmf.BlackHole;
 import ca.uqac.lif.json.JsonList;
-import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.ExperimentException;
-import pattheminer.source.BoundedSource;
 
 /**
- * Experiment that connects a source to a processor and measures its
- * throughput
+ * Experiment that connects a BeepBeep source to a processor and measures
+ * its throughput
  */
-public abstract class StreamExperiment extends Experiment
+public abstract class StreamExperiment extends TraceExperiment
 {
-  /**
-   * The average number of events processed per second
-   */
-  public static final transient String THROUGHPUT = "Throughput";
-
   /**
    * Cumulative running time (in ms)
    */
@@ -59,11 +52,6 @@ public abstract class StreamExperiment extends Experiment
   protected transient Processor m_processor;
 
   /**
-   * The source from which the input events will originate
-   */
-  protected transient BoundedSource<?> m_source;
-
-  /**
    * The interval at which the experiment updates its data on
    * runtime and throughput
    */
@@ -74,7 +62,8 @@ public abstract class StreamExperiment extends Experiment
    */
   public StreamExperiment()
   {
-    describe(THROUGHPUT, "The average number of events processed per second");
+    super();
+    write(SOFTWARE, "BeepBeep");
     describe(TIME, "Cumulative running time (in ms)");
     describe(LENGTH, "Number of events processed");
     describe(MULTITHREAD, "Whether the experiment uses multiple threads or a single one");
@@ -127,15 +116,6 @@ public abstract class StreamExperiment extends Experiment
   }
 
   /**
-   * Sets the source from which the input events will originate
-   * @param s The source
-   */
-  public void setSource(BoundedSource<?> s)
-  {
-    m_source = s;
-  }
-
-  /**
    * Sets the interval at which the experiment updates its data on
    * runtime and throughput
    * @param step The interval
@@ -143,23 +123,5 @@ public abstract class StreamExperiment extends Experiment
   public void setEventStep(int step)
   {
     m_eventStep = step;
-  }
-  
-  @Override
-  public boolean prerequisitesFulfilled()
-  {
-    return m_source.isReady();
-  }
-  
-  @Override
-  public void fulfillPrerequisites()
-  {
-    m_source.prepare();
-  }
-  
-  @Override
-  public void cleanPrerequisites()
-  {
-    m_source.clear();
   }
 }
