@@ -25,12 +25,13 @@ import java.util.Queue;
 import java.util.Scanner;
 
 import ca.uqac.lif.cep.ProcessorException;
+import ca.uqac.lif.mtnp.util.FileHelper;
 
 /**
  * Source that writes events into an external file, and
  * then fetches its events from that file
  */
-public abstract class FileSource<T> extends BoundedSource<T>
+public class FileSource<T> extends BoundedSource<T>
 {
   /**
    * The name of the file to read from
@@ -54,25 +55,24 @@ public abstract class FileSource<T> extends BoundedSource<T>
 
   /**
    * Creates a new file source
-   * @param num_events The number of events to generate
    * @param source The underlying source that will actually generate the events
    * @param data_folder The folder where the trace file will be written and read
    */
-  public FileSource(int num_events, BoundedSource<T> source, String data_folder)
+  public FileSource(BoundedSource<T> source, String data_folder)
   {
-    super(num_events);
+    super(source.m_numEvents);
     m_source = source;
     m_dataFolder = data_folder;
+    m_filename = source.getFilename();
   }
   
   /**
    * Creates a new file source
-   * @param num_events The number of events to generate
    * @param source The underlying source that will actually generate the events
    */
-  public FileSource(int num_events, BoundedSource<T> source)
+  public FileSource(BoundedSource<T> source)
   {
-    this(num_events, source, "./");
+    this(source, "./");
   }
 
   /**
@@ -83,7 +83,7 @@ public abstract class FileSource<T> extends BoundedSource<T>
   @Override
   public boolean isReady()
   {
-    File f = new File(m_filename);
+    File f = new File(m_dataFolder + m_filename);
     return f.exists();
   }
 
@@ -94,7 +94,7 @@ public abstract class FileSource<T> extends BoundedSource<T>
     {
       try
       {
-        m_scanner = new Scanner(new File(m_filename));
+        m_scanner = new Scanner(new File(m_dataFolder + m_filename));
       }
       catch (FileNotFoundException e)
       {
@@ -107,21 +107,14 @@ public abstract class FileSource<T> extends BoundedSource<T>
       return false;
     }
     String line = m_scanner.nextLine();
-    Object o = getEvent(line);
+    Object o = m_source.readEvent(line);
     if (o != null)
     {
       outputs.add(new Object[] {o});
     }
     return true;
   }
-
-  /**
-   * Creates an event out of a line of text fetched from a file
-   * @param line The line of text
-   * @return An event, or <tt>null</tt> if no event can be produced
-   */
-  /*@ null @*/ protected abstract Object getEvent(/*@ non_null @*/ String line);
-
+  
   @Override
   public void prepare() throws ProcessorException
   {
@@ -138,5 +131,42 @@ public abstract class FileSource<T> extends BoundedSource<T>
     BoundedSource<?> source = (BoundedSource<?>) m_source.duplicate();
     source.printTo(ps);
     ps.close();
+  }
+  
+  @Override
+  public void clear()
+  {
+    FileHelper.deleteFile(m_dataFolder + m_filename);
+  }
+
+  @Override
+  public T readEvent(String line)
+  {
+    throw new UnsupportedOperationException("Operation not supported on this object");
+  }
+
+  @Override
+  public String printEvent(T e)
+  {
+    throw new UnsupportedOperationException("Operation not supported on this object");
+  }
+
+  @Override
+  public String getFilename()
+  {
+    throw new UnsupportedOperationException("Operation not supported on this object");
+  }
+
+  @Override
+  public FileSource<T> duplicate(boolean with_state)
+  {
+    throw new UnsupportedOperationException("Duplication is not supported on this object");
+  }
+
+  @Override
+  protected T getEvent()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

@@ -127,6 +127,15 @@ public abstract class BoundedSource<T> extends Source
   }
   
   /**
+   * Cancels the operations done by {@link #prepare()}
+   */
+  public void clear()
+  {
+    // Nothing to do by default
+    return;
+  }
+  
+  /**
    * Gets the name of the file corresponding to this source
    * @return The filename
    */

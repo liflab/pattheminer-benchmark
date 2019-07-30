@@ -241,4 +241,13 @@ public class MainLab extends Laboratory
     }
     return null;
   }
+  
+  /**
+   * Gets the folder where static files will be generated
+   * @return The folder
+   */
+  public String getDataFolder()
+  {
+    return m_dataFolder;
+  }
 }

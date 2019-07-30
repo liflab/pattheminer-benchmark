@@ -52,7 +52,7 @@ public class SetupStaticVsSelf extends SetupAgent
   @Override
   public void fillWithExperiments()
   {
-    StaticTrendDistanceFactory std_factory = new StaticTrendDistanceFactory(m_lab, m_lab.useFiles());
+    StaticTrendDistanceFactory std_factory = new StaticTrendDistanceFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
     SelfCorrelatedFactory sc_factory = new SelfCorrelatedFactory(m_lab);
     Region reg = new Region();
     reg.add(WIDTH, MainLab.s_widths);

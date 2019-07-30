@@ -156,4 +156,10 @@ public abstract class StreamExperiment extends Experiment
   {
     m_source.prepare();
   }
+  
+  @Override
+  public void cleanPrerequisites()
+  {
+    m_source.clear();
+  }
 }

@@ -28,6 +28,11 @@ public abstract class TrendFactory<T extends TrendExperiment> extends Experiment
   protected transient boolean m_useFiles = false;
   
   /**
+   * The folder where the files are generated
+   */
+  protected transient String m_dataFolder = "./";
+  
+  /**
    * Creates a new trend experiment factory
    * @param lab The lab to which the experiments will be added
    * @param c The class of the experiments to create
@@ -35,14 +40,15 @@ public abstract class TrendFactory<T extends TrendExperiment> extends Experiment
    * Setting this to false will have the experiment generate the input
    * traces on-the-fly.
    */
-  public TrendFactory(MainLab lab, Class<T> c, boolean use_files)
+  public TrendFactory(MainLab lab, Class<T> c, boolean use_files, String data_folder)
   {
     super(lab, c);
     m_useFiles = use_files;
+    m_dataFolder = data_folder;
   }
   
   public TrendFactory(MainLab lab, Class<T> c)
   {
-    this(lab, c, false);
+    this(lab, c, false, "");
   }
 }
