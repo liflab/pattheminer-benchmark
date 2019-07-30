@@ -26,7 +26,7 @@ import java.util.Map;
  * A source of randomly-generated labelled events, used for testing and
  * benchmarking.
  */
-public class RandomLabelSource extends RandomSource
+public class RandomLabelSource extends RandomSource<Object[]>
 {
   /**
    * The label given to the "start" event for each slice
@@ -118,7 +118,7 @@ public class RandomLabelSource extends RandomSource
   }
 
   @Override
-  protected Object getEvent()
+  protected Object[] getEvent()
   {
     Object[] tuple;
     int state_size = m_sliceStates.size();
@@ -196,5 +196,24 @@ public class RandomLabelSource extends RandomSource
     m_lowestSliceId = 0;
     m_sliceStates.clear();
     m_sliceIndex = 0;
+  }
+
+  @Override
+  public Object[] readEvent(String line)
+  {
+    String[] parts = line.split(",");
+    Object[] tuple = new Object[parts.length];
+    tuple[0] = Integer.parseInt(parts[0]);
+    tuple[1] = Integer.parseInt(parts[1]);
+    tuple[2] = parts[2];
+    return tuple;
+  }
+  
+  @Override
+  public String printEvent(Object[] e)
+  {
+    StringBuilder out = new StringBuilder();
+    out.append(e[0]).append(",").append(e[1]).append(",").append(e[2]);
+    return out.toString();
   }
 }

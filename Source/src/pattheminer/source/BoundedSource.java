@@ -23,7 +23,7 @@ import java.util.Queue;
 /**
  * A BeepBeep {@link Source} that produces a fixed number of events.
  */
-public abstract class BoundedSource extends Source
+public abstract class BoundedSource<T> extends Source
 {
   /**
    * The number of events to produce
@@ -73,5 +73,20 @@ public abstract class BoundedSource extends Source
    * Generates the next event
    * @return The next event
    */
-  protected abstract Object getEvent();
+  protected abstract T getEvent();
+  
+  /**
+   * Reads an event from a line of text
+   * @param line The line of text
+   * @return The event, or <tt>null</tt> if no event can be produced
+   * from the line
+   */
+  /*@ null @*/ public abstract T readEvent(/*@ non_null @*/ String line);
+  
+  /**
+   * Prints an event to a line of text
+   * @param e The event
+   * @return The line of text
+   */
+  public abstract String printEvent(T e);
 }

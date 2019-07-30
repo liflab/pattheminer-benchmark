@@ -25,7 +25,7 @@ import ca.uqac.lif.cep.functions.UnaryFunction;
  * A source that produces tuples made of a weekday and some random
  * integer.
  */
-public class WeekdaySource extends RandomSource
+public class WeekdaySource extends RandomSource<Object[]>
 {
   /**
    * An array storing the names of each weekday
@@ -59,7 +59,7 @@ public class WeekdaySource extends RandomSource
   }
   
   @Override
-  protected Object getEvent()
+  protected Object[] getEvent()
   {
     Object[] out = new Object[] {s_weekdays[m_weekdayIndex], m_random.nextInt(1000)};
     if ((m_eventCount + 1) % m_weekdayLength == 0)
@@ -113,5 +113,23 @@ public class WeekdaySource extends RandomSource
       return x.compareTo(s_weekdays[0]) != 0 && x.compareTo(s_weekdays[6]) != 0;
     }
     
+  }
+
+  @Override
+  public Object[] readEvent(String line)
+  {
+    String[] parts = line.split(",");
+    Object[] out = new Object[2];
+    out[0] = parts[0];
+    out[1] = Integer.parseInt(parts[1].trim());
+    return out;
+  }
+
+  @Override
+  public String printEvent(Object[] e)
+  {
+    StringBuilder out = new StringBuilder();
+    out.append(e[0]).append(",").append(e[1]);
+    return out.toString();
   }
 }

@@ -23,7 +23,7 @@ import ca.uqac.lif.labpal.Random;
 /**
  * A source of randomly generated symbols.
  */
-public class RandomSymbolSource extends RandomSource
+public class RandomSymbolSource extends RandomSource<String>
 {
   /**
    * The number of distinct symbols to choose from
@@ -82,5 +82,17 @@ public class RandomSymbolSource extends RandomSource
   {
     // Not supported
     return null;
-  }  
+  }
+
+  @Override
+  public String readEvent(String line)
+  {
+    return line.trim();
+  }
+
+  @Override
+  public String printEvent(String e)
+  {
+    return e;
+  }
 }

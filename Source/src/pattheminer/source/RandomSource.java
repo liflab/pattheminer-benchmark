@@ -22,7 +22,7 @@ import ca.uqac.lif.labpal.Random;
 /**
  * A source of randomly-generated events.
  */
-public abstract class RandomSource extends BoundedSource
+public abstract class RandomSource<T> extends BoundedSource<T>
 {
   /**
    * The random number generator used to generate the numbers

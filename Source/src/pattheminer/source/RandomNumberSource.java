@@ -23,7 +23,7 @@ import ca.uqac.lif.labpal.Random;
 /**
  * A source of randomly generated numbers.
  */
-public class RandomNumberSource extends RandomSource
+public class RandomNumberSource extends RandomSource<Float>
 {
   /**
    * Creates a new random number source.
@@ -46,5 +46,17 @@ public class RandomNumberSource extends RandomSource
   {
     // Not supported
     return null;
+  }
+
+  @Override
+  public Float readEvent(String line)
+  {
+    return Float.parseFloat(line.trim());
+  }
+
+  @Override
+  public String printEvent(Float e)
+  {
+    return e.toString();
   }
 }
