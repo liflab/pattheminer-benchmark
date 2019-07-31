@@ -42,10 +42,10 @@ public abstract class StaticTrendDistanceFactory<T extends TraceExperiment> exte
   }
 
   @Override
-  protected T createExperiment(Region r)
+  protected final T createExperiment(Region r)
   {
-    String trend_name = r.getString(StaticTrendDistanceExperiment.TREND);
-    int width = r.getInt(StaticTrendDistanceExperiment.WIDTH);
+    String trend_name = r.getString(StaticTrendDistanceStreamExperiment.TREND);
+    int width = r.getInt(StaticTrendDistanceStreamExperiment.WIDTH);
     if (trend_name.compareTo(RUNNING_AVG) == 0)
     {
       return createAverageExperiment(width, false);

@@ -20,21 +20,21 @@ package pattheminer.trenddistance.threads;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.macro.NumberMacro;
 import ca.uqac.lif.mtnp.DataFormatter;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 
 public class ThreadSpeedupMacro extends NumberMacro
 {
   /**
    * The experiment performed without threads
    */
-  protected transient StaticTrendDistanceExperiment m_experimentNt;
+  protected transient StaticTrendDistanceStreamExperiment m_experimentNt;
   
   /**
    * The experiment performed with threads
    */
-  protected transient StaticTrendDistanceExperiment m_experimentMt;
+  protected transient StaticTrendDistanceStreamExperiment m_experimentMt;
   
-  public ThreadSpeedupMacro(Laboratory lab, StaticTrendDistanceExperiment ent, StaticTrendDistanceExperiment emt)
+  public ThreadSpeedupMacro(Laboratory lab, StaticTrendDistanceStreamExperiment ent, StaticTrendDistanceStreamExperiment emt)
   {
     super(lab, "threadSpeedup", "The speedup obtained by using multiple threads for a trend distance pattern processor");
     m_experimentNt = ent;
@@ -44,8 +44,8 @@ public class ThreadSpeedupMacro extends NumberMacro
   @Override
   public Double getNumber()
   {
-    float tp_nt = m_experimentNt.readFloat(StaticTrendDistanceExperiment.THROUGHPUT);
-    float tp_mt = m_experimentMt.readFloat(StaticTrendDistanceExperiment.THROUGHPUT);
+    float tp_nt = m_experimentNt.readFloat(StaticTrendDistanceStreamExperiment.THROUGHPUT);
+    float tp_mt = m_experimentMt.readFloat(StaticTrendDistanceStreamExperiment.THROUGHPUT);
     if (tp_nt == 0)
     {
       return 0d;

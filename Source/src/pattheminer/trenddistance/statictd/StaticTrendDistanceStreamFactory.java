@@ -24,7 +24,6 @@ import static pattheminer.trenddistance.TrendExperiment.NUM_SLICES;
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_AVG;
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_MOMENTS;
 import static pattheminer.trenddistance.TrendExperiment.AVG_SLICE_LENGTH;
-import static pattheminer.trenddistance.TrendExperiment.SLICE_LENGTH;
 import static pattheminer.trenddistance.TrendExperiment.SYMBOL_DISTRIBUTION;
 
 import ca.uqac.lif.cep.GroupProcessor;
@@ -42,7 +41,6 @@ import ca.uqac.lif.cep.peg.ml.RunningMoments;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.json.JsonString;
 import ca.uqac.lif.labpal.Random;
-import ca.uqac.lif.labpal.Region;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -64,55 +62,15 @@ import pattheminer.source.RandomSymbolSource;
  * Factory that generates static trend distance experiments using various
  * input sources and trend processors.
  */
-public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory<StaticTrendDistanceExperiment>
+public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory<StaticTrendDistanceStreamExperiment>
 {
   public StaticTrendDistanceStreamFactory(MainLab lab, boolean use_files, String data_folder)
   {
-    super(lab, StaticTrendDistanceExperiment.class, use_files, data_folder);
+    super(lab, StaticTrendDistanceStreamExperiment.class, use_files, data_folder);
   }
 
   @Override
-  protected StaticTrendDistanceExperiment createExperiment(Region r)
-  {
-    String trend_name = r.getString(StaticTrendDistanceExperiment.TREND);
-    int width = r.getInt(StaticTrendDistanceExperiment.WIDTH);
-    if (trend_name.compareTo(RUNNING_AVG) == 0)
-    {
-      return createAverageExperiment(width, false);
-    }
-    else if (trend_name.compareTo(RUNNING_MOMENTS) == 0)
-    {
-      return createRunningMomentsExperiment(width, false);
-    }
-    else if (trend_name.compareTo(CLOSEST_CLUSTER) == 0)
-    {
-      return createClosestClusterExperiment(width, false);
-    }
-    else if (trend_name.compareTo(SYMBOL_DISTRIBUTION) == 0)
-    {
-      return createDistributionExperiment(width, false);
-    }
-    else if (trend_name.compareTo(N_GRAMS) == 0)
-    {
-      if (r.hasDimension(N_GRAM_WIDTH))
-      {
-        return createNgramExperiment(width, r.getInt(N_GRAM_WIDTH), false);
-      }
-      return createNgramExperiment(width, 3, false);
-    }
-    else if (trend_name.compareTo(AVG_SLICE_LENGTH) == 0)
-    {
-      if (r.hasDimension(NUM_SLICES))
-      {
-        return createSliceLengthExperiment(width, r.getInt(NUM_SLICES), r.getInt(SLICE_LENGTH), false);
-      }
-      return createSliceLengthExperiment(width, 3, 10, false);
-    }
-    return null;
-  }
-
-  @Override
-  protected StaticTrendDistanceExperiment createAverageExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceStreamExperiment createAverageExperiment(int width, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     CumulativeAverage average = new CumulativeAverage();
@@ -134,11 +92,11 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     {
       src = new FileSource<Float>(src, m_dataFolder);
     }
-    return createNewTrendDistanceExperiment(RUNNING_AVG, "Subtraction", src, alarm, width, multi_thread);
+    return createNewTrendDistanceStreamExperiment(RUNNING_AVG, "Subtraction", src, alarm, width, multi_thread);
   }
 
   @Override
-  protected StaticTrendDistanceExperiment createRunningMomentsExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceStreamExperiment createRunningMomentsExperiment(int width, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     RunningMoments beta = new RunningMoments(3);
@@ -161,11 +119,11 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     {
       src = new FileSource<Float>(src, m_dataFolder);
     }
-    return createNewTrendDistanceExperiment(RUNNING_MOMENTS, "Vector distance", src, alarm, width, multi_thread);
+    return createNewTrendDistanceStreamExperiment(RUNNING_MOMENTS, "Vector distance", src, alarm, width, multi_thread);
   }
 
   @Override
-  protected StaticTrendDistanceExperiment createClosestClusterExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceStreamExperiment createClosestClusterExperiment(int width, boolean multi_thread)
   {
     int num_symbols = 2;
     Random random = m_lab.getRandom();
@@ -191,11 +149,11 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     {
       src = new FileSource<String>(src, m_dataFolder);
     }
-    return createNewTrendDistanceExperiment(CLOSEST_CLUSTER, "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
+    return createNewTrendDistanceStreamExperiment(CLOSEST_CLUSTER, "Euclidean distance to closest cluster", src, alarm, width, multi_thread);
   }
 
   @Override
-  protected StaticTrendDistanceExperiment createDistributionExperiment(int width, boolean multi_thread)
+  protected StaticTrendDistanceStreamExperiment createDistributionExperiment(int width, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     SymbolDistribution beta = new SymbolDistribution();
@@ -218,11 +176,11 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     {
       src = new FileSource<String>(src, m_dataFolder);
     }
-    return createNewTrendDistanceExperiment(SYMBOL_DISTRIBUTION, "Map distance", src, alarm, width, multi_thread);
+    return createNewTrendDistanceStreamExperiment(SYMBOL_DISTRIBUTION, "Map distance", src, alarm, width, multi_thread);
   }
 
   @Override
-  protected StaticTrendDistanceExperiment createNgramExperiment(int width, int N, boolean multi_thread)
+  protected StaticTrendDistanceStreamExperiment createNgramExperiment(int width, int N, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     BoundedSource<String> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
@@ -251,7 +209,7 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     reference.add(createList("B", "B", "A"));
     reference.add(createList("C", "C", "C"));
     TrendDistance<Set<Object>,Number,Number> alarm = new TrendDistance<Set<Object>,Number,Number>(reference, wp, JaccardIndex.instance, 1, Numbers.isLessThan);
-    StaticTrendDistanceExperiment tde = createNewTrendDistanceExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
+    StaticTrendDistanceStreamExperiment tde = createNewTrendDistanceStreamExperiment(N_GRAMS, "Jaccard index", src, alarm, width, multi_thread);
     // For the n-gram experiment, there is an additional parameter
     tde.setInput(N_GRAM_WIDTH, N);
     tde.describe(N_GRAM_WIDTH, "The width of the N-grams (i.e. the value of N");
@@ -265,7 +223,7 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
    * @param multi_thread Whether to use multi-threading
    * @return The slice length experiment
    */
-  protected StaticTrendDistanceExperiment createSliceLengthExperiment(int width, int num_slices, int slice_length, boolean multi_thread)
+  protected StaticTrendDistanceStreamExperiment createSliceLengthExperiment(int width, int num_slices, int slice_length, boolean multi_thread)
   {
     Random random = m_lab.getRandom();
     BoundedSource<Object[]> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
@@ -289,7 +247,7 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
       wp = new ParallelWindow(asl, width);
     }
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(10, wp, Numbers.subtraction, 1, Numbers.isLessThan);
-    StaticTrendDistanceExperiment tde = createNewTrendDistanceExperiment(AVG_SLICE_LENGTH, "Subtraction", src, alarm, width, multi_thread);
+    StaticTrendDistanceStreamExperiment tde = createNewTrendDistanceStreamExperiment(AVG_SLICE_LENGTH, "Subtraction", src, alarm, width, multi_thread);
     // For the slice experiment, there are two additional parameters
     tde.setInput(NUM_SLICES, num_slices);
     tde.describe(NUM_SLICES, "The number of slices");
@@ -308,23 +266,23 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
    * @param multi_thread Whether the experiment uses multi-threading
    * @return A new trend distance experiment
    */
-  protected StaticTrendDistanceExperiment createNewTrendDistanceExperiment(String trend, String metric, BoundedSource<?> src, Processor alarm, int width, boolean multi_thread)
+  protected StaticTrendDistanceStreamExperiment createNewTrendDistanceStreamExperiment(String trend, String metric, BoundedSource<?> src, Processor alarm, int width, boolean multi_thread)
   {
-    StaticTrendDistanceExperiment tde = new StaticTrendDistanceExperiment();
+    StaticTrendDistanceStreamExperiment tde = new StaticTrendDistanceStreamExperiment();
     tde.setSource(src);
     tde.setProcessor(alarm);
     tde.setEventStep(MainLab.s_eventStep);
-    tde.setInput(StaticTrendDistanceExperiment.WIDTH, width);
-    tde.setInput(StaticTrendDistanceExperiment.TREND, trend);
-    tde.setInput(StaticTrendDistanceExperiment.METRIC, metric);
+    tde.setInput(StaticTrendDistanceStreamExperiment.WIDTH, width);
+    tde.setInput(StaticTrendDistanceStreamExperiment.TREND, trend);
+    tde.setInput(StaticTrendDistanceStreamExperiment.METRIC, metric);
     JsonString jb = new JsonString("yes");
     if (!multi_thread)
     {
       jb = new JsonString("no");
     }
-    tde.setInput(StaticTrendDistanceExperiment.MULTITHREAD, jb);
+    tde.setInput(StaticTrendDistanceStreamExperiment.MULTITHREAD, jb);
     return tde;
   }
 
-  
+
 }

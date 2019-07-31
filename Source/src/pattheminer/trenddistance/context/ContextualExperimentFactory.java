@@ -37,7 +37,7 @@ import pattheminer.patterns.CumulativeAverage;
 import pattheminer.source.BoundedSource;
 import pattheminer.source.WeekdaySource;
 import pattheminer.trenddistance.TraceExperimentFactory;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 
 import static ca.uqac.lif.cep.Connector.INPUT;
 import static ca.uqac.lif.cep.Connector.OUTPUT;
@@ -115,7 +115,7 @@ public class ContextualExperimentFactory extends TraceExperimentFactory<Contextu
     {
       jb = new JsonString("no");
     }
-    tde.setInput(StaticTrendDistanceExperiment.MULTITHREAD, jb);
+    tde.setInput(StaticTrendDistanceStreamExperiment.MULTITHREAD, jb);
     tde.setInput(TREND, trend_name);
     tde.setInput(WIDTH, n);
     tde.setInput(CONTEXT_WIDTH, m);

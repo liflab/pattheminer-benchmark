@@ -59,7 +59,7 @@ import pattheminer.source.RandomLabelSource;
 import pattheminer.source.RandomNumberSource;
 import pattheminer.source.RandomSymbolSource;
 import pattheminer.trenddistance.TraceExperimentFactory;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 
 /**
  * Factory that generates self-correlated trend distance experiments using various
@@ -205,15 +205,15 @@ public class SelfCorrelatedFactory extends TraceExperimentFactory<SelfCorrelated
     tde.setSource(src);
     tde.setProcessor(alarm);
     tde.setEventStep(MainLab.s_eventStep);
-    tde.setInput(StaticTrendDistanceExperiment.WIDTH, width);
-    tde.setInput(StaticTrendDistanceExperiment.TREND, trend);
-    tde.setInput(StaticTrendDistanceExperiment.METRIC, metric);
+    tde.setInput(StaticTrendDistanceStreamExperiment.WIDTH, width);
+    tde.setInput(StaticTrendDistanceStreamExperiment.TREND, trend);
+    tde.setInput(StaticTrendDistanceStreamExperiment.METRIC, metric);
     JsonString jb = new JsonString("yes");
     if (!multi_thread)
     {
       jb = new JsonString("no");
     }
-    tde.setInput(StaticTrendDistanceExperiment.MULTITHREAD, jb);
+    tde.setInput(StaticTrendDistanceStreamExperiment.MULTITHREAD, jb);
     return tde;
   }
 }

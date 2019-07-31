@@ -17,8 +17,11 @@
  */
 package pattheminer.rscript;
 
+import ca.uqac.lif.json.JsonList;
 import ca.uqac.lif.labpal.CommandRunner;
 import ca.uqac.lif.labpal.ExperimentException;
+import ca.uqac.lif.mtnp.util.FileHelper;
+import java.io.File;
 import pattheminer.TraceExperiment;
 
 /**
@@ -37,12 +40,24 @@ public abstract class RscriptExperiment extends TraceExperiment
   protected static final transient String s_rExecutable = "Rscript";
   
   /**
+   * The name of the folder containing the R scripts <em>inside</em> the
+   * LabPal directory structure. Must end with a forward slash.
+   */
+  protected static final transient String s_scriptFolder = "scripts/";
+  
+  /**
+   * The name of the file containing the R script <em>inside</em> the
+   * LabPal directory structure
+   */
+  protected transient String m_scriptFilename;
+  
+  /**
    * Creates a new experiment that uses R
    */
   public RscriptExperiment()
   {
     super();
-    write(SOFTWARE, "R");
+    setInput(SOFTWARE, "R");
   }
   
   @Override
@@ -53,6 +68,10 @@ public abstract class RscriptExperiment extends TraceExperiment
     runner.run();
     long end = System.currentTimeMillis();
     write(THROUGHPUT, (end - start) / (1000 * m_source.getEventBound()));
+    JsonList time = (JsonList) read(TIME);
+    time.add(end - start);
+    JsonList length = (JsonList) read(LENGTH);
+    length.add(m_source.getEventBound());
   }
   
   /**
@@ -61,12 +80,46 @@ public abstract class RscriptExperiment extends TraceExperiment
    */
   protected String[] getCommand()
   {
-    return new String[] {s_rExecutable, getScriptFilename(), m_source.getFilename()};
+    return new String[] {s_rExecutable, m_scriptFilename, m_source.getFilename()};
   }
   
   /**
-   * Gets the filename of the R script to execute at the command line
-   * @return The filename
+   * Sets the filename of the R script that this experiment will execute
+   * @param name The name of the file (without its path)
    */
-  protected abstract String getScriptFilename();
+  public void setScriptName(String name)
+  {
+    m_scriptFilename = name;
+  }
+  
+  @Override
+  public boolean prerequisitesFulfilled()
+  {
+    if (!FileHelper.fileExists(m_scriptFilename))
+    {
+      return false;
+    }
+    return super.prerequisitesFulfilled();
+  }
+  
+  @Override
+  public void fulfillPrerequisites() throws ExperimentException
+  {
+    // Do whatever preparation the parent requires
+    super.fulfillPrerequisites();
+    // Take the R script from inside the lab, and copy it to the local folder on the machine
+    String contents = FileHelper.internalFileToString(RscriptExperiment.class, s_scriptFolder + m_scriptFilename);
+    if (contents == null)
+    {
+      throw new ExperimentException("Could not find the R script for this experiment");
+    }
+    FileHelper.writeFromString(new File(m_scriptFilename), contents);
+  }
+  
+  @Override
+  public void cleanPrerequisites()
+  {
+    super.cleanPrerequisites();
+    FileHelper.deleteFile(m_scriptFilename);
+  }
 }

@@ -23,7 +23,7 @@ import ca.uqac.lif.mtnp.table.PrimitiveValue;
 import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 
 /**
  * Claim that checks that the running time of the same computation increases
@@ -71,7 +71,7 @@ public class MonotonicWindowClaim extends Claim
           Explanation exp = new Explanation("The running time of " + m_trend 
               + " with a window width of " + m_keys[i+1] 
               + " is shorter than that for a window width of " + m_keys[i]
-              + " for a trace length of " + te.get(StaticTrendDistanceExperiment.LENGTH));
+              + " for a trace length of " + te.get(StaticTrendDistanceStreamExperiment.LENGTH));
           exp.add(m_table);
           addExplanation(exp);
           out_res = Result.WARNING;

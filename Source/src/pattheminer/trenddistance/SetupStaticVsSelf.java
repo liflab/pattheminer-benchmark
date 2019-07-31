@@ -26,7 +26,7 @@ import pattheminer.MainLab;
 import pattheminer.SetupAgent;
 import pattheminer.trenddistance.selftd.SelfCorrelatedExperiment;
 import pattheminer.trenddistance.selftd.SelfCorrelatedFactory;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamFactory;
 
 import static pattheminer.StreamExperiment.THROUGHPUT;
@@ -70,7 +70,7 @@ public class SetupStaticVsSelf extends SetupAgent
       m_lab.add(et);
       for (Region r_t : r_w.all(TREND))
       {
-        StaticTrendDistanceExperiment stde = std_factory.get(r_t);
+        StaticTrendDistanceStreamExperiment stde = std_factory.get(r_t);
         if (stde != null)
         {
           et.add(stde);

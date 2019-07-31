@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
+    Copyright (C) 2018 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -17,16 +17,16 @@
  */
 package pattheminer.trenddistance.statictd;
 
-import pattheminer.MainLab;
-import pattheminer.trenddistance.SetupTrendExperiments;
+import pattheminer.trenddistance.TrendExperiment;
 
-/**
- * Setup of experiments for the static trend distance.
- */
-public class SetupTrendDistanceExperiments extends SetupTrendExperiments<StaticTrendDistanceStreamExperiment>
-{
-  public SetupTrendDistanceExperiments(MainLab lab)
+public class StaticTrendDistanceStreamExperiment extends TrendExperiment
+{  
+  public static final transient String TYPE_NAME = "Trend distance";
+  
+  public StaticTrendDistanceStreamExperiment()
   {
-    super(lab, new StaticTrendDistanceStreamFactory(lab, lab.useFiles(), lab.getDataFolder()), "Static trend distance throughput", "Measures the throughput of the static trend distance pattern using various window widths and trend processors.", "static trend distance", "std");
+    super();
+    setDescription("Measures the throughput of the trend distance processor");
+    setInput(TYPE, TYPE_NAME);
   }
 }

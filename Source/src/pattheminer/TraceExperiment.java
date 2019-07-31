@@ -17,7 +17,9 @@
  */
 package pattheminer;
 
+import ca.uqac.lif.json.JsonList;
 import ca.uqac.lif.labpal.Experiment;
+import ca.uqac.lif.labpal.ExperimentException;
 import pattheminer.source.BoundedSource;
 
 public abstract class TraceExperiment extends Experiment
@@ -33,15 +35,36 @@ public abstract class TraceExperiment extends Experiment
   public static final transient String SOFTWARE = "Software";
   
   /**
+   * Cumulative running time (in ms)
+   */
+  public static final transient String TIME = "Running time";
+
+  /**
+   * Number of events processed
+   */
+  public static final transient String LENGTH = "Stream length";
+  
+  /**
    * The source from which the input events will originate
    */
   protected transient BoundedSource<?> m_source;
   
+  /**
+   * Creates a new empty trace experiment
+   */
   public TraceExperiment()
   {
     super();
     describe(THROUGHPUT, "The average number of events processed per second");
     describe(SOFTWARE, "The software used to process the trace");
+    describe(TIME, "Cumulative running time (in ms)");
+    describe(LENGTH, "Number of events processed");
+    JsonList x = new JsonList();
+    x.add(0);
+    write(LENGTH, x);
+    JsonList y = new JsonList();
+    y.add(0);
+    write(TIME, y);
   }
   
   /**
@@ -60,7 +83,7 @@ public abstract class TraceExperiment extends Experiment
   }
   
   @Override
-  public void fulfillPrerequisites()
+  public void fulfillPrerequisites() throws ExperimentException
   {
     m_source.prepare();
   }

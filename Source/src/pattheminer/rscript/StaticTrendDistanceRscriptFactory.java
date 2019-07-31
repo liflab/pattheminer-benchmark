@@ -17,9 +17,15 @@
  */
 package pattheminer.rscript;
 
-import ca.uqac.lif.labpal.Region;
+import static pattheminer.trenddistance.TrendExperiment.RUNNING_AVG;
+
+import ca.uqac.lif.labpal.Random;
 import pattheminer.MainLab;
+import pattheminer.source.BoundedSource;
+import pattheminer.source.FileSource;
+import pattheminer.source.RandomNumberSource;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceFactory;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 
 public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactory<StaticTrendDistanceRscriptExperiment>
 {
@@ -28,22 +34,17 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
   public StaticTrendDistanceRscriptFactory(MainLab lab, boolean use_files, String data_folder)
   {
     super(lab, StaticTrendDistanceRscriptExperiment.class, use_files, data_folder);
-    
-  }
-
-  @Override
-  protected StaticTrendDistanceRscriptExperiment createExperiment(Region r)
-  {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
   protected StaticTrendDistanceRscriptExperiment createAverageExperiment(int width,
       boolean multi_thread)
   {
-    // TODO Auto-generated method stub
-    return null;
+    Random random = m_lab.getRandom();
+    BoundedSource<Float> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
+    FileSource<Float> f_src = new FileSource<Float>(src, m_dataFolder);
+    String script_filename = "running_average_" + width + ".r";
+    return createNewTrendDistanceRscriptExperiment(RUNNING_AVG, "Subtraction", f_src, width, script_filename);
   }
 
   @Override
@@ -84,5 +85,27 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
   {
     // TODO Auto-generated method stub
     return null;
+  }
+  
+  /**
+   * Creates a new generic static trend distance experiment
+   * @param trend The name of the trend to be computed
+   * @param metric The distance metric
+   * @param src The processor to be used as the source 
+   * @param width The window width
+   * @param script_name The filename of the R script that this experiment
+   * will execute
+   * @return A new trend distance experiment
+   */
+  protected StaticTrendDistanceRscriptExperiment createNewTrendDistanceRscriptExperiment(String trend, String metric, BoundedSource<?> src, int width, String script_name)
+  {
+    StaticTrendDistanceRscriptExperiment tde = new StaticTrendDistanceRscriptExperiment();
+    tde.setSource(src);
+    tde.setInput(StaticTrendDistanceStreamExperiment.WIDTH, width);
+    tde.setInput(StaticTrendDistanceStreamExperiment.TREND, trend);
+    tde.setInput(StaticTrendDistanceStreamExperiment.METRIC, metric);
+    tde.setScriptName("helloworld.r");
+    //tde.setScriptName(script_name);
+    return tde;
   }
 }

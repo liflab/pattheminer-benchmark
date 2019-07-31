@@ -28,12 +28,12 @@ import ca.uqac.lif.mtnp.table.TransformedTable;
 import pattheminer.MainLab;
 import pattheminer.SetupAgent;
 import pattheminer.trenddistance.TrendExperiment;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamFactory;
 
 import static pattheminer.trenddistance.TrendExperiment.TREND;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
-import static pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment.MULTITHREAD;
+import static pattheminer.trenddistance.TrendExperiment.MULTITHREAD;
 
 public class SetupThreadExperiments extends SetupAgent
 {
@@ -51,8 +51,8 @@ public class SetupThreadExperiments extends SetupAgent
     {
       int for_width = MainLab.s_widths[2].intValue();
       String for_trend = TrendExperiment.RUNNING_MOMENTS;
-      StaticTrendDistanceExperiment exp_nt = factory.get(new Region().add(TREND, for_trend).add(WIDTH, for_width).add(MULTITHREAD, "no"));
-      StaticTrendDistanceExperiment exp_mt = factory.get(new Region().add(TREND, for_trend).add(WIDTH, for_width).add(MULTITHREAD, "yes"));
+      StaticTrendDistanceStreamExperiment exp_nt = factory.get(new Region().add(TREND, for_trend).add(WIDTH, for_width).add(MULTITHREAD, "no"));
+      StaticTrendDistanceStreamExperiment exp_mt = factory.get(new Region().add(TREND, for_trend).add(WIDTH, for_width).add(MULTITHREAD, "yes"));
       ExperimentTable et_nt = new ExperimentTable(TrendExperiment.LENGTH, TrendExperiment.TIME).add(exp_nt);
       ExperimentTable et_mt = new ExperimentTable(TrendExperiment.LENGTH, TrendExperiment.TIME).add(exp_mt);
       TransformedTable t_impact_mt = new TransformedTable(new Join(TrendExperiment.LENGTH),

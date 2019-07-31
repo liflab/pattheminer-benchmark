@@ -27,6 +27,7 @@ import static pattheminer.trenddistance.TrendExperiment.SYMBOL_DISTRIBUTION;
 import static pattheminer.trenddistance.TrendExperiment.TREND;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
 
+import ca.uqac.lif.labpal.Group;
 import ca.uqac.lif.labpal.Region;
 import ca.uqac.lif.labpal.table.ExperimentTable;
 import ca.uqac.lif.mtnp.table.ExpandAsColumns;
@@ -34,7 +35,7 @@ import ca.uqac.lif.mtnp.table.TransformedTable;
 import pattheminer.MainLab;
 import pattheminer.SetupAgent;
 import pattheminer.StreamExperiment;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamFactory;
 
 /**
@@ -54,6 +55,8 @@ public class SetupBeepBeepVsRscript extends SetupAgent
   @Override
   public void fillWithExperiments()
   {
+    Group g = new Group("R experiments");
+    m_lab.add(g);
     StaticTrendDistanceStreamFactory beep_factory = new StaticTrendDistanceStreamFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
     StaticTrendDistanceRscriptFactory r_factory = new StaticTrendDistanceRscriptFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
     Region reg = new Region();
@@ -69,15 +72,16 @@ public class SetupBeepBeepVsRscript extends SetupAgent
       m_lab.add(et);
       for (Region r_t : r_w.all(TREND))
       {
-        StaticTrendDistanceExperiment stde = beep_factory.get(r_t);
-        if (stde != null)
+        StaticTrendDistanceStreamExperiment beep_exp = beep_factory.get(r_t);
+        if (beep_exp != null)
         {
-          et.add(stde);
+          et.add(beep_exp);
         }
-        StaticTrendDistanceRscriptExperiment sce = r_factory.get(r_t);
-        if (sce != null)
+        StaticTrendDistanceRscriptExperiment r_exp = r_factory.get(r_t);
+        if (r_exp != null)
         {
-          et.add(sce);
+          et.add(r_exp);
+          g.add(r_exp);
         }
       }
       TransformedTable tt = new TransformedTable(new ExpandAsColumns(SOFTWARE, THROUGHPUT), et);

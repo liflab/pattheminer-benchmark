@@ -1,6 +1,6 @@
 /*
     A benchmark for Pat The Miner
-    Copyright (C) 2018 Laboratoire d'informatique formelle
+    Copyright (C) 2018-2019 Laboratoire d'informatique formelle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published
@@ -15,18 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pattheminer.trenddistance.statictd;
 
-import pattheminer.trenddistance.TrendExperiment;
-
-public class StaticTrendDistanceExperiment extends TrendExperiment
-{  
-  public static final transient String TYPE_NAME = "Trend distance";
-  
-  public StaticTrendDistanceExperiment()
-  {
-    super();
-    setDescription("Measures the throughput of the trend distance processor");
-    setInput(TYPE, TYPE_NAME);
-  }
-}
+/**
+ * Folder where the scripts for R are stored
+ */
+package pattheminer.rscript.scripts;

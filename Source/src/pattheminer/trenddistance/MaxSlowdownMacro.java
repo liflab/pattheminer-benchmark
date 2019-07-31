@@ -24,7 +24,7 @@ import ca.uqac.lif.mtnp.table.Table;
 import ca.uqac.lif.mtnp.table.TableEntry;
 import ca.uqac.lif.mtnp.table.TempTable;
 import pattheminer.trenddistance.selftd.SelfCorrelatedExperiment;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamExperiment;
 
 public class MaxSlowdownMacro extends NumberMacro
 {
@@ -43,7 +43,7 @@ public class MaxSlowdownMacro extends NumberMacro
     double slowdown = 0;
     for (TableEntry te : tt.getEntries())
     {
-      PrimitiveValue pv_t = te.get(StaticTrendDistanceExperiment.TYPE_NAME);
+      PrimitiveValue pv_t = te.get(StaticTrendDistanceStreamExperiment.TYPE_NAME);
       PrimitiveValue pv_s = te.get(SelfCorrelatedExperiment.TYPE_NAME);
       if (pv_t == null || pv_s == null)
       {

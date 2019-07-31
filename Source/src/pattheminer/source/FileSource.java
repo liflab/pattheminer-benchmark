@@ -154,7 +154,7 @@ public class FileSource<T> extends BoundedSource<T>
   @Override
   public String getFilename()
   {
-    throw new UnsupportedOperationException("Operation not supported on this object");
+    return m_source.getFilename();
   }
 
   @Override
@@ -166,7 +166,6 @@ public class FileSource<T> extends BoundedSource<T>
   @Override
   protected T getEvent()
   {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Operation not supported on this object");
   }
 }

@@ -35,16 +35,6 @@ public abstract class StreamExperiment extends TraceExperiment
    * The name of the software that runs this experiment
    */
   public static final transient String SOFTWARE_NAME = "BeepBeep";
-  
-  /**
-   * Cumulative running time (in ms)
-   */
-  public static final transient String TIME = "Running time";
-
-  /**
-   * Number of events processed
-   */
-  public static final transient String LENGTH = "Stream length";
 
   /**
    * Whether the experiment uses multiple threads or a single one
@@ -68,16 +58,8 @@ public abstract class StreamExperiment extends TraceExperiment
   public StreamExperiment()
   {
     super();
-    write(SOFTWARE, "BeepBeep");
-    describe(TIME, "Cumulative running time (in ms)");
-    describe(LENGTH, "Number of events processed");
+    setInput(SOFTWARE, SOFTWARE_NAME);
     describe(MULTITHREAD, "Whether the experiment uses multiple threads or a single one");
-    JsonList x = new JsonList();
-    x.add(0);
-    write(LENGTH, x);
-    JsonList y = new JsonList();
-    y.add(0);
-    write(TIME, y);
   }
 
   @Override
