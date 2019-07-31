@@ -29,7 +29,7 @@ import pattheminer.MainLab;
 import pattheminer.SetupAgent;
 import pattheminer.trenddistance.TrendExperiment;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceFactory;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamFactory;
 
 import static pattheminer.trenddistance.TrendExperiment.TREND;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
@@ -45,7 +45,7 @@ public class SetupThreadExperiments extends SetupAgent
   @Override
   public void fillWithExperiments()
   {
-    StaticTrendDistanceFactory factory = new StaticTrendDistanceFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
+    StaticTrendDistanceStreamFactory factory = new StaticTrendDistanceStreamFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
     Group g_threading = new Group("Impact of multi-threading (trend distance)");
     m_lab.add(g_threading);
     {

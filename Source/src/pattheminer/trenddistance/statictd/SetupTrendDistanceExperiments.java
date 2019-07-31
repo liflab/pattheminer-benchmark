@@ -27,6 +27,6 @@ public class SetupTrendDistanceExperiments extends SetupTrendExperiments<StaticT
 {
   public SetupTrendDistanceExperiments(MainLab lab)
   {
-    super(lab, new StaticTrendDistanceFactory(lab, lab.useFiles(), lab.getDataFolder()), "Static trend distance throughput", "Measures the throughput of the static trend distance pattern using various window widths and trend processors.", "static trend distance", "std");
+    super(lab, new StaticTrendDistanceStreamFactory(lab, lab.useFiles(), lab.getDataFolder()), "Static trend distance throughput", "Measures the throughput of the static trend distance pattern using various window widths and trend processors.", "static trend distance", "std");
   }
 }

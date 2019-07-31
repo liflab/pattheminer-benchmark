@@ -36,7 +36,7 @@ import pattheminer.MainLab;
 import pattheminer.patterns.CumulativeAverage;
 import pattheminer.source.BoundedSource;
 import pattheminer.source.WeekdaySource;
-import pattheminer.trenddistance.TrendFactory;
+import pattheminer.trenddistance.TraceExperimentFactory;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
 
 import static ca.uqac.lif.cep.Connector.INPUT;
@@ -51,7 +51,7 @@ import static pattheminer.trenddistance.context.ContextualExperiment.WEEKDAYS;
  * Factory that generates contextual trend distance experiments using various
  * input sources and trend/context processors.
  */
-public class ContextualExperimentFactory extends TrendFactory<ContextualExperiment>
+public class ContextualExperimentFactory extends TraceExperimentFactory<ContextualExperiment>
 {
   public ContextualExperimentFactory(MainLab lab)
   {

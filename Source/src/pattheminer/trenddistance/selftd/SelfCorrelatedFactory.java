@@ -58,14 +58,14 @@ import pattheminer.source.BoundedSource;
 import pattheminer.source.RandomLabelSource;
 import pattheminer.source.RandomNumberSource;
 import pattheminer.source.RandomSymbolSource;
-import pattheminer.trenddistance.TrendFactory;
+import pattheminer.trenddistance.TraceExperimentFactory;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
 
 /**
  * Factory that generates self-correlated trend distance experiments using various
  * input sources and trend processors.
  */
-public class SelfCorrelatedFactory extends TrendFactory<SelfCorrelatedExperiment>
+public class SelfCorrelatedFactory extends TraceExperimentFactory<SelfCorrelatedExperiment>
 {
   public SelfCorrelatedFactory(MainLab lab)
   {

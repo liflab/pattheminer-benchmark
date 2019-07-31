@@ -27,7 +27,7 @@ import pattheminer.SetupAgent;
 import pattheminer.trenddistance.selftd.SelfCorrelatedExperiment;
 import pattheminer.trenddistance.selftd.SelfCorrelatedFactory;
 import pattheminer.trenddistance.statictd.StaticTrendDistanceExperiment;
-import pattheminer.trenddistance.statictd.StaticTrendDistanceFactory;
+import pattheminer.trenddistance.statictd.StaticTrendDistanceStreamFactory;
 
 import static pattheminer.StreamExperiment.THROUGHPUT;
 import static pattheminer.trenddistance.TrendExperiment.TREND;
@@ -44,6 +44,10 @@ import static pattheminer.trenddistance.TrendExperiment.WIDTH;
  */
 public class SetupStaticVsSelf extends SetupAgent
 {
+  /**
+   * Initializes the setup agent
+   * @param lab The lab to which the tables are added
+   */
   public SetupStaticVsSelf(MainLab lab)
   {
     super(lab);
@@ -52,7 +56,7 @@ public class SetupStaticVsSelf extends SetupAgent
   @Override
   public void fillWithExperiments()
   {
-    StaticTrendDistanceFactory std_factory = new StaticTrendDistanceFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
+    StaticTrendDistanceStreamFactory std_factory = new StaticTrendDistanceStreamFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
     SelfCorrelatedFactory sc_factory = new SelfCorrelatedFactory(m_lab);
     Region reg = new Region();
     reg.add(WIDTH, MainLab.s_widths);

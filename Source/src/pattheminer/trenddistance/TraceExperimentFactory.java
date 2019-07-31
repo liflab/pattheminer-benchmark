@@ -18,9 +18,15 @@
 package pattheminer.trenddistance;
 
 import pattheminer.MainLab;
+import pattheminer.TraceExperiment;
 import ca.uqac.lif.labpal.ExperimentFactory;
 
-public abstract class TrendFactory<T extends TrendExperiment> extends ExperimentFactory<MainLab,T>
+/**
+ * Factory that produces trace experiments
+ * @param <T> The type of the experiment, must be a descendant
+ * of{@link TraceExperiment}
+ */
+public abstract class TraceExperimentFactory<T extends TraceExperiment> extends ExperimentFactory<MainLab,T>
 {
   /**
    * Whether to use files when reading the traces
@@ -40,14 +46,14 @@ public abstract class TrendFactory<T extends TrendExperiment> extends Experiment
    * Setting this to false will have the experiment generate the input
    * traces on-the-fly.
    */
-  public TrendFactory(MainLab lab, Class<T> c, boolean use_files, String data_folder)
+  public TraceExperimentFactory(MainLab lab, Class<T> c, boolean use_files, String data_folder)
   {
     super(lab, c);
     m_useFiles = use_files;
     m_dataFolder = data_folder;
   }
   
-  public TrendFactory(MainLab lab, Class<T> c)
+  public TraceExperimentFactory(MainLab lab, Class<T> c)
   {
     this(lab, c, false, "");
   }

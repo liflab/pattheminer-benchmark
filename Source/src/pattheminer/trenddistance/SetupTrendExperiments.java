@@ -42,7 +42,7 @@ import pattheminer.SetupAgent;
 
 public abstract class SetupTrendExperiments<T extends TrendExperiment> extends SetupAgent
 {
-  protected TrendFactory<T> m_factory;
+  protected TraceExperimentFactory<T> m_factory;
   
   protected String m_groupName;
   
@@ -52,7 +52,7 @@ public abstract class SetupTrendExperiments<T extends TrendExperiment> extends S
   
   protected String m_suffix;
   
-  public SetupTrendExperiments(MainLab lab, TrendFactory<T> factory, String group_name, String group_description, String caption, String suffix)
+  public SetupTrendExperiments(MainLab lab, TraceExperimentFactory<T> factory, String group_name, String group_description, String caption, String suffix)
   {
     super(lab);
     m_factory = factory;

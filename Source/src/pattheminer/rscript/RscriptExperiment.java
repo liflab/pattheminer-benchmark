@@ -27,10 +27,18 @@ import pattheminer.TraceExperiment;
 public abstract class RscriptExperiment extends TraceExperiment
 {
   /**
+   * The name of the software that runs this experiment
+   */
+  public static final transient String SOFTWARE_NAME = "R";
+  
+  /**
    * The name of the executable to launch R scripts
    */
   protected static final transient String s_rExecutable = "Rscript";
   
+  /**
+   * Creates a new experiment that uses R
+   */
   public RscriptExperiment()
   {
     super();

@@ -32,6 +32,11 @@ import ca.uqac.lif.labpal.ExperimentException;
 public abstract class StreamExperiment extends TraceExperiment
 {
   /**
+   * The name of the software that runs this experiment
+   */
+  public static final transient String SOFTWARE_NAME = "BeepBeep";
+  
+  /**
    * Cumulative running time (in ms)
    */
   public static final transient String TIME = "Running time";
