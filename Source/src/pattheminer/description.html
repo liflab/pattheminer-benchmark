@@ -57,14 +57,26 @@ lab</a>, hosted on Zenodo.</strong></li>
 
 <h3>Prerequisites</h3>
 
-<p>There are no prerequisites to run this lab. The self-contained JAR file is
-a bundle of all the dependent libraries:</p>
+<p>The self-contained JAR file is a bundle of the following dependent libraries
+(which you don't need to install):</p>
 
 <ul>
 <li><a href="https://liflab.github.io/beepbeep-3">BeepBeep</a></li>
 <li><a href="https://github.com/liflab/PatTheMiner">Pat The Miner</a></li>
-<li><a href="http://commons.apache.org/proper/commons-math">Apache Commons Math</li>
+<li><a href="http://commons.apache.org/proper/commons-math">Apache Commons Math</a></li>
 <li><a href="https://www.cs.waikato.ac.nz/ml/weka/index.html">WEKA</a></li>
+</ul>
+
+<p>Some experiments involve the <a href="https://www.r-project.org/">R</a>
+statistical software. The exerpiments are enabled by a command-line switch
+(<tt>--with-r</tt>) and will only work if R is installed on the local
+machine. In addition, R must be setup so that the current user has the
+following packages installed:</p>
+
+<ul>
+<li>evobiR</li>
+<li>moments</li>
+<li>stylo</li>
 </ul>
 
 <p>All the logs processed in the lab are either synthetically generated at runtime,
@@ -85,6 +97,10 @@ java -jar pattheminer-benchmark.jar [options]
 to the experiments in the EDOC 2018 paper mentioned above)</li>
 <li><tt>--with-pred</tt>: show experiments for predictive analytics (corresponds
 to the experiments in the EDOC 2019 paper mentioned above)</li>
+<li><tt>--with-r</tt>: show experiments that compare R with BeepBeep (corresponds
+to the experiments in the <i>Information Systems</i> paper mentioned above)</li>
+<li><tt>--datadir dir</tt>: instructs LabPal to write the generated log files
+to <i>dir</i> (the R experiments read traces from these files)</li>
 </ul>
  
 <p>See the <a href=/help">Help</a> page for more information.</p>

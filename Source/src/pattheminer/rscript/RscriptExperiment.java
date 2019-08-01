@@ -19,6 +19,7 @@ package pattheminer.rscript;
 
 import ca.uqac.lif.json.JsonList;
 import ca.uqac.lif.labpal.CommandRunner;
+import ca.uqac.lif.labpal.Experiment;
 import ca.uqac.lif.labpal.ExperimentException;
 import ca.uqac.lif.mtnp.util.FileHelper;
 import java.io.File;
@@ -62,6 +63,16 @@ public abstract class RscriptExperiment extends TraceExperiment
   public RscriptExperiment()
   {
     super();
+    setInput(SOFTWARE, "R");
+  }
+  
+  /**
+   * Creates a new experiment that uses R
+   * @param status A status to give to the experiment when it is instantiated
+   */
+  public RscriptExperiment(Experiment.Status status)
+  {
+    super(status);
     setInput(SOFTWARE, "R");
   }
   
@@ -149,5 +160,20 @@ public abstract class RscriptExperiment extends TraceExperiment
   public void setArguments(Object ... args)
   {
     m_arguments = args;
+  }
+  
+  /**
+   * Formats the command called by the experiment as a string.
+   * @param args The arguments
+   * @return The string
+   */
+  public static String formatCommand(String ... args)
+  {
+    StringBuilder out = new StringBuilder();
+    for (String a : args)
+    {
+      out.append(a).append(" ");
+    }
+    return out.toString();
   }
 }

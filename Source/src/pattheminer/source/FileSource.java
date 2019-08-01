@@ -154,7 +154,7 @@ public class FileSource<T> extends BoundedSource<T>
   @Override
   public String getFilename()
   {
-    return m_source.getFilename();
+    return m_dataFolder + m_source.getFilename();
   }
 
   @Override

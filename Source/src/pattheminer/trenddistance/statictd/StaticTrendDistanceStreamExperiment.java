@@ -19,6 +19,9 @@ package pattheminer.trenddistance.statictd;
 
 import pattheminer.trenddistance.TrendExperiment;
 
+/**
+ * Experiment that evaluates the static trend distance pattern using BeepBeep
+ */
 public class StaticTrendDistanceStreamExperiment extends TrendExperiment
 {  
   public static final transient String TYPE_NAME = "Trend distance";

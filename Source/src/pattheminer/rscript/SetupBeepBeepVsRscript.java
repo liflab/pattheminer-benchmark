@@ -19,6 +19,7 @@ package pattheminer.rscript;
 
 import static pattheminer.TraceExperiment.SOFTWARE;
 import static pattheminer.TraceExperiment.THROUGHPUT;
+import static pattheminer.trenddistance.TrendExperiment.AVG_SLICE_LENGTH;
 import static pattheminer.trenddistance.TrendExperiment.CLOSEST_CLUSTER;
 import static pattheminer.trenddistance.TrendExperiment.N_GRAMS;
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_AVG;
@@ -61,7 +62,7 @@ public class SetupBeepBeepVsRscript extends SetupAgent
     StaticTrendDistanceRscriptFactory r_factory = new StaticTrendDistanceRscriptFactory(m_lab, m_lab.useFiles(), m_lab.getDataFolder());
     Region reg = new Region();
     reg.add(WIDTH, MainLab.s_widths);
-    reg.add(TREND, RUNNING_AVG, RUNNING_MOMENTS, CLOSEST_CLUSTER, SYMBOL_DISTRIBUTION, N_GRAMS);
+    reg.add(TREND, RUNNING_AVG, RUNNING_MOMENTS, CLOSEST_CLUSTER, SYMBOL_DISTRIBUTION, N_GRAMS, AVG_SLICE_LENGTH);
     reg.add(SOFTWARE, StreamExperiment.SOFTWARE_NAME, RscriptExperiment.SOFTWARE_NAME);
     for (Region r_w : reg.all(WIDTH))
     {

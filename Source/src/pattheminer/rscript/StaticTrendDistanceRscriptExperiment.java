@@ -20,13 +20,40 @@ package pattheminer.rscript;
 import static pattheminer.trenddistance.TrendExperiment.METRIC;
 import static pattheminer.trenddistance.TrendExperiment.TREND;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
+
+import ca.uqac.lif.labpal.Experiment;
+
 import static pattheminer.trenddistance.TrendExperiment.TYPE;
 
+/**
+ * Experiment that evaluates the static trend distance pattern using R
+ */
 public class StaticTrendDistanceRscriptExperiment extends RscriptExperiment
 {
+  /**
+   * Creates a new empty static trend distance experiment for R
+   * @param status A status to give to the experiment when it is instantiated
+   */
+  public StaticTrendDistanceRscriptExperiment(Experiment.Status status)
+  {
+    super(status);
+    addDescriptions();
+  }
+  
+  /**
+   * Creates a new empty static trend distance experiment for R
+   */
   public StaticTrendDistanceRscriptExperiment()
   {
     super();
+    addDescriptions();
+  }
+  
+  /**
+   * Adds the descriptions of the experiment's parameters
+   */
+  protected void addDescriptions()
+  {
     describe(METRIC, "The metric used to compute the distance between the reference trend and the computed trend");
     describe(TREND, "The trend computed on the event stream");
     describe(WIDTH, "The width of the window over which the trend is computed");

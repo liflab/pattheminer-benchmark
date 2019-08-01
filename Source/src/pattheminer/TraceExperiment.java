@@ -55,6 +55,24 @@ public abstract class TraceExperiment extends Experiment
   public TraceExperiment()
   {
     super();
+    initialize();
+  }
+  
+  /**
+   * Creates a new empty trace experiment
+   * @param status A status to give to the experiment when it is instantiated
+   */
+  public TraceExperiment(Experiment.Status status)
+  {
+    super(status);
+    initialize();
+  }
+  
+  /**
+   * Sets the initial input parameters and their descriptions
+   */
+  protected void initialize()
+  {
     describe(THROUGHPUT, "The average number of events processed per second");
     describe(SOFTWARE, "The software used to process the trace");
     describe(TIME, "Cumulative running time (in ms)");

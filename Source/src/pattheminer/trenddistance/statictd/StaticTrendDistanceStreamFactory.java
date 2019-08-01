@@ -82,7 +82,6 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     }
     else
     {
-      //wp = new Window(average, width);
       wp = new ParallelWindow(average, width);
     }
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(6, wp, new FunctionTree(Numbers.absoluteValue, 
@@ -109,7 +108,6 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     }
     else
     {
-      //wp = new Window(average, width);
       wp = new ParallelWindow(beta, width);
     }
     TrendDistance<DoublePoint,Number,Number> alarm = new TrendDistance<DoublePoint,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
@@ -139,7 +137,6 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     }
     else
     {
-      //wp = new Window(average, width);
       wp = new ParallelWindow(beta, width);
     }
     TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number> alarm = new TrendDistance<Set<DoublePoint>,Set<DoublePoint>,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
@@ -166,7 +163,6 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     }
     else
     {
-      //wp = new Window(average, width);
       wp = new ParallelWindow(beta, width);
     }
     TrendDistance<HashMap<?,?>,Number,Number> alarm = new TrendDistance<HashMap<?,?>,Number,Number>(pattern, wp, new FunctionTree(Numbers.absoluteValue, 
@@ -201,7 +197,6 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     }
     else
     {
-      //wp = new Window(average, width);
       wp = new ParallelWindow(cumul_n_grams, width);
     }
     Set<Object> reference = new HashSet<Object>();
@@ -243,7 +238,6 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     }
     else
     {
-      //wp = new Window(average, width);
       wp = new ParallelWindow(asl, width);
     }
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(10, wp, Numbers.subtraction, 1, Numbers.isLessThan);
@@ -283,6 +277,4 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     tde.setInput(StaticTrendDistanceStreamExperiment.MULTITHREAD, jb);
     return tde;
   }
-
-
 }
