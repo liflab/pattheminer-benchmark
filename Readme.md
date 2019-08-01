@@ -2,16 +2,22 @@ A benchmark for Pat The Miner
 =============================
 
 | Author:      | Laboratoire d'informatique formelle |
-| Version:     | 1.0                                 |
-| Date:        | 2018-05-24                          |
+| Version:     | 2.1                                 |
+| Date:        | 2019-08-01                          |
 
-Pat The Miner is an extension to the BeepBeep event stream engine.
-It provides various functions and processors to perform two things:
+[Pat The Miner](https://github.com/liflab/PatTheMiner) is an extension to the
+[BeepBeep](https://liflab.github.io/beepbeep-3) event stream engine.
+It provides various functions and processors to perform the following things:
 
 - Compute in real time whether a stream of events deviates from a reference
   "trend"
 - Compute referece trends from an event stream or a collection of reference
   event streams
+- Compute predictions on future events of a stream based on a predefined
+  prediction function
+- Build a predictive function based on past instances of a process
+- Learn associations between windows of the same trace using a machine
+  learning classifier
 
 This benchmark measures the performance of these two functionalities, using
 various types of input event streams, pattern computations, and distance
@@ -86,12 +92,48 @@ Please refer to the [LabPal website](https://liflab.github.io/labpal)
 or to the Help page within the web interface for more information about
 LabPal's functionalities.
 
+External dependencies
+---------------------
+
+The self-contained JAR file is a bundle of the following dependent libraries
+(which you don't need to install):
+
+- [BeepBeep](https://liflab.github.io/beepbeep-3)
+- [Pat The Miner](https://github.com/liflab/PatTheMiner)
+- [Apache Commons Math](http://commons.apache.org/proper/commons-math)
+- [WEKA](https://www.cs.waikato.ac.nz/ml/weka/index.html)
+
+Some experiments involve the [R](https://www.r-project.org/)
+statistical software. The exerpiments are enabled by a command-line switch
+`--with-r` and will only work if R is installed on the local
+machine. In addition, R must be setup so that the current user has the
+following packages installed:
+
+- evobiR
+- moments
+- stringi
+- stylo
+
+Command line options
+--------------------
+
+The lab accepts the following options when started from the command line:
+
+- `--with-trend`: shows experiments for trend computations (corresponds
+to the experiments in the EDOC 2018 paper mentioned above)
+- `--with-pred`: show experiments for predictive analytics (corresponds
+to the experiments in the EDOC 2019 paper mentioned above)
+- `--with-r`: show experiments that compare R with BeepBeep (corresponds
+to the experiments in the <i>Information Systems</i> paper mentioned above)
+- `--datadir dir`: instructs LabPal to write the generated log files
+to <i>dir</i> (the R experiments read traces from these files)
+
 Disclaimer
 ----------
 
-The LabPal *library* was written by Sylvain Hallé, Associate Professor at
-Université du Québec à Chicoutimi, Canada. However, the *experiments* contained 
-in this specific lab instance and the results they produce are the sole
-responsibility of their author.
+The LabPal *library* was written by Sylvain Hallé, Professor at Université du
+Québec à Chicoutimi, Canada. However, the *experiments* contained in this
+specific lab instance and the results they produce are the sole responsibility
+of their author.
 
 <!-- :maxLineLen=80: -->
