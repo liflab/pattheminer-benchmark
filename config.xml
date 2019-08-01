@@ -139,19 +139,7 @@
       </files>
       <bundle>false</bundle>
     </dependency>
-    <dependency>
-      <!--
-      Azrael
-      -->
-      <name>Azrael</name>
-      <classname>ca.uqac.lif.azrael.ObjectPrinter</classname>
-      <bundle>true</bundle>
-      <files>
-        <jar>https://github.com/sylvainhalle/Azrael/releases/download/v2.0/azrael-core.jar</jar>
-        <jar>https://github.com/sylvainhalle/Azrael/releases/download/v2.0/azrael-size.jar</jar>
-      </files>
-    </dependency>
-    <dependency>
+   <dependency>
       <!--
       Azrael Core
       -->
