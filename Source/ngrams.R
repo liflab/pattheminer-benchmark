@@ -84,7 +84,7 @@ SlidingWindow_modified = function(FUN, data, window, step, strict=F, ...){
 args= commandArgs(trailingOnly = TRUE)
 text= ((read.csv(args [1], header=TRUE)))
 
-text=text[3] # to select the column that contains the labels 
+text=text[1] # to select the column that contains the labels 
 text=unlist(text) # we have to unlist the vector If we don't there will be a conflict of types
 #---- args test
 

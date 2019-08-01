@@ -59,6 +59,7 @@
       -->
       <name>LabPal</name>
       <classname>ca.uqac.lif.labpal.Laboratory</classname>
+      <bundle>true</bundle>
       <files>
         <zip>https://github.com/liflab/labpal/releases/download/v2.11.3/labpal-2.11.3.zip</zip>
       </files>
@@ -69,6 +70,7 @@
       -->
       <name>BeepBeep</name>
       <classname>ca.uqac.lif.cep.Processor</classname>
+      <bundle>true</bundle>
       <files>
         <zip>https://github.com/liflab/beepbeep-3/releases/download/v0.10.2-alpha/beepbeep-3-0.10.2-alpha.zip</zip>
       </files>
@@ -79,6 +81,7 @@
       -->
       <name>Pat The Miner</name>
       <classname>ca.uqac.lif.cep.peg.TrendDistance</classname>
+      <bundle>true</bundle>
       <files>
         <zip>https://github.com/liflab/pattheminer/releases/download/v0.2/pattheminer-0.2.zip</zip>
       </files>
@@ -135,6 +138,40 @@
         <zip>http://managedway.dl.sourceforge.net/project/weka/weka-3-6/3.6.15/weka-3-6-15.zip</zip>
       </files>
       <bundle>false</bundle>
+    </dependency>
+    <dependency>
+      <!--
+      Azrael
+      -->
+      <name>Azrael</name>
+      <classname>ca.uqac.lif.azrael.ObjectPrinter</classname>
+      <bundle>true</bundle>
+      <files>
+        <jar>https://github.com/sylvainhalle/Azrael/releases/download/v2.0/azrael-core.jar</jar>
+        <jar>https://github.com/sylvainhalle/Azrael/releases/download/v2.0/azrael-size.jar</jar>
+      </files>
+    </dependency>
+    <dependency>
+      <!--
+      Azrael Core
+      -->
+      <name>Azrael Core</name>
+      <classname>ca.uqac.lif.azrael.ObjectPrinter</classname>
+      <bundle>true</bundle>
+      <files>
+        <jar>https://github.com/sylvainhalle/Azrael/releases/download/v2.0/azrael-core.jar</jar>
+      </files>
+    </dependency>
+    <dependency>
+      <!--
+      Azrael Size
+      -->
+      <name>Azrael Size</name>
+      <classname>ca.uqac.lif.azrael.size.SizePrinter</classname>
+      <bundle>true</bundle>
+      <files>
+        <jar>https://github.com/sylvainhalle/Azrael/releases/download/v2.0/azrael-size.jar</jar>
+      </files>
     </dependency>
   </dependencies>
 </build>

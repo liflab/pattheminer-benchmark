@@ -17,6 +17,7 @@
  */
 package pattheminer;
 
+import ca.uqac.lif.azrael.PrintException;
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pullable;
@@ -40,6 +41,16 @@ public abstract class StreamExperiment extends TraceExperiment
    * Whether the experiment uses multiple threads or a single one
    */
   public static final transient String MULTITHREAD = "Multi-threaded";
+  
+  /**
+   * Memory consumed
+   */
+  public static final transient String MEMORY = "Memory";
+  
+  /**
+   * Maximum memory consumed
+   */
+  public static final transient String MAX_MEMORY = "Max memory";
 
   /**
    * The processor that is being monitored in this experiment
@@ -51,6 +62,11 @@ public abstract class StreamExperiment extends TraceExperiment
    * runtime and throughput
    */
   protected int m_eventStep = 1000;
+  
+  /**
+   * A helper object used to compute the memory footprint of a processor
+   */
+  protected transient LabSizePrinter m_sizePrinter;
 
   /**
    * Creates a new empty stream experiment
@@ -60,6 +76,12 @@ public abstract class StreamExperiment extends TraceExperiment
     super();
     setInput(SOFTWARE, SOFTWARE_NAME);
     describe(MULTITHREAD, "Whether the experiment uses multiple threads or a single one");
+    describe(MEMORY, "The size of the processor object (in bytes)");
+    describe(MAX_MEMORY, "The maximum size of the processor object (in bytes)");
+    JsonList z = new JsonList();
+    z.add(0);
+    write(MEMORY, z);
+    m_sizePrinter = new LabSizePrinter();
   }
 
   @Override
@@ -67,6 +89,8 @@ public abstract class StreamExperiment extends TraceExperiment
   {
     JsonList length = (JsonList) read(LENGTH);
     JsonList time = (JsonList) read(TIME);
+    JsonList memory = (JsonList) read(MEMORY);
+    int max_memory = 0;
     // Setup processor chain
     Pullable s_p = m_source.getPullableOutput();
     Pushable t_p = m_processor.getPushableInput();
@@ -82,6 +106,18 @@ public abstract class StreamExperiment extends TraceExperiment
         long lap = System.currentTimeMillis();
         length.add(event_count);
         time.add(lap - start);
+        try
+        {
+          m_sizePrinter.reset();
+          int size = (Integer) m_sizePrinter.print(m_processor);
+          memory.add(size);
+          max_memory = Math.max(max_memory, size);
+          write(MAX_MEMORY, max_memory);
+        }
+        catch (PrintException e)
+        {
+          throw new ExperimentException(e);
+        }
         float prog = ((float) event_count) / ((float) source_length);
         setProgression(prog);
       }

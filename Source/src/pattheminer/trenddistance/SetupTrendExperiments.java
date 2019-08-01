@@ -18,6 +18,7 @@
 package pattheminer.trenddistance;
 
 import static pattheminer.StreamExperiment.LENGTH;
+import static pattheminer.StreamExperiment.MAX_MEMORY;
 import static pattheminer.StreamExperiment.THROUGHPUT;
 import static pattheminer.StreamExperiment.TIME;
 import static pattheminer.trenddistance.TrendExperiment.CLOSEST_CLUSTER;
@@ -30,6 +31,7 @@ import static pattheminer.trenddistance.TrendExperiment.TREND;
 import static pattheminer.trenddistance.TrendExperiment.WIDTH;
 
 import ca.uqac.lif.labpal.Group;
+import ca.uqac.lif.labpal.LatexNamer;
 import ca.uqac.lif.labpal.Namer;
 import ca.uqac.lif.labpal.Region;
 import ca.uqac.lif.labpal.table.ExperimentTable;
@@ -43,15 +45,15 @@ import pattheminer.SetupAgent;
 public abstract class SetupTrendExperiments<T extends TrendExperiment> extends SetupAgent
 {
   protected TraceExperimentFactory<T> m_factory;
-  
+
   protected String m_groupName;
-  
+
   protected String m_groupDescription;
-  
+
   protected String m_caption;
-  
+
   protected String m_suffix;
-  
+
   public SetupTrendExperiments(MainLab lab, TraceExperimentFactory<T> factory, String group_name, String group_description, String caption, String suffix)
   {
     super(lab);
@@ -61,7 +63,7 @@ public abstract class SetupTrendExperiments<T extends TrendExperiment> extends S
     m_caption = caption;
     m_suffix = suffix;
   }
-  
+
   @Override
   public void fillWithExperiments()
   {
@@ -96,7 +98,35 @@ public abstract class SetupTrendExperiments<T extends TrendExperiment> extends S
         MainLab.s_nicknamer.setNickname(plot, r_w, "p", "throughput");
         plot.setTitle(et.getTitle());
         m_lab.add(plot);
-        */
+         */
+      }
+
+      // Memory usage for each trend and each window width
+      {
+        ExperimentTable et = new ExperimentTable(TREND, WIDTH, MAX_MEMORY);
+        et.setTitle("Max memory by window width (BeepBeep, " + m_caption + ")");
+        et.setNickname(LatexNamer.latexify("tMemory" + m_caption));
+        et.setShowInList(false);
+        m_lab.add(et);
+        for (Region r_w : big_reg.all(TREND, WIDTH))
+        {
+          TrendExperiment tde = m_factory.get(r_w);
+          if (tde == null)
+          {
+            continue;
+          }
+          g.add(tde);
+          et.add(tde);
+        }
+        TransformedTable tt = new TransformedTable(new ExpandAsColumns(TREND, MAX_MEMORY), et);
+        tt.setTitle("Max memory by window width (BeepBeep, " + m_caption + ")");
+        tt.setNickname(LatexNamer.latexify("ttMemory" + m_caption));
+        m_lab.add(tt);
+        Scatterplot plot = new Scatterplot(tt);
+        plot.setTitle("Max memory by window width (BeepBeep, " + m_caption + ")");
+        plot.setNickname(LatexNamer.latexify("pMemory" + m_caption));
+        plot.setCaption(Axis.X, "Window width").setCaption(Axis.Y, "Max memory (B)");
+        m_lab.add(plot);
       }
 
       // Impact of window width for each trend

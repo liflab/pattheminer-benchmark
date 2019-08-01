@@ -106,8 +106,8 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
       boolean multi_thread)
   {
     Random random = m_lab.getRandom();
-    BoundedSource<String> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
-    FileSource<String> f_src = new FileSource<String>(src, m_dataFolder);
+    BoundedSource<Object[]> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, 3, 3, 3);
+    FileSource<Object[]> f_src = new FileSource<Object[]>(src, m_dataFolder);
     String script_filename = "ngrams.R";
     StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(N_GRAMS, "Jaccard index", f_src, width, script_filename);
     exp.setArguments(width, 1, N);
