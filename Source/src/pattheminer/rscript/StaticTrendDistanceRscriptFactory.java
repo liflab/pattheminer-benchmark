@@ -18,6 +18,7 @@
 package pattheminer.rscript;
 
 import static pattheminer.trenddistance.TrendExperiment.RUNNING_AVG;
+import static pattheminer.trenddistance.TrendExperiment.RUNNING_MOMENTS;
 
 import ca.uqac.lif.labpal.Random;
 import pattheminer.MainLab;
@@ -43,16 +44,23 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<Float> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
     FileSource<Float> f_src = new FileSource<Float>(src, m_dataFolder);
-    String script_filename = "running_average_" + width + ".r";
-    return createNewTrendDistanceRscriptExperiment(RUNNING_AVG, "Subtraction", f_src, width, script_filename);
+    String script_filename = "sliding_moments.R";
+    StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(RUNNING_AVG, "Subtraction", f_src, width, script_filename);
+    exp.setArguments(width, 1);
+    return exp;
   }
 
   @Override
   protected StaticTrendDistanceRscriptExperiment createRunningMomentsExperiment(int width,
       boolean multi_thread)
   {
-    // TODO Auto-generated method stub
-    return null;
+    Random random = m_lab.getRandom();
+    BoundedSource<Float> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
+    FileSource<Float> f_src = new FileSource<Float>(src, m_dataFolder);
+    String script_filename = "sliding_moments.R";
+    StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(RUNNING_MOMENTS, "Vector distance", f_src, width, script_filename);
+    exp.setArguments(width, 1);
+    return exp;
   }
 
   @Override
@@ -104,8 +112,8 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     tde.setInput(StaticTrendDistanceStreamExperiment.WIDTH, width);
     tde.setInput(StaticTrendDistanceStreamExperiment.TREND, trend);
     tde.setInput(StaticTrendDistanceStreamExperiment.METRIC, metric);
-    tde.setScriptName("helloworld.r");
-    //tde.setScriptName(script_name);
+    //tde.setScriptName("helloworld.r");
+    tde.setScriptName(script_name);
     return tde;
   }
 }

@@ -52,6 +52,11 @@ public abstract class RscriptExperiment extends TraceExperiment
   protected transient String m_scriptFilename;
   
   /**
+   * Arguments that must be passed to the script
+   */
+  /*@ null @*/ protected Object[] m_arguments = null;
+  
+  /**
    * Creates a new experiment that uses R
    */
   public RscriptExperiment()
@@ -67,7 +72,7 @@ public abstract class RscriptExperiment extends TraceExperiment
     long start = System.currentTimeMillis();
     runner.run();
     long end = System.currentTimeMillis();
-    write(THROUGHPUT, (end - start) / (1000 * m_source.getEventBound()));
+    write(THROUGHPUT, (1000f * m_source.getEventBound()) / (float) (end - start));
     JsonList time = (JsonList) read(TIME);
     time.add(end - start);
     JsonList length = (JsonList) read(LENGTH);
@@ -78,9 +83,22 @@ public abstract class RscriptExperiment extends TraceExperiment
    * Gets the command line to execute the R script
    * @return The command line with its arguments
    */
-  protected String[] getCommand()
+  /*@ non_null @*/ protected String[] getCommand()
   {
-    return new String[] {s_rExecutable, m_scriptFilename, m_source.getFilename()};
+    int size = 0;
+    if (m_arguments != null)
+    {
+      size = m_arguments.length;
+    }
+    String[] out_array = new String[size + 3];
+    out_array[0] = s_rExecutable;
+    out_array[1] = m_scriptFilename;
+    out_array[2] = m_source.getFilename();
+    for (int i = 0; i < size; i++)
+    {
+      out_array[i + 3] = m_arguments[i].toString();
+    }
+    return out_array;
   }
   
   /**
@@ -93,7 +111,7 @@ public abstract class RscriptExperiment extends TraceExperiment
   }
   
   @Override
-  public boolean prerequisitesFulfilled()
+  /*@ pure @*/ public boolean prerequisitesFulfilled()
   {
     if (!FileHelper.fileExists(m_scriptFilename))
     {
@@ -121,5 +139,15 @@ public abstract class RscriptExperiment extends TraceExperiment
   {
     super.cleanPrerequisites();
     FileHelper.deleteFile(m_scriptFilename);
+  }
+  
+  /**
+   * Sets the arguments that must be passed to the script
+   * @param args An array of objects, each of which will be converted to a
+   * string and appended to the command line when the script is called.
+   */
+  public void setArguments(Object ... args)
+  {
+    m_arguments = args;
   }
 }
