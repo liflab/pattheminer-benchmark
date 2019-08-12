@@ -53,7 +53,7 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<Float> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
     FileSource<Float> f_src = new FileSource<Float>(src, m_dataFolder);
-    String script_filename = "sliding_average.R";
+    String script_filename = "C1_running_average.R";
     StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(RUNNING_AVG, "Subtraction", f_src, width, script_filename);
     exp.setArguments(width, 1);
     insertCommand(exp, RscriptExperiment.formatCommand(exp.getCommand()));
@@ -67,7 +67,7 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<Float> src = new RandomNumberSource(random, MainLab.MAX_TRACE_LENGTH);
     FileSource<Float> f_src = new FileSource<Float>(src, m_dataFolder);
-    String script_filename = "sliding_moments.R";
+    String script_filename = "C2_Vector_3_moments.R";
     StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(RUNNING_MOMENTS, "Vector distance", f_src, width, script_filename);
     exp.setArguments(width, 1);
     return exp;
@@ -94,7 +94,7 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<String> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
     FileSource<String> f_src = new FileSource<String>(src, m_dataFolder);
-    String script_filename = "a_and_b_frequencies.R";
+    String script_filename = "C4_symbol_freq.R";
     StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(SYMBOL_DISTRIBUTION, "Map distance", f_src, width, script_filename);
     exp.setArguments(width, 1);
     insertCommand(exp, RscriptExperiment.formatCommand(exp.getCommand()));
