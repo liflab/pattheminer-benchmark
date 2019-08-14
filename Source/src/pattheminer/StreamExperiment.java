@@ -41,12 +41,12 @@ public abstract class StreamExperiment extends TraceExperiment
    * Whether the experiment uses multiple threads or a single one
    */
   public static final transient String MULTITHREAD = "Multi-threaded";
-  
+
   /**
    * Memory consumed
    */
   public static final transient String MEMORY = "Memory";
-  
+
   /**
    * Maximum memory consumed
    */
@@ -62,11 +62,16 @@ public abstract class StreamExperiment extends TraceExperiment
    * runtime and throughput
    */
   protected int m_eventStep = 1000;
-  
+
   /**
    * A helper object used to compute the memory footprint of a processor
    */
   protected transient LabSizePrinter m_sizePrinter;
+
+  /**
+   * Whether to count the memory footprint of the processor chain
+   */
+  protected boolean m_countSize = true;
 
   /**
    * Creates a new empty stream experiment
@@ -106,17 +111,20 @@ public abstract class StreamExperiment extends TraceExperiment
         long lap = System.currentTimeMillis();
         length.add(event_count);
         time.add(lap - start);
-        try
+        if (m_countSize)
         {
-          m_sizePrinter.reset();
-          int size = (Integer) m_sizePrinter.print(m_processor);
-          memory.add(size);
-          max_memory = Math.max(max_memory, size);
-          write(MAX_MEMORY, max_memory);
-        }
-        catch (PrintException e)
-        {
-          throw new ExperimentException(e);
+          try
+          {
+            m_sizePrinter.reset();
+            int size = (Integer) m_sizePrinter.print(m_processor);
+            memory.add(size);
+            max_memory = Math.max(max_memory, size);
+            write(MAX_MEMORY, max_memory);
+          }
+          catch (PrintException e)
+          {
+            throw new ExperimentException(e);
+          }
         }
         float prog = ((float) event_count) / ((float) source_length);
         setProgression(prog);
@@ -146,5 +154,15 @@ public abstract class StreamExperiment extends TraceExperiment
   public void setEventStep(int step)
   {
     m_eventStep = step;
+  }
+  
+  /**
+   * Sets whether the experiment counts 
+   * the memory footprint of the processor chain
+   * @param b Set to <tt>false</tt> to prevent memory size measurements
+   */
+  public void setCountSize(boolean b)
+  {
+    m_countSize = b;
   }
 }

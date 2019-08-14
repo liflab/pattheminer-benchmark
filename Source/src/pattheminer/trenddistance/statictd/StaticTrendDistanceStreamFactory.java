@@ -38,6 +38,7 @@ import ca.uqac.lif.cep.peg.PointDistance;
 import ca.uqac.lif.cep.peg.TrendDistance;
 import ca.uqac.lif.cep.peg.ml.DistanceToClosest;
 import ca.uqac.lif.cep.peg.ml.RunningMoments;
+import ca.uqac.lif.cep.tmf.Window;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.json.JsonString;
 import ca.uqac.lif.labpal.Random;
@@ -82,7 +83,7 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
     }
     else
     {
-      wp = new ParallelWindow(average, width);
+      wp = new Window(average, width);
     }
     TrendDistance<Number,Number,Number> alarm = new TrendDistance<Number,Number,Number>(6, wp, new FunctionTree(Numbers.absoluteValue, 
         new FunctionTree(Numbers.subtraction, StreamVariable.X, StreamVariable.Y)), 0.5, Numbers.isLessThan);
@@ -260,7 +261,7 @@ public class StaticTrendDistanceStreamFactory extends StaticTrendDistanceFactory
    * @param multi_thread Whether the experiment uses multi-threading
    * @return A new trend distance experiment
    */
-  protected StaticTrendDistanceStreamExperiment createNewTrendDistanceStreamExperiment(String trend, String metric, BoundedSource<?> src, Processor alarm, int width, boolean multi_thread)
+  public static StaticTrendDistanceStreamExperiment createNewTrendDistanceStreamExperiment(String trend, String metric, BoundedSource<?> src, Processor alarm, int width, boolean multi_thread)
   {
     StaticTrendDistanceStreamExperiment tde = new StaticTrendDistanceStreamExperiment();
     tde.setSource(src);
