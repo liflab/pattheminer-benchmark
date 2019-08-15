@@ -80,7 +80,7 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<String> src = new RandomSymbolSource(random, MainLab.MAX_TRACE_LENGTH);
     FileSource<String> f_src = new FileSource<String>(src, m_dataFolder);
-    String script_filename = "a_and_b_frequencies.R";
+    String script_filename = "C3_symbol_distribution.R";
     StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(CLOSEST_CLUSTER, "Euclidean distance to closest cluster", f_src, width, script_filename);
     exp.setArguments(width, 1);
     insertCommand(exp, RscriptExperiment.formatCommand(exp.getCommand()));
@@ -108,7 +108,7 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<Object[]> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, 3, 3, 3);
     FileSource<Object[]> f_src = new FileSource<Object[]>(src, m_dataFolder);
-    String script_filename = "ngrams.R";
+    String script_filename = "C5_set_of_ngrams.R";
     StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(N_GRAMS, "Jaccard index", f_src, width, script_filename);
     exp.setArguments(width, 1, N);
     // For the n-gram experiment, there is an additional parameter
@@ -125,9 +125,9 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<Object[]> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
     FileSource<Object[]> f_src = new FileSource<Object[]>(src, m_dataFolder);
-    String script_filename = "Script not yet ready";
+    String script_filename = "C6_slice_duration";
     // TODO: remove the "PREREQ_F" argument on this line when the script is ready
-    StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(AVG_SLICE_LENGTH, "Jaccard index", f_src, width, script_filename, Experiment.Status.PREREQ_F);
+    StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(AVG_SLICE_LENGTH, "Jaccard index", f_src, width, script_filename);
     // For the slice experiment, there are two additional parameters
     exp.setInput(NUM_SLICES, num_slices);
     exp.describe(NUM_SLICES, "The number of slices");
