@@ -125,14 +125,15 @@ public class StaticTrendDistanceRscriptFactory extends StaticTrendDistanceFactor
     Random random = m_lab.getRandom();
     BoundedSource<Object[]> src = new RandomLabelSource(random, MainLab.MAX_TRACE_LENGTH, slice_length, num_slices);
     FileSource<Object[]> f_src = new FileSource<Object[]>(src, m_dataFolder);
-    String script_filename = "C6_slice_duration";
+    String script_filename = "C6_slice_duration.R";
     // TODO: remove the "PREREQ_F" argument on this line when the script is ready
-    StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(AVG_SLICE_LENGTH, "Jaccard index", f_src, width, script_filename);
+    StaticTrendDistanceRscriptExperiment exp = createNewTrendDistanceRscriptExperiment(AVG_SLICE_LENGTH, "Subtraction", f_src, width, script_filename);
     // For the slice experiment, there are two additional parameters
     exp.setInput(NUM_SLICES, num_slices);
     exp.describe(NUM_SLICES, "The number of slices");
     exp.setInput(AVG_SLICE_LENGTH, slice_length);
     exp.describe(AVG_SLICE_LENGTH, "The length of each slice");
+    exp.setArguments(width, 1);
     insertCommand(exp, RscriptExperiment.formatCommand(exp.getCommand()));
     return exp;
   }
